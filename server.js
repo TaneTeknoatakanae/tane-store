@@ -8,7 +8,11 @@ const session = require('express-session');
 const db = require('./database/db');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Tane Store çalışıyor → Port: ${PORT}`);
+});
 
 // Uploads klasörünü oluştur
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
