@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tane Store — Admin Paneli</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh}
+nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:100;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#1a1a1a;text-decoration:none}
+.logo span{color:#f97316}
+.container{max-width:1100px;margin:0 auto;padding:32px 24px}
+.page-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px}
+.page-sub{color:#888;font-size:14px;margin-bottom:28px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:#fff;border:1px solid #eee;border-radius:14px;padding:18px}
+.stat-icon{font-size:24px;margin-bottom:8px}
+.stat-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:2px}
+.stat-label{font-size:12px;color:#888}
+.tabs{display:flex;gap:8px;margin-bottom:20px}
+.tab{padding:9px 20px;border-radius:9px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;transition:all .15s}
+.tab.active{background:#1a1a1a;color:#fff}
+.tab:not(.active){background:#fff;border:1px solid #eee;color:#666}
+.table-wrap{background:#fff;border:1px solid #eee;border-radius:16px;overflow:hidden}
+.table-head{padding:18px 22px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.table-head h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
+table{width:100%;border-collapse:collapse}
+th{padding:11px 18px;text-align:left;font-size:11px;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #f3f3f1}
+td{padding:13px 18px;border-bottom:1px solid #f5f5f3;font-size:14px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.btn-primary{background:#1a1a1a;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:9px;padding:9px 18px;font-size:14px}
+.btn-orange{background:#f97316;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:8px;padding:7px 14px;font-size:13px}
+.btn-danger{background:#fef2f2;border:1px solid #fecaca;color:#ef4444;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border-radius:8px;padding:7px 14px;font-size:13px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:20px;padding:30px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .3s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:13px;color:#555;font-weight:500;margin-bottom:5px;display:block}
+.form-input{width:100%;border:1px solid #e5e5e5;border-radius:9px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;color:#1a1a1a;background:#fff}
+.form-input:focus{border-color:#f97316}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-submit{width:100%;background:#f97316;border:none;color:#fff;padding:13px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px}
+.btn-cancel{width:100%;background:#f3f3f1;border:none;color:#666;padding:11px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;margin-top:8px}
+.upload-area{border:2px dashed #e5e5e5;border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafafa}
+.upload-area:hover{border-color:#f97316;background:#fff8f5}
+.upload-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-preview{width:100%;height:160px;object-fit:cover;border-radius:10px;margin-top:12px;display:none}
+.platform-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;background:#f8f8f6;border-radius:9px;padding:10px 12px}
+.platform-label{font-size:13px;font-weight:600;min-width:100px;color:#555}
+.platform-input{flex:1;border:1px solid #e5e5e5;border-radius:8px;padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:#fff}
+.platform-input:focus{border-color:#f97316}
+.badge{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.badge-orange{background:#fff3e8;color:#f97316}
+.badge-green{background:#f0fdf4;color:#16a34a}
+.badge-gray{background:#f3f3f1;color:#888}
+.badge-blue{background:#eff6ff;color:#3b82f6}
+.product-img-thumb{width:44px;height:44px;border-radius:9px;object-fit:cover}
+.product-img-ph{width:44px;height:44px;border-radius:9px;background:#f3f3f1;display:flex;align-items:center;justify-content:center;font-size:20px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:11px 22px;border-radius:11px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.15);white-space:nowrap}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">TANE <span>STORE</span></a>
+  <a href="/" style="color:#666;font-size:14px;font-weight:500;text-decoration:none">🌐 Siteyi Gör</a>
+</nav>
+<div class="container">
+  <div class="page-title">⚙️ Admin Paneli</div>
+  <div class="page-sub">Ürün yönetimi, fiyat karşılaştırma ve sipariş takibi</div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon">🏷️</div><div class="stat-num" id="s-products">-</div><div class="stat-label">Toplam Ürün</div></div>
+    <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-num" id="s-orders">-</div><div class="stat-label">Toplam Sipariş</div></div>
+    <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-num" id="s-revenue">-</div><div class="stat-label">Toplam Ciro</div></div>
+    <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-num" id="s-cheapest">-</div><div class="stat-label">En Ucuz Olan</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('products',this)">🏷️ Ürünler</button>
+    <button class="tab" onclick="setTab('orders',this)">📦 Siparişler</button>
+    <button class="tab" onclick="setTab('prices',this)">💰 Fiyat Gir</button>
+  </div>
+  <div id="tab-products">
+    <div class="table-wrap">
+      <div class="table-head"><h3>Tüm Ürünler</h3><button class="btn-primary" onclick="openAddModal()">➕ Yeni Ürün Ekle</button></div>
+      <table><thead><tr><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Karşılaştırma</th><th>İşlem</th></tr></thead>
+      <tbody id="products-tbody"></tbody></table>
+    </div>
+  </div>
+  <div id="tab-orders" class="hidden">
+    <div class="table-wrap">
+      <div class="table-head"><h3>Gelen Siparişler</h3></div>
+      <table><thead><tr><th>No</th><th>Müşteri</th><th>Telefon</th><th>Şehir</th><th>Tutar</th><th>Ürünler</th><th>Durum</th><th>Tarih</th></tr></thead>
+      <tbody id="orders-tbody"></tbody></table>
+    </div>
+  </div>
+  <div id="tab-prices" class="hidden">
+    <div class="table-wrap">
+      <div class="table-head"><h3>Manuel Fiyat Girişi</h3></div>
+      <div style="padding:20px" id="price-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ÜRÜN EKLE MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <h2>➕ Yeni Ürün Ekle</h2>
+    <div class="form-group">
+      <label class="form-label">Ürün Fotoğrafı</label>
+      <div class="upload-area">
+        <input type="file" class="upload-input" id="img-file" accept="image/*" onchange="previewImage(this)"/>
+        <div id="upload-placeholder"><div style="font-size:32px;margin-bottom:8px">📸</div><div style="font-size:14px;color:#888;font-weight:500">Fotoğraf seç veya sürükle bırak</div><div style="font-size:12px;color:#bbb;margin-top:4px">JPG, PNG, WEBP — Max 5MB</div></div>
+        <img id="upload-preview" class="upload-preview"/>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Ürün Adı *</label><input class="form-input" id="new-name" placeholder="Örn: Sony WH-1000XM5 Kulaklık"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Kategori</label><select class="form-input" id="new-category"><option>Elektronik</option><option>Giyim</option><option>Ev</option><option>Spor</option><option>Kozmetik</option><option>Genel</option></select></div>
+      <div class="form-group"><label class="form-label">Fiyat (₺) *</label><input class="form-input" id="new-price" type="number" placeholder="4299"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Açıklama</label><input class="form-input" id="new-desc" placeholder="Kısa açıklama..."/></div>
+    <button class="btn-submit" onclick="addProduct()">✅ Ürünü Ekle</button>
+    <button class="btn-cancel" onclick="closeModal('add-modal')">İptal</button>
+  </div>
+</div>
+
+<!-- FİYAT MODAL -->
+<div class="modal-overlay" id="price-modal">
+  <div class="modal">
+    <h2>💰 Rakip Fiyat Gir</h2>
+    <div id="price-modal-product" style="background:#fff8f5;border:1px solid #fed7aa;border-radius:10px;padding:12px;margin-bottom:18px;font-weight:600;font-size:14px"></div>
+    <div class="platform-row"><span class="platform-label">🔍 Cimri</span><input class="platform-input" id="p-cimri" type="number" placeholder="Fiyat (₺)"/><input class="platform-input" id="u-cimri" placeholder="Link"/></div>
+    <div class="platform-row"><span class="platform-label">🛒 Akakçe</span><input class="platform-input" id="p-akakce" type="number" placeholder="Fiyat (₺)"/><input class="platform-input" id="u-akakce" placeholder="Link"/></div>
+    <div class="platform-row"><span class="platform-label">📦 Trendyol</span><input class="platform-input" id="p-trendyol" type="number" placeholder="Fiyat (₺)"/><input class="platform-input" id="u-trendyol" placeholder="Link"/></div>
+    <div class="platform-row"><span class="platform-label">🏪 Hepsiburada</span><input class="platform-input" id="p-hepsi" type="number" placeholder="Fiyat (₺)"/><input class="platform-input" id="u-hepsi" placeholder="Link"/></div>
+    <div class="platform-row"><span class="platform-label">🌐 Amazon</span><input class="platform-input" id="p-amazon" type="number" placeholder="Fiyat (₺)"/><input class="platform-input" id="u-amazon" placeholder="Link"/></div>
+    <button class="btn-submit" onclick="savePrices()">💾 Kaydet</button>
+    <button class="btn-cancel" onclick="closeModal('price-modal')">İptal</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+let products=[],orders=[],selectedProductId=null;
+
+async function loadAll(){
+  try{
+    const[pr,or]=await Promise.all([fetch('/api/products').then(r=>r.json()),fetch('/api/orders').then(r=>r.json())]);
+    products=pr;orders=or;
+    document.getElementById('s-products').textContent=products.length;
+    document.getElementById('s-orders').textContent=orders.length;
+    const revenue=orders.reduce((s,o)=>s+(o.total_price||0),0);
+    document.getElementById('s-revenue').textContent=revenue.toLocaleString('tr-TR')+' ₺';
+    let cheapest=0;
+    products.forEach(p=>{if(p.platforms&&p.platform_prices){const ps=p.platform_prices.split(',').map(Number);if(p.tane_price<=Math.min(...ps))cheapest++;}});
+    document.getElementById('s-cheapest').textContent=cheapest+'/'+products.length;
+    renderProducts();renderOrders();renderPriceList();
+  }catch(e){showToast('❌ Veri yüklenemedi');}
+}
+
+function renderProducts(){
+  const tbody=document.getElementById('products-tbody');
+  if(!products.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#aaa;padding:40px">Henüz ürün yok</td></tr>';return;}
+  tbody.innerHTML=products.map(p=>{
+    const priceCount=p.platforms?p.platforms.split(',').length:0;
+    const imgEl=p.image_url?`<img src="${p.image_url}" class="product-img-thumb" onerror="this.outerHTML='<div class=product-img-ph>📦</div>'">`:`<div class="product-img-ph">📦</div>`;
+    return`<tr><td><div style="display:flex;align-items:center;gap:10px">${imgEl}<div><div style="font-weight:600">${p.name}</div><div style="font-size:12px;color:#aaa">${p.description||''}</div></div></div></td><td><span class="badge badge-orange">${p.category||'Genel'}</span></td><td style="font-weight:700;color:#f97316">${p.tane_price.toLocaleString('tr-TR')} ₺</td><td><span class="badge ${priceCount>0?'badge-green':'badge-gray'}">${priceCount>0?priceCount+' platform':'Girilmedi'}</span></td><td><div style="display:flex;gap:6px"><button class="btn-orange" onclick="openPriceModal(${p.id})">💰 Fiyat</button><button class="btn-danger" onclick="deleteProduct(${p.id})">🗑</button></div></td></tr>`;
+  }).join('');
+}
+
+function renderOrders(){
+  const tbody=document.getElementById('orders-tbody');
+  if(!orders.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:40px">Henüz sipariş yok</td></tr>';return;}
+  tbody.innerHTML=orders.map(o=>`<tr><td style="font-family:monospace;color:#f97316">#${o.id}</td><td style="font-weight:600">${o.customer_name}</td><td>${o.customer_phone}</td><td>${o.customer_city}</td><td style="font-weight:700">${o.total_price.toLocaleString('tr-TR')} ₺</td><td style="font-size:12px;color:#666">${o.items||'-'}</td><td><select style="border:1px solid #eee;border-radius:6px;padding:4px 8px;font-family:'DM Sans',sans-serif;font-size:12px;outline:none" onchange="updateStatus(${o.id},this.value)">${['Beklemede','Onaylandı','Kargoda','Teslim Edildi','İptal'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select></td><td style="font-size:12px;color:#aaa">${new Date(o.created_at).toLocaleDateString('tr-TR')}</td></tr>`).join('');
+}
+
+function renderPriceList(){
+  const el=document.getElementById('price-list');
+  if(!products.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:40px">Önce ürün ekle</div>';return;}
+  el.innerHTML=products.map(p=>{
+    const imgEl=p.image_url?`<img src="${p.image_url}" class="product-img-thumb" onerror="this.outerHTML='<div class=product-img-ph>📦</div>'">`:`<div class="product-img-ph">📦</div>`;
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f3f3f1"><div style="display:flex;align-items:center;gap:10px">${imgEl}<div><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:#f97316">Tane Store: ${p.tane_price.toLocaleString('tr-TR')} ₺</div></div></div><button class="btn-orange" onclick="openPriceModal(${p.id})">💰 Fiyat Gir</button></div>`;
+  }).join('');
+}
+
+function previewImage(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const preview=document.getElementById('upload-preview');
+    const ph=document.getElementById('upload-placeholder');
+    preview.src=e.target.result;preview.style.display='block';ph.style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadImage(){
+  const file=document.getElementById('img-file').files[0];
+  if(!file)return null;
+  const fd=new FormData();fd.append('image',file);
+  try{const res=await fetch('/api/upload',{method:'POST',body:fd});const d=await res.json();return d.url;}
+  catch(e){showToast('❌ Fotoğraf yüklenemedi');return null;}
+}
+
+async function addProduct(){
+  const name=document.getElementById('new-name').value.trim();
+  const price=document.getElementById('new-price').value;
+  if(!name||!price)return showToast('❌ Ad ve fiyat zorunlu!');
+  showToast('📤 Yükleniyor...');
+  const imageUrl=await uploadImage();
+  try{
+    await fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,image_url:imageUrl,description:document.getElementById('new-desc').value,category:document.getElementById('new-category').value,tane_price:parseFloat(price)})});
+    showToast('✅ Ürün eklendi!');closeModal('add-modal');loadAll();
+  }catch(e){showToast('❌ Hata oluştu');}
+}
+
+async function deleteProduct(id){
+  if(!confirm('Silmek istediğine emin misin?'))return;
+  await fetch('/api/products/'+id,{method:'DELETE'});
+  showToast('✅ Silindi');loadAll();
+}
+
+function openPriceModal(id){
+  selectedProductId=id;
+  const p=products.find(x=>x.id===id);
+  document.getElementById('price-modal-product').textContent=`📦 ${p.name} — ${p.tane_price.toLocaleString('tr-TR')} ₺`;
+  ['cimri','akakce','trendyol','hepsi','amazon'].forEach(k=>{document.getElementById('p-'+k).value='';document.getElementById('u-'+k).value='';});
+  document.getElementById('price-modal').classList.add('open');
+}
+
+async function savePrices(){
+  const platforms=[{key:'cimri',name:'Cimri'},{key:'akakce',name:'Akakçe'},{key:'trendyol',name:'Trendyol'},{key:'hepsi',name:'Hepsiburada'},{key:'amazon',name:'Amazon'}];
+  let saved=0;
+  for(const pl of platforms){
+    const price=document.getElementById('p-'+pl.key).value;
+    const url=document.getElementById('u-'+pl.key).value;
+    if(price){await fetch('/api/prices/manual',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_id:selectedProductId,platform:pl.name,price:parseFloat(price),url:url||null})});saved++;}
+  }
+  if(saved>0){showToast(`✅ ${saved} fiyat kaydedildi!`);closeModal('price-modal');loadAll();}
+  else showToast('⚠️ En az bir fiyat gir!');
+}
+
+async function updateStatus(id,status){
+  await fetch(`/api/orders/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+  showToast('✅ Durum güncellendi');
+}
+
+function openAddModal(){
+  ['new-name','new-desc','new-price'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('upload-preview').style.display='none';
+  document.getElementById('upload-placeholder').style.display='block';
+  document.getElementById('img-file').value='';
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function setTab(tab,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['products','orders','prices'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==tab));
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
+  setTimeout(()=>t.style.display='none',2500);
+}
+
+loadAll();
+</script>
+</body>
+</html>

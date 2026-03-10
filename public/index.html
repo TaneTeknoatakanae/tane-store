@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tane Store — En Ucuz Fiyat Garantisi</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+
+nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:100;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#1a1a1a;text-decoration:none}
+.logo span{color:#f97316}
+.nav-right{display:flex;align-items:center;gap:12px}
+.cart-btn{display:flex;align-items:center;gap:8px;background:#1a1a1a;color:#fff;border:none;padding:9px 18px;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;transition:background .2s}
+.cart-btn:hover{background:#333}
+.cart-count{background:#f97316;color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.nav-link{color:#666;font-size:14px;font-weight:500;text-decoration:none}
+.nav-link:hover{color:#1a1a1a}
+
+.hero{background:linear-gradient(135deg,#1a1a1a,#2d2d2d);color:#fff;padding:48px 24px;text-align:center}
+.hero-badge{display:inline-block;background:rgba(249,115,22,.2);color:#f97316;border:1px solid rgba(249,115,22,.3);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;line-height:1.2;margin-bottom:12px}
+.hero h1 span{color:#f97316}
+.hero p{color:#aaa;font-size:15px;max-width:480px;margin:0 auto 24px}
+.hero-search{max-width:520px;margin:0 auto;position:relative}
+.hero-search input{width:100%;padding:14px 20px 14px 48px;border-radius:14px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;color:#1a1a1a}
+.hero-search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;color:#aaa}
+
+.filter-bar{background:#fff;border-bottom:1px solid #eee;padding:12px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:sticky;top:60px;z-index:99}
+.cat-btn{padding:7px 16px;border-radius:9px;border:1px solid #e5e5e5;background:#fff;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;font-size:13px;transition:all .15s;white-space:nowrap}
+.cat-btn.active{background:#1a1a1a;border-color:#1a1a1a;color:#fff}
+.cat-btn:hover:not(.active){border-color:#ccc;color:#1a1a1a}
+.filter-sep{width:1px;height:24px;background:#eee;margin:0 4px}
+.sort-select{border:1px solid #e5e5e5;border-radius:9px;padding:7px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:#555;outline:none;background:#fff;cursor:pointer}
+.price-filter{display:flex;align-items:center;gap:6px;font-size:13px;color:#666}
+.price-input{width:80px;border:1px solid #e5e5e5;border-radius:8px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;color:#1a1a1a}
+.price-input:focus{border-color:#f97316}
+.filter-tag{display:flex;align-items:center;gap:5px;background:#fff3e8;border:1px solid #fed7aa;color:#f97316;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600}
+.filter-tag button{background:none;border:none;cursor:pointer;color:#f97316;font-size:14px;line-height:1;padding:0}
+.results-info{margin-left:auto;font-size:13px;color:#aaa;white-space:nowrap}
+
+.main{max-width:1200px;margin:0 auto;padding:28px 24px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+
+.product-card{background:#fff;border:1px solid #eee;border-radius:16px;overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer}
+.product-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.1)}
+.product-img{width:100%;height:190px;object-fit:cover;display:block}
+.product-img-ph{width:100%;height:190px;background:linear-gradient(135deg,#f3f3f1,#e8e8e6);display:flex;align-items:center;justify-content:center;font-size:56px}
+.product-body{padding:14px}
+.product-cat{font-size:11px;color:#f97316;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.product-name{font-weight:600;font-size:14px;line-height:1.4;margin-bottom:6px;color:#1a1a1a}
+.product-desc{font-size:12px;color:#aaa;line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.price-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.tane-price{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1a1a1a}
+.tane-label{background:#f97316;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.competitor-mini{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;min-height:22px}
+.comp-pill{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:500}
+.comp-higher{background:#fef2f2;color:#ef4444}
+.comp-loading{background:#f3f3f1;color:#aaa}
+.savings-tag{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;margin-bottom:10px}
+.card-actions{display:flex;gap:8px}
+.btn-detail{flex:1;background:#f3f3f1;color:#555;border:none;padding:9px;border-radius:9px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-detail:hover{background:#e8e8e6}
+.btn-cart{flex:2;background:#1a1a1a;color:#fff;border:none;padding:9px;border-radius:9px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:background .2s}
+.btn-cart:hover{background:#f97316}
+
+.empty-state{text-align:center;padding:80px 0;color:#aaa;grid-column:1/-1}
+.empty-icon{font-size:56px;margin-bottom:16px}
+.empty-title{font-size:16px;font-weight:600;margin-bottom:8px;color:#666}
+.empty-sub{font-size:14px}
+
+/* CART */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+.cart-overlay.open{opacity:1;pointer-events:all}
+.cart-sidebar{position:fixed;top:0;right:0;bottom:0;width:380px;background:#fff;z-index:201;transform:translateX(100%);transition:transform .3s;display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.12)}
+.cart-sidebar.open{transform:translateX(0)}
+.cart-head{padding:20px 24px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between}
+.cart-head h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
+.close-btn{background:none;border:none;cursor:pointer;font-size:22px;color:#666}
+.cart-items{flex:1;overflow-y:auto;padding:16px 24px}
+.cart-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #f3f3f1}
+.cart-item-img{width:56px;height:56px;object-fit:cover;border-radius:10px;background:#f3f3f1;flex-shrink:0}
+.cart-item-ph{width:56px;height:56px;border-radius:10px;background:#f3f3f1;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.cart-item-name{font-size:13px;font-weight:600;margin-bottom:4px;line-height:1.3}
+.cart-item-price{font-size:14px;font-weight:700;color:#f97316}
+.qty-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.qty-btn{width:26px;height:26px;border:1px solid #e5e5e5;background:#fff;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600;transition:all .15s}
+.qty-btn:hover{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.qty-num{font-size:14px;font-weight:600;min-width:20px;text-align:center}
+.rm-btn{background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;margin-left:auto}
+.rm-btn:hover{color:#ef4444}
+.cart-foot{padding:20px 24px;border-top:1px solid #eee}
+.cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.cart-total-price{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.btn-checkout{width:100%;background:#f97316;color:#fff;border:none;padding:14px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer}
+
+/* ORDER MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(20px);transition:transform .3s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px}
+.modal-sub{font-size:13px;color:#888;margin-bottom:24px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:13px;color:#555;font-weight:500;margin-bottom:5px;display:block}
+.form-input{width:100%;border:1px solid #e5e5e5;border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;color:#1a1a1a}
+.form-input:focus{border-color:#f97316}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.order-summary{background:#f8f8f6;border-radius:12px;padding:16px;margin-bottom:20px}
+.order-summary-title{font-size:12px;font-weight:600;color:#888;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.order-item-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#555}
+.order-total-row{display:flex;justify-content:space-between;font-size:16px;font-weight:700;border-top:1px solid #e5e5e5;padding-top:10px;margin-top:6px}
+.btn-order{width:100%;background:#f97316;color:#fff;border:none;padding:14px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:8px}
+.btn-back-modal{width:100%;background:#f3f3f1;color:#666;border:none;padding:12px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;margin-top:8px}
+.success-screen{text-align:center;padding:20px 0}
+.success-icon{font-size:64px;margin-bottom:16px}
+.success-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px}
+.success-sub{font-size:14px;color:#888;line-height:1.6}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.2);white-space:nowrap}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">TANE <span>STORE</span></a>
+  <div class="nav-right">
+    <a href="/admin.html" class="nav-link">⚙️ Admin</a>
+    <button class="cart-btn" onclick="toggleCart()">
+      🛒 Sepet <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🏆 Fiyat Karşılaştırma Platformu</div>
+  <h1>En Ucuz Fiyat<br><span>Tane Store'da!</span></h1>
+  <p>Cimri ve Akakçe fiyatlarıyla karşılaştırıyoruz. Kanıtlı en ucuz fiyat garantisi.</p>
+  <div class="hero-search">
+    <span class="hero-search-icon">🔍</span>
+    <input type="text" id="search" placeholder="Ürün, kategori veya marka ara..." oninput="applyFilters()"/>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <button class="cat-btn active" onclick="setCat('Tümü',this)">Tümü</button>
+  <button class="cat-btn" onclick="setCat('Elektronik',this)">📱 Elektronik</button>
+  <button class="cat-btn" onclick="setCat('Giyim',this)">👕 Giyim</button>
+  <button class="cat-btn" onclick="setCat('Ev',this)">🏠 Ev</button>
+  <button class="cat-btn" onclick="setCat('Spor',this)">⚽ Spor</button>
+  <button class="cat-btn" onclick="setCat('Kozmetik',this)">💄 Kozmetik</button>
+  <div class="filter-sep"></div>
+  <div class="price-filter">
+    <input class="price-input" id="min-price" type="number" placeholder="Min ₺" oninput="applyFilters()"/>
+    <span>—</span>
+    <input class="price-input" id="max-price" type="number" placeholder="Max ₺" oninput="applyFilters()"/>
+  </div>
+  <div class="filter-sep"></div>
+  <select class="sort-select" id="sort" onchange="applyFilters()">
+    <option value="default">Sıralama</option>
+    <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
+    <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
+    <option value="savings">En Çok Tasarruf</option>
+    <option value="newest">En Yeni</option>
+  </select>
+  <div id="active-filters"></div>
+  <span class="results-info" id="results-info"></span>
+</div>
+
+<div class="main">
+  <div class="products-grid" id="products-grid">
+    <div style="color:#aaa;padding:60px;text-align:center;grid-column:1/-1">Yükleniyor...</div>
+  </div>
+</div>
+
+<!-- CART -->
+<div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cart-sidebar">
+  <div class="cart-head">
+    <h3>🛒 Sepetim</h3>
+    <button class="close-btn" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-el"></div>
+  <div class="cart-foot" id="cart-foot" style="display:none">
+    <div class="cart-total-row">
+      <span style="font-size:15px;color:#666">Toplam</span>
+      <span class="cart-total-price" id="cart-total">0 ₺</span>
+    </div>
+    <button class="btn-checkout" onclick="openOrderModal()">Sipariş Ver →</button>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal">
+    <div id="order-form-screen">
+      <h2>📦 Sipariş Ver</h2>
+      <p class="modal-sub">Bilgilerini gir, siparişini tamamla.</p>
+      <div class="order-summary" id="order-summary"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Ad Soyad *</label><input class="form-input" id="o-name" placeholder="Ahmet Yılmaz"/></div>
+        <div class="form-group"><label class="form-label">Telefon *</label><input class="form-input" id="o-phone" placeholder="05xx xxx xx xx"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">E-posta</label><input class="form-input" id="o-email" type="email" placeholder="ahmet@email.com"/></div>
+      <div class="form-group"><label class="form-label">Açık Adres *</label><input class="form-input" id="o-address" placeholder="Mahalle, cadde, sokak, no, daire..."/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Şehir *</label><input class="form-input" id="o-city" placeholder="İstanbul"/></div>
+        <div class="form-group"><label class="form-label">Not</label><input class="form-input" id="o-note" placeholder="Kargo notu..."/></div>
+      </div>
+      <button class="btn-order" onclick="submitOrder()">✅ Siparişi Tamamla</button>
+      <button class="btn-back-modal" onclick="closeOrderModal()">← Geri Dön</button>
+    </div>
+    <div id="order-success-screen" class="success-screen hidden">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Siparişiniz Alındı!</div>
+      <p class="success-sub">En kısa sürede sizinle iletişime geçeceğiz.<br/>Telefonunuzu kontrol edin.</p>
+      <button class="btn-order" style="margin-top:24px" onclick="closeOrderModal()">Alışverişe Devam Et</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allProducts = [], currentCat = 'Tümü';
+let cart = JSON.parse(localStorage.getItem('tane-cart') || '[]');
+
+async function loadProducts() {
+  try {
+    const res = await fetch('/api/products');
+    allProducts = await res.json();
+    applyFilters();
+  } catch(e) {
+    document.getElementById('products-grid').innerHTML = '<div style="color:#aaa;padding:60px;text-align:center;grid-column:1/-1">❌ Ürünler yüklenemedi</div>';
+  }
+}
+
+function applyFilters() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const minP = parseFloat(document.getElementById('min-price').value) || 0;
+  const maxP = parseFloat(document.getElementById('max-price').value) || Infinity;
+  const sort = document.getElementById('sort').value;
+
+  let filtered = allProducts.filter(p => {
+    const matchCat = currentCat === 'Tümü' || p.category === currentCat;
+    const matchQ = !q || p.name.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q);
+    const matchPrice = p.tane_price >= minP && p.tane_price <= maxP;
+    return matchCat && matchQ && matchPrice;
+  });
+
+  // Sıralama
+  if (sort === 'price-asc') filtered.sort((a,b) => a.tane_price - b.tane_price);
+  else if (sort === 'price-desc') filtered.sort((a,b) => b.tane_price - a.tane_price);
+  else if (sort === 'savings') filtered.sort((a,b) => getSavings(b) - getSavings(a));
+  else if (sort === 'newest') filtered.sort((a,b) => b.id - a.id);
+
+  // Aktif filtre etiketleri
+  const tags = [];
+  if (q) tags.push({label: `"${q}"`, clear: ()=>{ document.getElementById('search').value=''; applyFilters(); }});
+  if (minP) tags.push({label: `Min: ${minP.toLocaleString('tr-TR')}₺`, clear: ()=>{ document.getElementById('min-price').value=''; applyFilters(); }});
+  if (maxP !== Infinity) tags.push({label: `Max: ${maxP.toLocaleString('tr-TR')}₺`, clear: ()=>{ document.getElementById('max-price').value=''; applyFilters(); }});
+
+  document.getElementById('active-filters').innerHTML = tags.map((t,i) =>
+    `<div class="filter-tag">${t.label} <button onclick="clearTag(${i})">×</button></div>`
+  ).join('');
+  window._filterTags = tags;
+
+  document.getElementById('results-info').textContent = `${filtered.length} ürün`;
+  renderProducts(filtered);
+}
+
+function clearTag(i) { window._filterTags[i].clear(); }
+
+function getSavings(p) {
+  if (!p.platform_prices) return 0;
+  const prices = p.platform_prices.split(',').map(Number);
+  return Math.max(...prices) - p.tane_price;
+}
+
+function setCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function renderProducts(products) {
+  const grid = document.getElementById('products-grid');
+  if (!products.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Ürün bulunamadı</div><div class="empty-sub">Farklı anahtar kelime veya filtre dene</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = products.map(p => {
+    let compHTML = '', savingsHTML = '';
+    if (p.platforms && p.platform_prices) {
+      const platforms = p.platforms.split(',');
+      const prices = p.platform_prices.split(',').map(Number);
+      const savings = getSavings(p);
+      compHTML = platforms.map((pl,i) => {
+        const diff = prices[i] - p.tane_price;
+        return `<span class="comp-pill comp-higher">${pl}: ${prices[i].toLocaleString('tr-TR')}₺ (+${diff.toLocaleString('tr-TR')}₺)</span>`;
+      }).join('');
+      if (savings > 0) savingsHTML = `<div class="savings-tag">🏆 ${savings.toLocaleString('tr-TR')} ₺ tasarruf!</div>`;
+    } else {
+      compHTML = `<span class="comp-pill comp-loading">Karşılaştırma bekleniyor</span>`;
+    }
+
+    const imgEl = p.image_url
+      ? `<img class="product-img" src="${p.image_url}" alt="${p.name}" onerror="this.outerHTML='<div class=product-img-ph>📦</div>'">`
+      : `<div class="product-img-ph">📦</div>`;
+
+    return `
+      <div class="product-card">
+        <div onclick="window.location.href='/product.html?id=${p.id}'">${imgEl}</div>
+        <div class="product-body">
+          <div class="product-cat">${p.category||'Genel'}</div>
+          <div class="product-name" onclick="window.location.href='/product.html?id=${p.id}'">${p.name}</div>
+          <div class="product-desc">${p.description||''}</div>
+          <div class="price-row">
+            <span class="tane-price">${p.tane_price.toLocaleString('tr-TR')} ₺</span>
+            <span class="tane-label">TANE</span>
+          </div>
+          <div class="competitor-mini">${compHTML}</div>
+          ${savingsHTML}
+          <div class="card-actions">
+            <button class="btn-detail" onclick="window.location.href='/product.html?id=${p.id}'">Detay</button>
+            <button class="btn-cart" onclick="addToCart(${p.id})">🛒 Sepete Ekle</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// CART
+function addToCart(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  const ex = cart.find(x => x.id === id);
+  if (ex) ex.qty++; else cart.push({...p, qty:1});
+  localStorage.setItem('tane-cart', JSON.stringify(cart));
+  updateCart();
+  showToast(`✅ ${p.name} sepete eklendi`);
+  openCart();
+}
+
+function updateCart() {
+  const count = cart.reduce((s,i)=>s+i.qty,0);
+  const total = cart.reduce((s,i)=>s+i.tane_price*i.qty,0);
+  document.getElementById('cart-count').textContent = count;
+  const el = document.getElementById('cart-items-el');
+  const foot = document.getElementById('cart-foot');
+  if (!cart.length) {
+    el.innerHTML = `<div style="text-align:center;padding:60px 0;color:#aaa"><div style="font-size:48px;margin-bottom:12px">🛒</div><div>Sepetiniz boş</div></div>`;
+    foot.style.display = 'none'; return;
+  }
+  foot.style.display = 'block';
+  document.getElementById('cart-total').textContent = total.toLocaleString('tr-TR') + ' ₺';
+  el.innerHTML = cart.map(item => {
+    const imgEl = item.image_url
+      ? `<img class="cart-item-img" src="${item.image_url}" onerror="this.outerHTML='<div class=cart-item-ph>📦</div>'">`
+      : `<div class="cart-item-ph">📦</div>`;
+    return `<div class="cart-item">${imgEl}
+      <div style="flex:1">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">${item.tane_price.toLocaleString('tr-TR')} ₺</div>
+        <div class="qty-row">
+          <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+          <button class="rm-btn" onclick="removeItem(${item.id})">🗑</button>
+        </div>
+      </div></div>`;
+  }).join('');
+}
+
+function changeQty(id,d){const item=cart.find(x=>x.id===id);if(!item)return;item.qty+=d;if(item.qty<=0)cart=cart.filter(x=>x.id!==id);localStorage.setItem('tane-cart',JSON.stringify(cart));updateCart();}
+function removeItem(id){cart=cart.filter(x=>x.id!==id);localStorage.setItem('tane-cart',JSON.stringify(cart));updateCart();}
+function toggleCart(){document.getElementById('cart-sidebar').classList.toggle('open');document.getElementById('cart-overlay').classList.toggle('open');}
+function openCart(){document.getElementById('cart-sidebar').classList.add('open');document.getElementById('cart-overlay').classList.add('open');}
+
+function openOrderModal() {
+  if (!cart.length) return showToast('Sepetiniz boş!');
+  const total = cart.reduce((s,i)=>s+i.tane_price*i.qty,0);
+  document.getElementById('order-summary').innerHTML = `
+    <div class="order-summary-title">Sipariş Özeti</div>
+    ${cart.map(i=>`<div class="order-item-row"><span>${i.name} ×${i.qty}</span><span>${(i.tane_price*i.qty).toLocaleString('tr-TR')} ₺</span></div>`).join('')}
+    <div class="order-total-row"><span>Toplam</span><span>${total.toLocaleString('tr-TR')} ₺</span></div>`;
+  document.getElementById('order-form-screen').classList.remove('hidden');
+  document.getElementById('order-success-screen').classList.add('hidden');
+  document.getElementById('order-modal').classList.add('open');
+  document.getElementById('cart-sidebar').classList.remove('open');
+  document.getElementById('cart-overlay').classList.remove('open');
+}
+
+function closeOrderModal(){document.getElementById('order-modal').classList.remove('open');}
+
+async function submitOrder() {
+  const name=document.getElementById('o-name').value.trim();
+  const phone=document.getElementById('o-phone').value.trim();
+  const address=document.getElementById('o-address').value.trim();
+  const city=document.getElementById('o-city').value.trim();
+  if(!name||!phone||!address||!city)return showToast('❌ Zorunlu alanları doldur!');
+  try{
+    const res=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer_name:name,customer_phone:phone,customer_email:document.getElementById('o-email').value,customer_address:address,customer_city:city,note:document.getElementById('o-note').value,items:cart.map(i=>({product_id:i.id,product_name:i.name,price:i.tane_price,quantity:i.qty}))})});
+    const data=await res.json();
+    if(data.id){cart=[];localStorage.setItem('tane-cart',JSON.stringify(cart));updateCart();document.getElementById('order-form-screen').classList.add('hidden');document.getElementById('order-success-screen').classList.remove('hidden');}
+  }catch(e){showToast('❌ Bir hata oluştu');}
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+
+loadProducts();
+updateCart();
+</script>
+</body>
+</html>
+
+
