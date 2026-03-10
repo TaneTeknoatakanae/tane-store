@@ -75,6 +75,3 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'log
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
 app.get('/hesabim', (req, res) => res.sendFile(path.join(__dirname, 'public', 'hesabim.html')));
 
-app.listen(PORT, () => {
-  console.log(`✅ Tane Store çalışıyor → http://localhost:${PORT}`);
-});
