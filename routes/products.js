@@ -5,7 +5,7 @@ const db = require('../database/db');
 // Tüm ürünleri getir
 router.get('/', (req, res) => {
   db.all(`
-    SELECT p.*, 
+    SELECT p.*,
       GROUP_CONCAT(pr.platform) as platforms,
       GROUP_CONCAT(pr.price) as platform_prices
     FROM products p
@@ -32,33 +32,40 @@ router.get('/:id', (req, res) => {
 
 // Yeni ürün ekle
 router.post('/', (req, res) => {
-  const { name, image_url, description, category, tane_price, tane_url } = req.body;
-  if (!name || !tane_price) return res.status(400).json({ error: 'Ürün adı ve fiyat zorunlu' });
+  const { name, image_url, description, category, brand, sku, tane_price, discount_price, tane_url, stock } = req.body;
+  if (!name) return res.status(400).json({ error: 'Ürün adı zorunlu' });
 
   db.run(`
-    INSERT INTO products (name, image_url, description, category, tane_price, tane_url)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `, [name, image_url, description, category, tane_price, tane_url], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ id: this.lastID, message: '✅ Ürün eklendi' });
-  });
+    INSERT INTO products (name, image_url, description, category, brand, sku, tane_price, discount_price, tane_url, stock)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [name, image_url || null, description || null, category || 'Genel', brand || null, sku || null,
+    parseFloat(tane_price) || 0, discount_price ? parseFloat(discount_price) : null, tane_url || null, parseInt(stock) || 99],
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: this.lastID, message: '✅ Ürün eklendi' });
+    });
 });
 
 // Ürün güncelle
 router.put('/:id', (req, res) => {
-  const { name, image_url, description, category, tane_price, tane_url } = req.body;
+  const { name, image_url, description, category, brand, sku, tane_price, discount_price, tane_url, stock } = req.body;
   db.run(`
-    UPDATE products SET name=?, image_url=?, description=?, category=?, tane_price=?, tane_url=?
+    UPDATE products SET name=?, image_url=?, description=?, category=?, brand=?, sku=?,
+      tane_price=?, discount_price=?, tane_url=?, stock=?
     WHERE id=?
-  `, [name, image_url, description, category, tane_price, tane_url, req.params.id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: '✅ Ürün güncellendi' });
-  });
+  `, [name, image_url || null, description || null, category || 'Genel', brand || null, sku || null,
+    parseFloat(tane_price) || 0, discount_price ? parseFloat(discount_price) : null, tane_url || null,
+    parseInt(stock) || 99, req.params.id],
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: '✅ Ürün güncellendi' });
+    });
 });
 
 // Ürün sil
 router.delete('/:id', (req, res) => {
   db.run('DELETE FROM prices WHERE product_id = ?', [req.params.id]);
+  db.run('DELETE FROM reviews WHERE product_id = ?', [req.params.id]);
   db.run('DELETE FROM products WHERE id = ?', [req.params.id], function(err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: '✅ Ürün silindi' });

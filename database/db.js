@@ -8,98 +8,125 @@ const db = new sqlite3.Database(path.join(__dirname, 'tane-store.db'), (err) => 
 
 db.serialize(() => {
 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS products (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      image_url TEXT,
-      description TEXT,
-      category TEXT,
-      tane_price REAL NOT NULL,
-      tane_url TEXT,
-      stock INTEGER DEFAULT 99,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `, err => { if (!err) console.log('✅ Products tablosu hazır'); });
+  db.run(`CREATE TABLE IF NOT EXISTS products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    image_url TEXT,
+    description TEXT,
+    category TEXT,
+    brand TEXT,
+    sku TEXT,
+    tane_price REAL NOT NULL DEFAULT 0,
+    discount_price REAL,
+    tane_url TEXT,
+    stock INTEGER DEFAULT 99,
+    rating REAL DEFAULT 0,
+    review_count INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS prices (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      product_id INTEGER NOT NULL,
-      platform TEXT NOT NULL,
-      price REAL,
-      url TEXT,
-      last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (product_id) REFERENCES products(id)
-    )
-  `, err => { if (!err) console.log('✅ Prices tablosu hazır'); });
+  db.run(`CREATE TABLE IF NOT EXISTS prices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL,
+    platform TEXT NOT NULL,
+    price REAL,
+    url TEXT,
+    last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+  )`);
 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS orders (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      customer_name TEXT NOT NULL,
-      customer_phone TEXT NOT NULL,
-      customer_email TEXT,
-      customer_address TEXT NOT NULL,
-      customer_city TEXT NOT NULL,
-      total_price REAL NOT NULL,
-      status TEXT DEFAULT 'Beklemede',
-      note TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `, err => { if (!err) console.log('✅ Orders tablosu hazır'); });
+  db.run(`CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT NOT NULL,
+    customer_email TEXT,
+    customer_address TEXT NOT NULL,
+    customer_city TEXT NOT NULL,
+    total_price REAL NOT NULL,
+    coupon_code TEXT,
+    discount_amount REAL DEFAULT 0,
+    status TEXT DEFAULT 'Beklemede',
+    note TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS order_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_id INTEGER NOT NULL,
-      product_id INTEGER NOT NULL,
-      product_name TEXT NOT NULL,
-      price REAL NOT NULL,
-      quantity INTEGER NOT NULL,
-      FOREIGN KEY (order_id) REFERENCES orders(id),
-      FOREIGN KEY (product_id) REFERENCES products(id)
-    )
-  `, err => { if (!err) console.log('✅ Order Items tablosu hazır'); });
+  db.run(`CREATE TABLE IF NOT EXISTS order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    product_name TEXT NOT NULL,
+    price REAL NOT NULL,
+    quantity INTEGER NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+  )`);
 
-  db.get("SELECT COUNT(*) as count FROM products", (err, row) => {
-    if (!err && row.count === 0) {
-      const samples = [
-        {
-          name: "Sony WH-1000XM5 Kulaklık",
-          image_url: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400",
-          description: "Endüstri lideri gürültü engelleme teknolojisi ile 30 saate kadar pil ömrü.",
-          category: "Elektronik",
-          tane_price: 4299,
-          stock: 15
-        },
-        {
-          name: "Nike Air Max 270",
-          image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
-          description: "Air Max serisinin en büyük hava yastığı ile maksimum konfor.",
-          category: "Giyim",
-          tane_price: 2199,
-          stock: 28
-        },
-        {
-          name: "Logitech MX Master 3",
-          image_url: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400",
-          description: "Profesyonel iş akışı için tasarlanmış gelişmiş kablosuz mouse.",
-          category: "Elektronik",
-          tane_price: 1899,
-          stock: 33
-        }
-      ];
+  db.run(`CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL,
+    customer_name TEXT NOT NULL,
+    rating INTEGER NOT NULL,
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+  )`);
 
-      const stmt = db.prepare(`
-        INSERT INTO products (name, image_url, description, category, tane_price, stock)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `);
-      samples.forEach(p => stmt.run(p.name, p.image_url, p.description, p.category, p.tane_price, p.stock));
-      stmt.finalize();
-      console.log('✅ Örnek ürünler eklendi');
-    }
-  });
+  db.run(`CREATE TABLE IF NOT EXISTS coupons (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT UNIQUE NOT NULL,
+    type TEXT NOT NULL,
+    value REAL NOT NULL,
+    min_order REAL DEFAULT 0,
+    usage_limit INTEGER,
+    used_count INTEGER DEFAULT 0,
+    active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    phone TEXT,
+    address TEXT,
+    city TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS cart_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    UNIQUE(user_id, product_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS wishlist_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    UNIQUE(user_id, product_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+  )`);
+
+  // Mevcut veritabanı için güvenli migrasyon
+  const migrations = [
+    "ALTER TABLE products ADD COLUMN brand TEXT",
+    "ALTER TABLE products ADD COLUMN sku TEXT",
+    "ALTER TABLE products ADD COLUMN discount_price REAL",
+    "ALTER TABLE products ADD COLUMN rating REAL DEFAULT 0",
+    "ALTER TABLE products ADD COLUMN review_count INTEGER DEFAULT 0",
+    "ALTER TABLE orders ADD COLUMN coupon_code TEXT",
+    "ALTER TABLE orders ADD COLUMN discount_amount REAL DEFAULT 0",
+    "ALTER TABLE orders ADD COLUMN user_id INTEGER",
+    "ALTER TABLE orders ADD COLUMN shipping_carrier TEXT",
+    "ALTER TABLE orders ADD COLUMN shipping_code TEXT"
+  ];
+  migrations.forEach(sql => db.run(sql, () => {}));
 
 });
 

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tane Store — Hesabım</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh}
+nav{background:#fff;border-bottom:1px solid #eee;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#1a1a1a;text-decoration:none}
+.logo span{color:#f97316}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-link{color:#666;font-size:14px;font-weight:500;text-decoration:none}
+.nav-link:hover{color:#f97316}
+.main{max-width:900px;margin:40px auto;padding:0 24px}
+.page-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px}
+.page-sub{color:#888;font-size:14px;margin-bottom:32px}
+.tabs{display:flex;gap:4px;margin-bottom:28px;background:#fff;border:1px solid #eee;border-radius:12px;padding:4px}
+.tab{flex:1;padding:10px;border:none;background:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;color:#888;transition:all .2s}
+.tab.active{background:#f97316;color:#fff}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.card{background:#fff;border:1px solid #eee;border-radius:16px;padding:28px;margin-bottom:16px}
+.card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:20px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.field{margin-bottom:12px}
+label{font-size:13px;font-weight:600;color:#555;display:block;margin-bottom:5px}
+input{width:100%;border:1px solid #e5e5e5;border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;color:#1a1a1a}
+input:focus{border-color:#f97316}
+.btn{background:#f97316;color:#fff;border:none;padding:11px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:background .2s}
+.btn:hover{background:#ea6c0b}
+.btn-outline{background:none;border:1px solid #e5e5e5;color:#666;padding:11px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-outline:hover{border-color:#f97316;color:#f97316}
+.ok{color:#16a34a;font-size:13px;font-weight:600;margin-top:8px;display:none}
+.err-msg{color:#ef4444;font-size:13px;font-weight:600;margin-top:8px;display:none}
+
+/* Siparişler */
+.order-row{border:1px solid #eee;border-radius:12px;padding:16px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.order-id{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:#f97316}
+.order-date{font-size:13px;color:#aaa}
+.order-total{font-weight:700;font-size:15px}
+.status-badge{display:inline-flex;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.status-Beklemede{background:#fff3e8;color:#f97316}
+.status-Onaylandı{background:#eff6ff;color:#3b82f6}
+.status-Kargoda{background:#f0fdf4;color:#16a34a}
+.status-Teslim{background:#f0fdf4;color:#16a34a}
+.status-İptal{background:#fef2f2;color:#ef4444}
+.btn-track{font-size:13px;color:#f97316;font-weight:600;text-decoration:none}
+.empty{text-align:center;padding:48px 0;color:#aaa;font-size:15px}
+
+/* Favoriler */
+.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.wish-card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;transition:box-shadow .2s;position:relative}
+.wish-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.wish-img{width:100%;aspect-ratio:1;object-fit:cover;background:#f5f5f5}
+.wish-info{padding:10px}
+.wish-name{font-size:12px;color:#555;line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wish-price{font-weight:700;font-size:14px}
+.wish-remove{position:absolute;top:8px;right:8px;background:#fff;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">TANE <span>STORE</span></a>
+  <div class="nav-right">
+    <a href="/" class="nav-link">← Alışverişe Dön</a>
+    <button onclick="logout()" class="btn-outline" style="padding:8px 16px;font-size:13px">Çıkış Yap</button>
+  </div>
+</nav>
+<div class="main">
+  <div class="page-title">Hesabım</div>
+  <p class="page-sub" id="welcome-msg">Merhaba!</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('orders')">📦 Siparişlerim</button>
+    <button class="tab" onclick="showTab('wishlist')">❤️ Favorilerim</button>
+    <button class="tab" onclick="showTab('profile')">👤 Profil</button>
+    <button class="tab" onclick="showTab('password')">🔒 Şifre</button>
+  </div>
+
+  <!-- Siparişler -->
+  <div id="panel-orders" class="tab-panel active">
+    <div id="orders-list"><div class="empty">Yükleniyor...</div></div>
+  </div>
+
+  <!-- Favoriler -->
+  <div id="panel-wishlist" class="tab-panel">
+    <div id="wishlist-grid" class="wish-grid"></div>
+    <div id="wishlist-empty" class="empty" style="display:none">Henüz favori ürün eklemediniz.</div>
+  </div>
+
+  <!-- Profil -->
+  <div id="panel-profile" class="tab-panel">
+    <div class="card">
+      <h3>Profil Bilgileri</h3>
+      <div class="field-row">
+        <div class="field"><label>Ad Soyad</label><input id="p-name" type="text"/></div>
+        <div class="field"><label>Telefon</label><input id="p-phone" type="tel"/></div>
+      </div>
+      <div class="field"><label>Adres</label><input id="p-address" type="text" placeholder="Teslimat adresiniz"/></div>
+      <div class="field"><label>Şehir</label><input id="p-city" type="text"/></div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:4px">
+        <button class="btn" onclick="saveProfile()">Kaydet</button>
+        <span class="ok" id="profile-ok">✅ Kaydedildi</span>
+        <span class="err-msg" id="profile-err"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Şifre -->
+  <div id="panel-password" class="tab-panel">
+    <div class="card">
+      <h3>Şifre Değiştir</h3>
+      <div class="field"><label>Mevcut Şifre</label><input id="pw-current" type="password"/></div>
+      <div class="field"><label>Yeni Şifre</label><input id="pw-new" type="password" placeholder="En az 6 karakter"/></div>
+      <div class="field"><label>Yeni Şifre Tekrar</label><input id="pw-new2" type="password"/></div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:4px">
+        <button class="btn" onclick="savePassword()">Şifreyi Değiştir</button>
+        <span class="ok" id="pw-ok">✅ Şifre güncellendi</span>
+        <span class="err-msg" id="pw-err"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentUser = null;
+
+async function init() {
+  const res = await fetch('/api/auth/me', { credentials: 'include' });
+  if (!res.ok) { window.location.href = '/login?next=/hesabim'; return; }
+  currentUser = await res.json();
+  document.getElementById('welcome-msg').textContent = `Merhaba, ${currentUser.name}!`;
+  document.getElementById('p-name').value = currentUser.name || '';
+  document.getElementById('p-phone').value = currentUser.phone || '';
+  document.getElementById('p-address').value = currentUser.address || '';
+  document.getElementById('p-city').value = currentUser.city || '';
+  loadOrders();
+  loadWishlist();
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names = ['orders','wishlist','profile','password'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+async function loadOrders() {
+  // Kullanıcının siparişlerini e-posta/telefon ile eşleştirerek getir
+  const res = await fetch(`/api/orders/mine`, { credentials: 'include' });
+  if (!res.ok) { document.getElementById('orders-list').innerHTML = '<div class="empty">Siparişler yüklenemedi.</div>'; return; }
+  const orders = await res.json();
+  if (!orders.length) { document.getElementById('orders-list').innerHTML = '<div class="empty">Henüz sipariş vermediniz.</div>'; return; }
+  document.getElementById('orders-list').innerHTML = orders.map(o => {
+    const statusClass = 'status-' + (o.status === 'Teslim Edildi' ? 'Teslim' : o.status === 'İptal' ? 'İptal' : o.status.split(' ')[0]);
+    const canCancel = o.status === 'Beklemede';
+    return `<div class="order-row" id="order-row-${o.id}">
+      <div>
+        <div class="order-id">#${o.id}</div>
+        <div class="order-date">${new Date(o.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+      <div style="flex:1;padding:0 16px;font-size:13px;color:#666">${o.items || ''}</div>
+      <div style="text-align:right">
+        <div class="order-total">${o.total_price.toLocaleString('tr-TR')} ₺</div>
+        <span class="status-badge ${statusClass}">${o.status}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <a href="/track?id=${o.id}" class="btn-track">Takip Et →</a>
+        ${canCancel ? `<button onclick="cancelOrder(${o.id})" style="font-size:12px;color:#ef4444;background:none;border:1px solid #fecaca;border-radius:6px;padding:4px 10px;cursor:pointer">Sipariş İptal Et</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadWishlist() {
+  const res = await fetch('/api/wishlist', { credentials: 'include' });
+  if (!res.ok) return;
+  const items = await res.json();
+  const grid = document.getElementById('wishlist-grid');
+  if (!items.length) {
+    grid.innerHTML = '';
+    document.getElementById('wishlist-empty').style.display = 'block';
+    return;
+  }
+  document.getElementById('wishlist-empty').style.display = 'none';
+  grid.innerHTML = items.map(p => {
+    const price = p.discount_price || p.tane_price;
+    return `<div class="wish-card">
+      <button class="wish-remove" onclick="removeWish(${p.product_id}, this)" title="Favorilerden çıkar">✕</button>
+      <a href="/product.html?id=${p.product_id}">
+        <img class="wish-img" src="${p.image_url || '/placeholder.png'}" alt="${p.name}" onerror="this.src='/placeholder.png'"/>
+        <div class="wish-info">
+          <div class="wish-name">${p.name}</div>
+          <div class="wish-price">${price ? price.toLocaleString('tr-TR') + ' ₺' : 'Fiyat yok'}</div>
+        </div>
+      </a>
+    </div>`;
+  }).join('');
+}
+
+async function removeWish(productId, btn) {
+  await fetch(`/api/wishlist/${productId}`, { method: 'DELETE', credentials: 'include' });
+  btn.closest('.wish-card').remove();
+  const grid = document.getElementById('wishlist-grid');
+  if (!grid.children.length) document.getElementById('wishlist-empty').style.display = 'block';
+}
+
+async function saveProfile() {
+  const body = {
+    name: document.getElementById('p-name').value.trim(),
+    phone: document.getElementById('p-phone').value.trim(),
+    address: document.getElementById('p-address').value.trim(),
+    city: document.getElementById('p-city').value.trim()
+  };
+  if (!body.name) return;
+  const res = await fetch('/api/auth/profile', { method:'PUT', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(body) });
+  const data = await res.json();
+  if (res.ok) { show('profile-ok'); } else { showErr('profile-err', data.error); }
+}
+
+async function savePassword() {
+  const current = document.getElementById('pw-current').value;
+  const pw = document.getElementById('pw-new').value;
+  const pw2 = document.getElementById('pw-new2').value;
+  if (pw !== pw2) return showErr('pw-err', 'Şifreler eşleşmiyor');
+  if (pw.length < 6) return showErr('pw-err', 'En az 6 karakter');
+  const res = await fetch('/api/auth/password', { method:'PUT', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ current_password: current, new_password: pw }) });
+  const data = await res.json();
+  if (res.ok) { show('pw-ok'); ['pw-current','pw-new','pw-new2'].forEach(id => document.getElementById(id).value=''); }
+  else showErr('pw-err', data.error);
+}
+
+async function cancelOrder(id) {
+  if (!confirm('Siparişi iptal etmek istediğinize emin misiniz?')) return;
+  const res = await fetch(`/api/orders/${id}/cancel`, { method: 'PUT', credentials: 'include' });
+  const data = await res.json();
+  if (res.ok) { show('profile-ok'); loadOrders(); }
+  else showErr('profile-err', data.error);
+}
+
+async function logout() {
+  await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
+  window.location.href = '/';
+}
+
+function show(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'inline';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'inline';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+init();
+</script>
+</body>
+</html>

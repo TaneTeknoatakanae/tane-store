@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const session = require('express-session');
 const db = require('./database/db');
 
 const app = express();
@@ -29,8 +30,14 @@ const upload = multer({
   }
 });
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(session({
+  secret: 'tane-store-secret-2026',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 gün
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Fotoğraf yükleme endpoint'i
@@ -43,13 +50,25 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 const productRoutes = require('./routes/products');
 const priceRoutes = require('./routes/prices');
 const orderRoutes = require('./routes/orders');
+const reviewRoutes = require('./routes/reviews');
+const couponRoutes = require('./routes/coupons');
+const authRoutes = require('./routes/auth');
+const cartRoutes = require('./routes/cart');
+const wishlistRoutes = require('./routes/wishlist');
 app.use('/api/products', productRoutes);
 app.use('/api/prices', priceRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/track', (req, res) => res.sendFile(path.join(__dirname, 'public', 'track.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
+app.get('/hesabim', (req, res) => res.sendFile(path.join(__dirname, 'public', 'hesabim.html')));
 
 app.listen(PORT, () => {
   console.log(`✅ Tane Store çalışıyor → http://localhost:${PORT}`);

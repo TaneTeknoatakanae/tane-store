@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const xlsx = require\\(''xlsx''\\); console.log\\(''xlsx ok''\\)\")",
+      "Bash(npm install:*)",
+      "Bash(node -e \":*)",
+      "Bash(node:*)",
+      "Bash(powershell -Command \"Expand-Archive -Path urunler.zip -DestinationPath xlsx-contents -Force\")",
+      "WebFetch(domain:www.hepsiburada.com)",
+      "WebFetch(domain:www.amazon.com.tr)"
+    ]
+  }
+}

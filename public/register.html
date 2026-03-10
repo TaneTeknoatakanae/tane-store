@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tane Store — Üye Ol</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh;display:flex;flex-direction:column}
+nav{background:#fff;border-bottom:1px solid #eee;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#1a1a1a;text-decoration:none}
+.logo span{color:#f97316}
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.card{background:#fff;border:1px solid #eee;border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.card-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px}
+.card-sub{color:#888;font-size:14px;margin-bottom:28px}
+.field{margin-bottom:16px}
+label{font-size:13px;font-weight:600;color:#555;display:block;margin-bottom:6px}
+input{width:100%;border:1px solid #e5e5e5;border-radius:10px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border .2s;color:#1a1a1a}
+input:focus{border-color:#f97316}
+.btn{width:100%;background:#f97316;color:#fff;border:none;padding:14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;cursor:pointer;margin-top:8px;transition:background .2s}
+.btn:hover{background:#ea6c0b}
+.btn:disabled{background:#ccc;cursor:default}
+.err{background:#fef2f2;border:1px solid #fecaca;color:#ef4444;padding:10px 14px;border-radius:8px;font-size:14px;margin-bottom:16px;display:none}
+.link-row{text-align:center;margin-top:20px;font-size:14px;color:#888}
+.link-row a{color:#f97316;font-weight:600;text-decoration:none}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">TANE <span>STORE</span></a>
+  <a href="/" style="color:#666;font-size:14px;font-weight:500;text-decoration:none">← Alışverişe Dön</a>
+</nav>
+<div class="main">
+  <div class="card">
+    <div class="card-title">Üye Ol</div>
+    <div class="card-sub">Hızlıca hesap oluşturun</div>
+    <div class="err" id="err"></div>
+    <div class="field">
+      <label>Ad Soyad</label>
+      <input type="text" id="name" placeholder="Adınız Soyadınız" autocomplete="name"/>
+    </div>
+    <div class="field">
+      <label>E-posta</label>
+      <input type="email" id="email" placeholder="ornek@mail.com" autocomplete="email"/>
+    </div>
+    <div class="field">
+      <label>Telefon <span style="color:#aaa;font-weight:400">(isteğe bağlı)</span></label>
+      <input type="tel" id="phone" placeholder="05XX XXX XXXX"/>
+    </div>
+    <div class="field">
+      <label>Şifre</label>
+      <input type="password" id="password" placeholder="En az 6 karakter" autocomplete="new-password"/>
+    </div>
+    <div class="field">
+      <label>Şifre Tekrar</label>
+      <input type="password" id="password2" placeholder="Şifrenizi tekrar girin" autocomplete="new-password" onkeydown="if(event.key==='Enter')register()"/>
+    </div>
+    <button class="btn" id="btn" onclick="register()">Üye Ol</button>
+    <div class="link-row">
+      Zaten hesabınız var mı? <a href="/login">Giriş Yap</a>
+    </div>
+  </div>
+</div>
+<script>
+async function register() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const password = document.getElementById('password').value;
+  const password2 = document.getElementById('password2').value;
+  const btn = document.getElementById('btn');
+
+  if (!name || !email || !password) return showErr('Ad, e-posta ve şifre zorunlu');
+  if (password.length < 6) return showErr('Şifre en az 6 karakter olmalı');
+  if (password !== password2) return showErr('Şifreler eşleşmiyor');
+
+  btn.disabled = true; btn.textContent = 'Kayıt yapılıyor...';
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({ name, email, password, phone })
+    });
+    const data = await res.json();
+    if (!res.ok) { showErr(data.error); btn.disabled = false; btn.textContent = 'Üye Ol'; return; }
+
+    // Misafir sepetini/favorilerini senkronize et
+    await syncGuestData();
+
+    window.location.href = '/';
+  } catch(e) { showErr('Bağlantı hatası'); btn.disabled = false; btn.textContent = 'Üye Ol'; }
+}
+
+async function syncGuestData() {
+  const cart = JSON.parse(localStorage.getItem('tane-cart') || '[]');
+  if (cart.length) {
+    const items = cart.map(i => ({ product_id: i.id, quantity: i.quantity || 1 }));
+    await fetch('/api/cart/sync', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ items }) });
+    localStorage.removeItem('tane-cart');
+  }
+  const wish = JSON.parse(localStorage.getItem('tane-wishlist') || '[]');
+  if (wish.length) {
+    await fetch('/api/wishlist/sync', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ ids: wish }) });
+    localStorage.removeItem('tane-wishlist');
+  }
+}
+
+function showErr(msg) {
+  const el = document.getElementById('err');
+  el.textContent = msg; el.style.display = 'block';
+}
+</script>
+</body>
+</html>

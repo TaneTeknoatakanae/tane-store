@@ -19,7 +19,7 @@ nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1
 .stat-icon{font-size:24px;margin-bottom:8px}
 .stat-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:2px}
 .stat-label{font-size:12px;color:#888}
-.tabs{display:flex;gap:8px;margin-bottom:20px}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .tab{padding:9px 20px;border-radius:9px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;transition:all .15s}
 .tab.active{background:#1a1a1a;color:#fff}
 .tab:not(.active){background:#fff;border:1px solid #eee;color:#666}
@@ -32,10 +32,11 @@ td{padding:13px 18px;border-bottom:1px solid #f5f5f3;font-size:14px;vertical-ali
 tr:last-child td{border-bottom:none}
 .btn-primary{background:#1a1a1a;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:9px;padding:9px 18px;font-size:14px}
 .btn-orange{background:#f97316;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:8px;padding:7px 14px;font-size:13px}
+.btn-blue{background:#3b82f6;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:8px;padding:7px 14px;font-size:13px}
 .btn-danger{background:#fef2f2;border:1px solid #fecaca;color:#ef4444;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border-radius:8px;padding:7px 14px;font-size:13px}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:#fff;border-radius:20px;padding:30px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .3s}
+.modal{background:#fff;border-radius:20px;padding:30px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .3s}
 .modal-overlay.open .modal{transform:translateY(0)}
 .modal h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px}
 .form-group{margin-bottom:14px}
@@ -43,12 +44,13 @@ tr:last-child td{border-bottom:none}
 .form-input{width:100%;border:1px solid #e5e5e5;border-radius:9px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;color:#1a1a1a;background:#fff}
 .form-input:focus{border-color:#f97316}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .btn-submit{width:100%;background:#f97316;border:none;color:#fff;padding:13px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px}
 .btn-cancel{width:100%;background:#f3f3f1;border:none;color:#666;padding:11px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;margin-top:8px}
 .upload-area{border:2px dashed #e5e5e5;border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafafa}
 .upload-area:hover{border-color:#f97316;background:#fff8f5}
 .upload-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-preview{width:100%;height:160px;object-fit:cover;border-radius:10px;margin-top:12px;display:none}
+.upload-preview{width:100%;height:140px;object-fit:cover;border-radius:10px;margin-top:12px;display:none}
 .platform-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;background:#f8f8f6;border-radius:9px;padding:10px 12px}
 .platform-label{font-size:13px;font-weight:600;min-width:100px;color:#555}
 .platform-input{flex:1;border:1px solid #e5e5e5;border-radius:8px;padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:#fff}
@@ -58,10 +60,17 @@ tr:last-child td{border-bottom:none}
 .badge-green{background:#f0fdf4;color:#16a34a}
 .badge-gray{background:#f3f3f1;color:#888}
 .badge-blue{background:#eff6ff;color:#3b82f6}
+.badge-red{background:#fef2f2;color:#ef4444}
 .product-img-thumb{width:44px;height:44px;border-radius:9px;object-fit:cover}
 .product-img-ph{width:44px;height:44px;border-radius:9px;background:#f3f3f1;display:flex;align-items:center;justify-content:center;font-size:20px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:11px 22px;border-radius:11px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.15);white-space:nowrap}
 .hidden{display:none}
+.coupon-card{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #eee;border-radius:10px;margin-bottom:8px;background:#fff}
+.coupon-card.inactive{opacity:.5}
+.coupon-code-text{font-weight:700;font-family:monospace;font-size:16px;color:#1a1a1a}
+.coupon-info{font-size:12px;color:#888;margin-top:2px}
+.stars-small{color:#f97316;font-size:11px}
+@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row,.form-row-3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -71,7 +80,7 @@ tr:last-child td{border-bottom:none}
 </nav>
 <div class="container">
   <div class="page-title">⚙️ Admin Paneli</div>
-  <div class="page-sub">Ürün yönetimi, fiyat karşılaştırma ve sipariş takibi</div>
+  <div class="page-sub">Ürün yönetimi, fiyat karşılaştırma, sipariş takibi ve kuponlar</div>
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-icon">🏷️</div><div class="stat-num" id="s-products">-</div><div class="stat-label">Toplam Ürün</div></div>
     <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-num" id="s-orders">-</div><div class="stat-label">Toplam Sipariş</div></div>
@@ -82,26 +91,95 @@ tr:last-child td{border-bottom:none}
     <button class="tab active" onclick="setTab('products',this)">🏷️ Ürünler</button>
     <button class="tab" onclick="setTab('orders',this)">📦 Siparişler</button>
     <button class="tab" onclick="setTab('prices',this)">💰 Fiyat Gir</button>
+    <button class="tab" onclick="setTab('coupons',this)">🎟 Kuponlar</button>
   </div>
+
+  <!-- ÜRÜNLER -->
   <div id="tab-products">
     <div class="table-wrap">
       <div class="table-head"><h3>Tüm Ürünler</h3><button class="btn-primary" onclick="openAddModal()">➕ Yeni Ürün Ekle</button></div>
-      <table><thead><tr><th>Ürün</th><th>Kategori</th><th>Fiyat</th><th>Karşılaştırma</th><th>İşlem</th></tr></thead>
+      <table><thead><tr><th>Ürün</th><th>Kategori / Marka</th><th>SKU / Stok</th><th>Fiyat</th><th>Karşılaştırma</th><th>Puan</th><th>İşlem</th></tr></thead>
       <tbody id="products-tbody"></tbody></table>
     </div>
   </div>
+
+  <!-- SİPARİŞLER -->
   <div id="tab-orders" class="hidden">
     <div class="table-wrap">
       <div class="table-head"><h3>Gelen Siparişler</h3></div>
-      <table><thead><tr><th>No</th><th>Müşteri</th><th>Telefon</th><th>Şehir</th><th>Tutar</th><th>Ürünler</th><th>Durum</th><th>Tarih</th></tr></thead>
+      <table><thead><tr><th>No</th><th>Müşteri</th><th>Telefon</th><th>Şehir</th><th>Tutar</th><th>İndirim</th><th>Ürünler</th><th>Kargo</th><th>Durum</th><th>Tarih</th><th></th></tr></thead>
       <tbody id="orders-tbody"></tbody></table>
     </div>
   </div>
+
+  <!-- FİYAT GİR -->
   <div id="tab-prices" class="hidden">
     <div class="table-wrap">
       <div class="table-head"><h3>Manuel Fiyat Girişi</h3></div>
       <div style="padding:20px" id="price-list"></div>
     </div>
+  </div>
+
+  <!-- KUPONLAR -->
+  <div id="tab-coupons" class="hidden">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="table-wrap">
+        <div class="table-head"><h3>Mevcut Kuponlar</h3></div>
+        <div style="padding:16px" id="coupon-list"><div style="text-align:center;color:#aaa;padding:40px">Yükleniyor...</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>Yeni Kupon Oluştur</h3></div>
+        <div style="padding:20px">
+          <div class="form-group"><label class="form-label">Kupon Kodu *</label><input class="form-input" id="c-code" placeholder="TANE20" style="text-transform:uppercase"/></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Tür *</label>
+              <select class="form-input" id="c-type">
+                <option value="percent">Yüzde (%)</option>
+                <option value="fixed">Sabit Tutar (₺)</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Değer *</label><input class="form-input" id="c-value" type="number" placeholder="20"/></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Min. Sepet (₺)</label><input class="form-input" id="c-min" type="number" placeholder="0"/></div>
+            <div class="form-group"><label class="form-label">Kullanım Limiti</label><input class="form-input" id="c-limit" type="number" placeholder="Sınırsız"/></div>
+          </div>
+          <button class="btn-submit" onclick="createCoupon()">✅ Kupon Oluştur</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SİPARİŞ DETAY MODAL -->
+<div class="modal-overlay" id="od-modal">
+  <div class="modal">
+    <h2>📦 Sipariş Detayı — <span id="od-id"></span></h2>
+    <div style="background:#f8f8f6;border-radius:10px;padding:14px;margin-bottom:18px;font-size:14px">
+      <div style="font-weight:600;margin-bottom:4px" id="od-customer"></div>
+      <div style="color:#666;margin-bottom:4px" id="od-address"></div>
+      <div style="color:#888;font-size:13px;margin-bottom:4px">📦 <span id="od-items"></span></div>
+      <div style="font-weight:700;color:#f97316" id="od-total"></div>
+      <div style="color:#888;font-size:12px;margin-top:4px">Not: <span id="od-note"></span></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Sipariş Durumu</label>
+      <select class="form-input" id="od-status">
+        <option>Beklemede</option><option>Onaylandı</option><option>Kargoda</option><option>Teslim Edildi</option><option>İptal</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Kargo Firması</label>
+        <input class="form-input" id="od-carrier" placeholder="Yurtiçi, Aras, PTT..."/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Takip Numarası</label>
+        <input class="form-input" id="od-tracking" placeholder="Kargo takip kodu"/>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="saveOrderDetail()">✅ Kaydet</button>
+    <button class="btn-cancel" onclick="closeModal('od-modal')">İptal</button>
   </div>
 </div>
 
@@ -112,19 +190,70 @@ tr:last-child td{border-bottom:none}
     <div class="form-group">
       <label class="form-label">Ürün Fotoğrafı</label>
       <div class="upload-area">
-        <input type="file" class="upload-input" id="img-file" accept="image/*" onchange="previewImage(this)"/>
+        <input type="file" class="upload-input" id="img-file" accept="image/*" onchange="previewImage(this,'add')"/>
         <div id="upload-placeholder"><div style="font-size:32px;margin-bottom:8px">📸</div><div style="font-size:14px;color:#888;font-weight:500">Fotoğraf seç veya sürükle bırak</div><div style="font-size:12px;color:#bbb;margin-top:4px">JPG, PNG, WEBP — Max 5MB</div></div>
         <img id="upload-preview" class="upload-preview"/>
       </div>
     </div>
     <div class="form-group"><label class="form-label">Ürün Adı *</label><input class="form-input" id="new-name" placeholder="Örn: Sony WH-1000XM5 Kulaklık"/></div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Kategori</label><select class="form-input" id="new-category"><option>Elektronik</option><option>Giyim</option><option>Ev</option><option>Spor</option><option>Kozmetik</option><option>Genel</option></select></div>
-      <div class="form-group"><label class="form-label">Fiyat (₺) *</label><input class="form-input" id="new-price" type="number" placeholder="4299"/></div>
+      <div class="form-group"><label class="form-label">Marka</label><input class="form-input" id="new-brand" placeholder="Sony, Nike..."/></div>
+      <div class="form-group"><label class="form-label">SKU / Barkod</label><input class="form-input" id="new-sku" placeholder="SKU123"/></div>
     </div>
-    <div class="form-group"><label class="form-label">Açıklama</label><input class="form-input" id="new-desc" placeholder="Kısa açıklama..."/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Kategori</label>
+        <select class="form-input" id="new-category">
+          <option>Elektronik</option><option>Giyim</option><option>Ev</option>
+          <option>Spor</option><option>Kozmetik</option><option>Kitap</option><option>Genel</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Stok</label><input class="form-input" id="new-stock" type="number" placeholder="99"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Normal Fiyat (₺) *</label><input class="form-input" id="new-price" type="number" placeholder="4299"/></div>
+      <div class="form-group"><label class="form-label">İndirimli Fiyat (₺)</label><input class="form-input" id="new-discount-price" type="number" placeholder="Boş bırak"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Açıklama</label><textarea class="form-input" id="new-desc" rows="2" placeholder="Kısa açıklama..." style="resize:vertical"></textarea></div>
     <button class="btn-submit" onclick="addProduct()">✅ Ürünü Ekle</button>
     <button class="btn-cancel" onclick="closeModal('add-modal')">İptal</button>
+  </div>
+</div>
+
+<!-- ÜRÜN DÜZENLE MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <h2>✏️ Ürünü Düzenle</h2>
+    <input type="hidden" id="edit-id"/>
+    <div class="form-group">
+      <label class="form-label">Fotoğraf URL veya Yükle</label>
+      <div class="upload-area">
+        <input type="file" class="upload-input" id="edit-img-file" accept="image/*" onchange="previewImage(this,'edit')"/>
+        <div id="edit-upload-placeholder"><div style="font-size:32px;margin-bottom:8px">📸</div><div style="font-size:14px;color:#888">Değiştirmek için tıkla</div></div>
+        <img id="edit-upload-preview" class="upload-preview"/>
+      </div>
+      <input class="form-input" id="edit-image-url" placeholder="veya fotoğraf URL'si gir" style="margin-top:8px"/>
+    </div>
+    <div class="form-group"><label class="form-label">Ürün Adı *</label><input class="form-input" id="edit-name"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Marka</label><input class="form-input" id="edit-brand"/></div>
+      <div class="form-group"><label class="form-label">SKU</label><input class="form-input" id="edit-sku"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Kategori</label>
+        <select class="form-input" id="edit-category">
+          <option>Elektronik</option><option>Giyim</option><option>Ev</option>
+          <option>Spor</option><option>Kozmetik</option><option>Kitap</option><option>Genel</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Stok</label><input class="form-input" id="edit-stock" type="number"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Normal Fiyat (₺) *</label><input class="form-input" id="edit-price" type="number"/></div>
+      <div class="form-group"><label class="form-label">İndirimli Fiyat (₺)</label><input class="form-input" id="edit-discount-price" type="number" placeholder="Boş bırak"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Açıklama</label><textarea class="form-input" id="edit-desc" rows="2" style="resize:vertical"></textarea></div>
+    <button class="btn-submit" onclick="saveEdit()">💾 Kaydet</button>
+    <button class="btn-cancel" onclick="closeModal('edit-modal')">İptal</button>
   </div>
 </div>
 
@@ -145,7 +274,7 @@ tr:last-child td{border-bottom:none}
 
 <div class="toast" id="toast"></div>
 <script>
-let products=[],orders=[],selectedProductId=null;
+let products=[],orders=[],selectedProductId=null,editImageUrl=null;
 
 async function loadAll(){
   try{
@@ -156,7 +285,7 @@ async function loadAll(){
     const revenue=orders.reduce((s,o)=>s+(o.total_price||0),0);
     document.getElementById('s-revenue').textContent=revenue.toLocaleString('tr-TR')+' ₺';
     let cheapest=0;
-    products.forEach(p=>{if(p.platforms&&p.platform_prices){const ps=p.platform_prices.split(',').map(Number);if(p.tane_price<=Math.min(...ps))cheapest++;}});
+    products.forEach(p=>{if(p.platforms&&p.platform_prices){const ps=p.platform_prices.split(',').map(Number);const ep=p.discount_price||p.tane_price;if(ep<=Math.min(...ps))cheapest++;}});
     document.getElementById('s-cheapest').textContent=cheapest+'/'+products.length;
     renderProducts();renderOrders();renderPriceList();
   }catch(e){showToast('❌ Veri yüklenemedi');}
@@ -164,18 +293,53 @@ async function loadAll(){
 
 function renderProducts(){
   const tbody=document.getElementById('products-tbody');
-  if(!products.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#aaa;padding:40px">Henüz ürün yok</td></tr>';return;}
+  if(!products.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:40px">Henüz ürün yok</td></tr>';return;}
   tbody.innerHTML=products.map(p=>{
     const priceCount=p.platforms?p.platforms.split(',').length:0;
     const imgEl=p.image_url?`<img src="${p.image_url}" class="product-img-thumb" onerror="this.outerHTML='<div class=product-img-ph>📦</div>'">`:`<div class="product-img-ph">📦</div>`;
-    return`<tr><td><div style="display:flex;align-items:center;gap:10px">${imgEl}<div><div style="font-weight:600">${p.name}</div><div style="font-size:12px;color:#aaa">${p.description||''}</div></div></div></td><td><span class="badge badge-orange">${p.category||'Genel'}</span></td><td style="font-weight:700;color:#f97316">${p.tane_price.toLocaleString('tr-TR')} ₺</td><td><span class="badge ${priceCount>0?'badge-green':'badge-gray'}">${priceCount>0?priceCount+' platform':'Girilmedi'}</span></td><td><div style="display:flex;gap:6px"><button class="btn-orange" onclick="openPriceModal(${p.id})">💰 Fiyat</button><button class="btn-danger" onclick="deleteProduct(${p.id})">🗑</button></div></td></tr>`;
+    const ep=p.discount_price||p.tane_price;
+    const priceText=p.discount_price?`<del style="color:#bbb;font-size:12px">${p.tane_price.toLocaleString('tr-TR')} ₺</del><br><span style="color:#ef4444;font-weight:700">${p.discount_price.toLocaleString('tr-TR')} ₺</span>`:`<span style="font-weight:700;color:#f97316">${p.tane_price.toLocaleString('tr-TR')} ₺</span>`;
+    const stars=p.rating?'★'.repeat(Math.round(p.rating))+'☆'.repeat(5-Math.round(p.rating)):'—';
+    const stockBadge=p.stock===0?'<span class="badge badge-red">Stok Yok</span>':p.stock<=10?`<span class="badge badge-orange">Son ${p.stock}</span>`:`<span style="font-size:12px;color:#888">${p.stock||99}</span>`;
+    return`<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">${imgEl}<div><div style="font-weight:600">${p.name}</div><div style="font-size:11px;color:#aaa">${p.description?p.description.substring(0,40)+'…':''}</div></div></div></td>
+      <td><span class="badge badge-orange">${p.category||'Genel'}</span>${p.brand?`<div style="font-size:11px;color:#888;margin-top:3px">${p.brand}</div>`:''}</td>
+      <td><div style="font-size:12px;font-family:monospace;color:#555">${p.sku||'—'}</div>${stockBadge}</td>
+      <td>${priceText}</td>
+      <td><span class="badge ${priceCount>0?'badge-green':'badge-gray'}">${priceCount>0?priceCount+' platform':'Girilmedi'}</span></td>
+      <td><span class="stars-small">${stars}</span><div style="font-size:11px;color:#aaa">${p.review_count||0} yorum</div></td>
+      <td><div style="display:flex;gap:5px">
+        <button class="btn-blue" onclick="openEditModal(${p.id})">✏️</button>
+        <button class="btn-orange" onclick="openPriceModal(${p.id})">💰</button>
+        <button class="btn-danger" onclick="deleteProduct(${p.id})">🗑</button>
+      </div></td>
+    </tr>`;
   }).join('');
 }
 
 function renderOrders(){
   const tbody=document.getElementById('orders-tbody');
-  if(!orders.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:40px">Henüz sipariş yok</td></tr>';return;}
-  tbody.innerHTML=orders.map(o=>`<tr><td style="font-family:monospace;color:#f97316">#${o.id}</td><td style="font-weight:600">${o.customer_name}</td><td>${o.customer_phone}</td><td>${o.customer_city}</td><td style="font-weight:700">${o.total_price.toLocaleString('tr-TR')} ₺</td><td style="font-size:12px;color:#666">${o.items||'-'}</td><td><select style="border:1px solid #eee;border-radius:6px;padding:4px 8px;font-family:'DM Sans',sans-serif;font-size:12px;outline:none" onchange="updateStatus(${o.id},this.value)">${['Beklemede','Onaylandı','Kargoda','Teslim Edildi','İptal'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select></td><td style="font-size:12px;color:#aaa">${new Date(o.created_at).toLocaleDateString('tr-TR')}</td></tr>`).join('');
+  if(!orders.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:#aaa;padding:40px">Henüz sipariş yok</td></tr>';return;}
+  const statusColors={'Beklemede':'#f97316','Onaylandı':'#3b82f6','Kargoda':'#16a34a','Teslim Edildi':'#16a34a','İptal':'#ef4444'};
+  tbody.innerHTML=orders.map(o=>{
+    const sc=statusColors[o.status]||'#888';
+    const kargoHTML=o.shipping_code
+      ?`<div style="font-size:11px"><div style="font-weight:600;color:#555">${o.shipping_carrier||'Kargo'}</div><div style="color:#3b82f6;font-family:monospace">${o.shipping_code}</div></div>`
+      :'<span style="color:#ccc;font-size:12px">—</span>';
+    return`<tr>
+    <td style="font-family:monospace;color:#f97316">#${o.id}</td>
+    <td style="font-weight:600">${o.customer_name}</td>
+    <td>${o.customer_phone}</td>
+    <td>${o.customer_city}</td>
+    <td style="font-weight:700">${o.total_price.toLocaleString('tr-TR')} ₺</td>
+    <td>${o.coupon_code?`<span class="badge badge-green">${o.coupon_code} -${(o.discount_amount||0).toLocaleString('tr-TR')}₺</span>`:'—'}</td>
+    <td style="font-size:12px;color:#666;max-width:160px">${o.items||'—'}</td>
+    <td>${kargoHTML}</td>
+    <td><span style="background:${sc}20;color:${sc};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${o.status}</span></td>
+    <td style="font-size:12px;color:#aaa">${new Date(o.created_at).toLocaleDateString('tr-TR')}</td>
+    <td><button class="btn-blue" style="padding:5px 12px;font-size:12px" onclick="openOrderDetail(${o.id})">Düzenle</button></td>
+  </tr>`;
+  }).join('');
 }
 
 function renderPriceList(){
@@ -183,24 +347,78 @@ function renderPriceList(){
   if(!products.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:40px">Önce ürün ekle</div>';return;}
   el.innerHTML=products.map(p=>{
     const imgEl=p.image_url?`<img src="${p.image_url}" class="product-img-thumb" onerror="this.outerHTML='<div class=product-img-ph>📦</div>'">`:`<div class="product-img-ph">📦</div>`;
-    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f3f3f1"><div style="display:flex;align-items:center;gap:10px">${imgEl}<div><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:#f97316">Tane Store: ${p.tane_price.toLocaleString('tr-TR')} ₺</div></div></div><button class="btn-orange" onclick="openPriceModal(${p.id})">💰 Fiyat Gir</button></div>`;
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f3f3f1">
+      <div style="display:flex;align-items:center;gap:10px">${imgEl}
+        <div><div style="font-weight:600;font-size:14px">${p.name}</div>
+        <div style="font-size:12px;color:#f97316">Tane Store: ${(p.discount_price||p.tane_price).toLocaleString('tr-TR')} ₺</div></div>
+      </div>
+      <button class="btn-orange" onclick="openPriceModal(${p.id})">💰 Fiyat Gir</button>
+    </div>`;
   }).join('');
 }
 
-function previewImage(input){
+async function loadCoupons(){
+  try{
+    const coupons=await fetch('/api/coupons').then(r=>r.json());
+    const el=document.getElementById('coupon-list');
+    if(!coupons.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:40px">Henüz kupon yok</div>';return;}
+    el.innerHTML=coupons.map(c=>`
+      <div class="coupon-card ${c.active?'':'inactive'}">
+        <div>
+          <div class="coupon-code-text">${c.code}</div>
+          <div class="coupon-info">
+            ${c.type==='percent'?'%'+c.value+' indirim':c.value.toLocaleString('tr-TR')+' ₺ indirim'}
+            ${c.min_order>0?` • Min ${c.min_order.toLocaleString('tr-TR')} ₺`:''}
+            • ${c.used_count}/${c.usage_limit||'∞'} kullanım
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="${c.active?'btn-danger':'btn-orange'}" onclick="toggleCoupon(${c.id},${c.active?0:1})">${c.active?'Pasif Yap':'Aktif Yap'}</button>
+          <button class="btn-danger" onclick="deleteCoupon(${c.id})">🗑</button>
+        </div>
+      </div>`).join('');
+  }catch(e){showToast('❌ Kuponlar yüklenemedi');}
+}
+
+async function createCoupon(){
+  const code=document.getElementById('c-code').value.trim();
+  const type=document.getElementById('c-type').value;
+  const value=document.getElementById('c-value').value;
+  if(!code||!value)return showToast('❌ Kod ve değer zorunlu');
+  try{
+    const res=await fetch('/api/coupons',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({code,type,value,min_order:document.getElementById('c-min').value||0,usage_limit:document.getElementById('c-limit').value||null})});
+    const d=await res.json();
+    if(d.id){showToast('✅ Kupon oluşturuldu!');['c-code','c-value','c-min','c-limit'].forEach(id=>document.getElementById(id).value='');loadCoupons();}
+    else showToast('❌ '+d.error);
+  }catch(e){showToast('❌ Hata oluştu');}
+}
+
+async function toggleCoupon(id,active){
+  await fetch('/api/coupons/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({active})});
+  loadCoupons();
+}
+
+async function deleteCoupon(id){
+  if(!confirm('Kuponu silmek istediğine emin misin?'))return;
+  await fetch('/api/coupons/'+id,{method:'DELETE'});
+  showToast('✅ Kupon silindi');loadCoupons();
+}
+
+function previewImage(input, prefix){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=e=>{
-    const preview=document.getElementById('upload-preview');
-    const ph=document.getElementById('upload-placeholder');
+    const preview=document.getElementById(prefix==='add'?'upload-preview':'edit-upload-preview');
+    const ph=document.getElementById(prefix==='add'?'upload-placeholder':'edit-upload-placeholder');
     preview.src=e.target.result;preview.style.display='block';ph.style.display='none';
   };
   reader.readAsDataURL(file);
 }
 
-async function uploadImage(){
-  const file=document.getElementById('img-file').files[0];
-  if(!file)return null;
+async function uploadImage(prefix){
+  const fileInput=document.getElementById(prefix==='add'?'img-file':'edit-img-file');
+  const file=fileInput.files[0];if(!file)return null;
   const fd=new FormData();fd.append('image',file);
   try{const res=await fetch('/api/upload',{method:'POST',body:fd});const d=await res.json();return d.url;}
   catch(e){showToast('❌ Fotoğraf yüklenemedi');return null;}
@@ -211,10 +429,65 @@ async function addProduct(){
   const price=document.getElementById('new-price').value;
   if(!name||!price)return showToast('❌ Ad ve fiyat zorunlu!');
   showToast('📤 Yükleniyor...');
-  const imageUrl=await uploadImage();
+  const imageUrl=await uploadImage('add');
   try{
-    await fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,image_url:imageUrl,description:document.getElementById('new-desc').value,category:document.getElementById('new-category').value,tane_price:parseFloat(price)})});
-    showToast('✅ Ürün eklendi!');closeModal('add-modal');loadAll();
+    const res=await fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      name,image_url:imageUrl,
+      description:document.getElementById('new-desc').value,
+      category:document.getElementById('new-category').value,
+      brand:document.getElementById('new-brand').value,
+      sku:document.getElementById('new-sku').value,
+      tane_price:parseFloat(price),
+      discount_price:document.getElementById('new-discount-price').value||null,
+      stock:document.getElementById('new-stock').value||99
+    })});
+    const d=await res.json();
+    if(d.id){showToast('✅ Ürün eklendi!');closeModal('add-modal');loadAll();}
+    else showToast('❌ '+d.error);
+  }catch(e){showToast('❌ Hata oluştu');}
+}
+
+function openEditModal(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  document.getElementById('edit-id').value=p.id;
+  document.getElementById('edit-name').value=p.name||'';
+  document.getElementById('edit-brand').value=p.brand||'';
+  document.getElementById('edit-sku').value=p.sku||'';
+  document.getElementById('edit-desc').value=p.description||'';
+  document.getElementById('edit-price').value=p.tane_price||0;
+  document.getElementById('edit-discount-price').value=p.discount_price||'';
+  document.getElementById('edit-stock').value=p.stock||99;
+  document.getElementById('edit-image-url').value=p.image_url||'';
+  const sel=document.getElementById('edit-category');
+  for(let i=0;i<sel.options.length;i++)if(sel.options[i].value===p.category){sel.selectedIndex=i;break;}
+  document.getElementById('edit-upload-preview').style.display='none';
+  document.getElementById('edit-upload-placeholder').style.display='block';
+  document.getElementById('edit-img-file').value='';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+async function saveEdit(){
+  const id=document.getElementById('edit-id').value;
+  const name=document.getElementById('edit-name').value.trim();
+  const price=document.getElementById('edit-price').value;
+  if(!name||!price)return showToast('❌ Ad ve fiyat zorunlu!');
+  showToast('💾 Kaydediliyor...');
+  let imageUrl=document.getElementById('edit-image-url').value||null;
+  const uploadedUrl=await uploadImage('edit');
+  if(uploadedUrl)imageUrl=uploadedUrl;
+  try{
+    const res=await fetch('/api/products/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      name,image_url:imageUrl,
+      description:document.getElementById('edit-desc').value,
+      category:document.getElementById('edit-category').value,
+      brand:document.getElementById('edit-brand').value,
+      sku:document.getElementById('edit-sku').value,
+      tane_price:parseFloat(price),
+      discount_price:document.getElementById('edit-discount-price').value||null,
+      stock:document.getElementById('edit-stock').value||99
+    })});
+    const d=await res.json();
+    showToast(d.message||'✅ Kaydedildi');closeModal('edit-modal');loadAll();
   }catch(e){showToast('❌ Hata oluştu');}
 }
 
@@ -227,7 +500,7 @@ async function deleteProduct(id){
 function openPriceModal(id){
   selectedProductId=id;
   const p=products.find(x=>x.id===id);
-  document.getElementById('price-modal-product').textContent=`📦 ${p.name} — ${p.tane_price.toLocaleString('tr-TR')} ₺`;
+  document.getElementById('price-modal-product').textContent=`📦 ${p.name} — ${(p.discount_price||p.tane_price).toLocaleString('tr-TR')} ₺`;
   ['cimri','akakce','trendyol','hepsi','amazon'].forEach(k=>{document.getElementById('p-'+k).value='';document.getElementById('u-'+k).value='';});
   document.getElementById('price-modal').classList.add('open');
 }
@@ -244,13 +517,35 @@ async function savePrices(){
   else showToast('⚠️ En az bir fiyat gir!');
 }
 
-async function updateStatus(id,status){
-  await fetch(`/api/orders/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
-  showToast('✅ Durum güncellendi');
+function openOrderDetail(id){
+  const o=orders.find(x=>x.id===id);
+  if(!o)return;
+  document.getElementById('od-id').textContent='#'+o.id;
+  document.getElementById('od-customer').textContent=o.customer_name+' — '+o.customer_phone;
+  document.getElementById('od-address').textContent=(o.customer_address||'')+(o.customer_city?' / '+o.customer_city:'');
+  document.getElementById('od-items').textContent=o.items||'—';
+  document.getElementById('od-total').textContent=o.total_price.toLocaleString('tr-TR')+' ₺'+(o.coupon_code?' ('+o.coupon_code+' -'+o.discount_amount+'₺)':'');
+  document.getElementById('od-note').textContent=o.note||'—';
+  document.getElementById('od-status').value=o.status;
+  document.getElementById('od-carrier').value=o.shipping_carrier||'';
+  document.getElementById('od-tracking').value=o.shipping_code||'';
+  document.getElementById('od-modal').dataset.orderId=id;
+  document.getElementById('od-modal').classList.add('open');
+}
+
+async function saveOrderDetail(){
+  const id=document.getElementById('od-modal').dataset.orderId;
+  const status=document.getElementById('od-status').value;
+  const shipping_carrier=document.getElementById('od-carrier').value.trim();
+  const shipping_code=document.getElementById('od-tracking').value.trim();
+  const res=await fetch(`/api/orders/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status,shipping_carrier:shipping_carrier||null,shipping_code:shipping_code||null})});
+  if(res.ok){showToast('✅ Sipariş güncellendi');closeModal('od-modal');loadAll();}
+  else showToast('❌ Hata oluştu');
 }
 
 function openAddModal(){
-  ['new-name','new-desc','new-price'].forEach(id=>document.getElementById(id).value='');
+  ['new-name','new-desc','new-price','new-brand','new-sku','new-discount-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('new-stock').value=99;
   document.getElementById('upload-preview').style.display='none';
   document.getElementById('upload-placeholder').style.display='block';
   document.getElementById('img-file').value='';
@@ -262,7 +557,8 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 function setTab(tab,btn){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  ['products','orders','prices'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==tab));
+  ['products','orders','prices','coupons'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==tab));
+  if(tab==='coupons')loadCoupons();
 }
 
 function showToast(msg){

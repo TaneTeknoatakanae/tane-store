@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tane Store — Sipariş Takip</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh}
+nav{background:#fff;border-bottom:1px solid #eee;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#1a1a1a;text-decoration:none}
+.logo span{color:#f97316}
+.main{max-width:620px;margin:48px auto;padding:0 24px}
+.page-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:6px}
+.page-sub{color:#888;font-size:14px;margin-bottom:32px}
+.search-box{background:#fff;border:1px solid #eee;border-radius:16px;padding:28px;margin-bottom:24px}
+.search-box h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px}
+.search-row{display:flex;gap:10px}
+.search-input{flex:1;border:1px solid #e5e5e5;border-radius:10px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border .2s;color:#1a1a1a}
+.search-input:focus{border-color:#f97316}
+.btn-search{background:#f97316;color:#fff;border:none;padding:12px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap}
+.btn-search:hover{background:#ea6c0b}
+
+.result-card{background:#fff;border:1px solid #eee;border-radius:16px;padding:28px;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.order-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.order-id{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#f97316}
+.order-date{font-size:13px;color:#aaa}
+
+/* Timeline */
+.timeline{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;position:relative}
+.timeline::before{content:'';position:absolute;top:18px;left:18px;right:18px;height:2px;background:#eee;z-index:0}
+.timeline-step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;z-index:1}
+.step-dot{width:36px;height:36px;border-radius:50%;border:2px solid #eee;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .3s}
+.step-dot.done{background:#f97316;border-color:#f97316}
+.step-dot.current{background:#fff;border-color:#f97316;box-shadow:0 0 0 4px rgba(249,115,22,.2)}
+.step-dot.cancelled{background:#ef4444;border-color:#ef4444}
+.step-label{font-size:11px;font-weight:600;text-align:center;color:#aaa;line-height:1.3}
+.step-label.done,.step-label.current{color:#1a1a1a}
+
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700}
+.status-Beklemede{background:#fff3e8;color:#f97316}
+.status-Onaylandı{background:#eff6ff;color:#3b82f6}
+.status-Kargoda{background:#f0fdf4;color:#16a34a}
+.status-Teslim{background:#f0fdf4;color:#16a34a}
+.status-İptal{background:#fef2f2;color:#ef4444}
+
+.order-info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;padding:16px;background:#f8f8f6;border-radius:12px}
+.info-item label{font-size:11px;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px}
+.info-item span{font-size:14px;font-weight:600;color:#1a1a1a}
+
+.items-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:14px}
+.order-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f3f3f1;font-size:14px}
+.order-item:last-child{border-bottom:none}
+.item-name{font-weight:500;color:#555;flex:1}
+.item-qty{color:#aaa;font-size:13px;margin:0 12px}
+.item-price{font-weight:700;color:#1a1a1a}
+
+.total-row{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:4px}
+.total-label{font-size:15px;color:#666}
+.total-amount{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#f97316}
+.discount-info{font-size:13px;color:#16a34a;font-weight:600;margin-top:4px;text-align:right}
+
+.btn-home{display:inline-flex;align-items:center;gap:8px;background:#1a1a1a;color:#fff;border:none;padding:12px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;margin-top:20px}
+.btn-home:hover{background:#f97316}
+
+.error-card{background:#fef2f2;border:1px solid #fecaca;border-radius:16px;padding:28px;text-align:center}
+.error-icon{font-size:48px;margin-bottom:12px}
+.error-msg{font-size:15px;color:#ef4444;font-weight:600}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">TANE <span>STORE</span></a>
+  <a href="/" style="color:#666;font-size:14px;font-weight:500;text-decoration:none">← Alışverişe Dön</a>
+</nav>
+
+<div class="main">
+  <div class="page-title">📦 Sipariş Takip</div>
+  <p class="page-sub">Sipariş numaranızı girerek kargo durumunuzu öğrenin.</p>
+
+  <div class="search-box">
+    <h3>Sipariş numaranızı girin</h3>
+    <div class="search-row">
+      <input class="search-input" id="order-id-input" type="number" placeholder="Sipariş numarası (ör: 42)" onkeydown="if(event.key==='Enter')trackOrder()"/>
+      <button class="btn-search" onclick="trackOrder()">🔍 Sorgula</button>
+    </div>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+const STATUS_STEPS = ['Beklemede','Onaylandı','Kargoda','Teslim Edildi'];
+const STATUS_ICONS = {'Beklemede':'⏳','Onaylandı':'✅','Kargoda':'🚚','Teslim Edildi':'🏠','İptal':'❌'};
+
+async function trackOrder() {
+  const id = document.getElementById('order-id-input').value.trim();
+  if (!id) return;
+  document.getElementById('result').innerHTML = '<div style="text-align:center;padding:40px;color:#aaa">🔍 Sorgulanıyor...</div>';
+
+  try {
+    const res = await fetch(`/api/orders/track/${id}`);
+    const data = await res.json();
+    if (data.error) {
+      document.getElementById('result').innerHTML = `
+        <div class="error-card">
+          <div class="error-icon">🔍</div>
+          <div class="error-msg">${data.error}</div>
+          <div style="font-size:13px;color:#888;margin-top:8px">Sipariş numaranızı kontrol edip tekrar deneyin.</div>
+        </div>`;
+      return;
+    }
+    renderOrder(data);
+  } catch(e) {
+    document.getElementById('result').innerHTML = `<div class="error-card"><div class="error-icon">❌</div><div class="error-msg">Bağlantı hatası. Tekrar deneyin.</div></div>`;
+  }
+}
+
+function renderOrder(order) {
+  const isCancelled = order.status === 'İptal';
+  const currentStepIdx = isCancelled ? -1 : STATUS_STEPS.indexOf(order.status);
+
+  const timelineHTML = STATUS_STEPS.map((step, i) => {
+    let dotClass = '';
+    let labelClass = '';
+    if (isCancelled) { dotClass = ''; labelClass = ''; }
+    else if (i < currentStepIdx) { dotClass = 'done'; labelClass = 'done'; }
+    else if (i === currentStepIdx) { dotClass = 'current'; labelClass = 'current'; }
+
+    return `<div class="timeline-step">
+      <div class="step-dot ${dotClass}">${i <= currentStepIdx && !isCancelled ? STATUS_ICONS[step] : (i < currentStepIdx ? '✓' : '')}</div>
+      <div class="step-label ${labelClass}">${step}</div>
+    </div>`;
+  }).join('');
+
+  const statusClass = isCancelled ? 'status-İptal' : `status-${order.status.split(' ')[0]}`;
+  const items = order.items || [];
+  const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+  document.getElementById('result').innerHTML = `
+    <div class="result-card">
+      <div class="order-header">
+        <div>
+          <div class="order-id">#${order.id}</div>
+          <div class="order-date">${new Date(order.created_at).toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+        <span class="status-badge ${statusClass}">${STATUS_ICONS[order.status] || ''} ${order.status}</span>
+      </div>
+
+      ${!isCancelled ? `<div class="timeline">${timelineHTML}</div>` : ''}
+
+      <div class="order-info">
+        <div class="info-item"><label>Müşteri</label><span>${order.customer_name}</span></div>
+        <div class="info-item"><label>Şehir</label><span>${order.customer_city}</span></div>
+        <div class="info-item"><label>Durum</label><span>${order.status}</span></div>
+        <div class="info-item"><label>Toplam</label><span>${order.total_price.toLocaleString('tr-TR')} ₺</span></div>
+      </div>
+
+      ${order.shipping_code ? `
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px;margin-bottom:24px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:28px">🚚</div>
+        <div>
+          <div style="font-size:11px;color:#3b82f6;font-weight:700;text-transform:uppercase;letter-spacing:1px">Kargo Bilgisi</div>
+          <div style="font-weight:700;font-size:15px;margin-top:2px">${order.shipping_carrier || 'Kargo Firması'}</div>
+          <div style="font-family:monospace;font-size:14px;color:#1d4ed8;margin-top:2px">Takip No: ${order.shipping_code}</div>
+        </div>
+      </div>` : ''}
+
+      <div class="items-title">Sipariş İçeriği</div>
+      ${items.map(item => `
+        <div class="order-item">
+          <span class="item-name">${item.product_name}</span>
+          <span class="item-qty">×${item.quantity}</span>
+          <span class="item-price">${(item.price * item.quantity).toLocaleString('tr-TR')} ₺</span>
+        </div>`).join('')}
+
+      <div class="total-row">
+        <span class="total-label">Toplam Tutar</span>
+        <span class="total-amount">${order.total_price.toLocaleString('tr-TR')} ₺</span>
+      </div>
+      ${order.discount_amount > 0 ? `<div class="discount-info">🎟 ${order.coupon_code} kuponu ile ${order.discount_amount.toLocaleString('tr-TR')} ₺ tasarruf ettiniz!</div>` : ''}
+
+      <a href="/" class="btn-home">← Alışverişe Devam Et</a>
+    </div>`;
+}
+
+// URL'den sipariş ID'si varsa otomatik sorgula
+const urlParams = new URLSearchParams(window.location.search);
+const autoId = urlParams.get('id');
+if (autoId) {
+  document.getElementById('order-id-input').value = autoId;
+  trackOrder();
+}
+</script>
+</body>
+</html>
