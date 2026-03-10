@@ -47,7 +47,7 @@ router.post('/', (req, res) => {
     [code.toUpperCase().trim(), type, parseFloat(value), parseFloat(min_order) || 0, usage_limit ? parseInt(usage_limit) : null],
     function(err) {
       if (err) {
-        if (err.message.includes('UNIQUE')) return res.status(400).json({ error: 'Bu kupon kodu zaten kullanılıyor' });
+        if (err.code === '23505') return res.status(400).json({ error: 'Bu kupon kodu zaten kullanılıyor' });
         return res.status(500).json({ error: err.message });
       }
       res.json({ id: this.lastID, message: '✅ Kupon oluşturuldu' });

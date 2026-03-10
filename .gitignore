@@ -1,3 +1,4 @@
 node_modules/
 database/tane-store.db
 public/uploads/
+.env

@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
       [name.trim(), email.trim().toLowerCase(), hash, phone || null],
       function(err) {
         if (err) {
-          if (err.message.includes('UNIQUE')) return res.status(409).json({ error: 'Bu e-posta zaten kayıtlı' });
+          if (err.code === '23505') return res.status(409).json({ error: 'Bu e-posta zaten kayıtlı' });
           return res.status(500).json({ error: err.message });
         }
         req.session.userId = this.lastID;

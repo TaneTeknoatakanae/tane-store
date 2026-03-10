@@ -5,7 +5,7 @@ const db = require('../database/db');
 // Tüm siparişleri getir (Admin)
 router.get('/', (req, res) => {
   db.all(`
-    SELECT o.*, GROUP_CONCAT(oi.product_name || ' x' || oi.quantity) as items
+    SELECT o.*, STRING_AGG(oi.product_name || ' x' || oi.quantity::text, ',') as items
     FROM orders o
     LEFT JOIN order_items oi ON o.id = oi.order_id
     GROUP BY o.id
@@ -24,7 +24,7 @@ router.get('/mine', (req, res) => {
     if (err || !user) return res.json([]);
     db.all(`
       SELECT o.id, o.status, o.total_price, o.created_at,
-        GROUP_CONCAT(oi.product_name || ' x' || oi.quantity) as items
+        STRING_AGG(oi.product_name || ' x' || oi.quantity::text, ',') as items
       FROM orders o
       LEFT JOIN order_items oi ON o.id = oi.order_id
       WHERE o.user_id = ? OR o.customer_email = ? OR o.customer_phone = ?

@@ -23,7 +23,7 @@ router.get('/', requireAuth, (req, res) => {
 // Favoriye ekle
 router.post('/:productId', requireAuth, (req, res) => {
   db.run(
-    'INSERT OR IGNORE INTO wishlist_items (user_id, product_id) VALUES (?, ?)',
+    'INSERT INTO wishlist_items (user_id, product_id) VALUES (?, ?) ON CONFLICT DO NOTHING',
     [req.session.userId, req.params.productId],
     err => {
       if (err) return res.status(500).json({ error: err.message });
@@ -49,7 +49,7 @@ router.post('/sync', requireAuth, (req, res) => {
   const { ids } = req.body; // [product_id, ...]
   if (!ids?.length) return res.json({ message: 'Boş liste' });
 
-  const stmt = db.prepare('INSERT OR IGNORE INTO wishlist_items (user_id, product_id) VALUES (?, ?)');
+  const stmt = db.prepare('INSERT INTO wishlist_items (user_id, product_id) VALUES (?, ?) ON CONFLICT DO NOTHING');
   ids.forEach(id => stmt.run(req.session.userId, id));
   stmt.finalize(() => res.json({ message: '✅ Favoriler senkronize edildi' }));
 });

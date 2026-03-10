@@ -28,7 +28,7 @@ router.post('/', requireAuth, (req, res) => {
 
   db.run(
     `INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)
-     ON CONFLICT(user_id, product_id) DO UPDATE SET quantity = quantity + excluded.quantity`,
+     ON CONFLICT(user_id, product_id) DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity`,
     [req.session.userId, product_id, quantity],
     err => {
       if (err) return res.status(500).json({ error: err.message });
@@ -79,7 +79,7 @@ router.post('/sync', requireAuth, (req, res) => {
 
   const stmt = db.prepare(
     `INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)
-     ON CONFLICT(user_id, product_id) DO UPDATE SET quantity = MAX(quantity, excluded.quantity)`
+     ON CONFLICT(user_id, product_id) DO UPDATE SET quantity = GREATEST(cart_items.quantity, EXCLUDED.quantity)`
   );
   items.forEach(item => stmt.run(req.session.userId, item.product_id, item.quantity));
   stmt.finalize(() => res.json({ message: '✅ Sepet senkronize edildi' }));

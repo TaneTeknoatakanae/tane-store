@@ -4,15 +4,19 @@ const db = require('../database/db');
 
 // Tüm ürünleri getir
 router.get('/', (req, res) => {
+  const { category } = req.query;
+  const where = category ? `WHERE p.category = $1` : '';
+  const params = category ? [category] : [];
   db.all(`
     SELECT p.*,
-      GROUP_CONCAT(pr.platform) as platforms,
-      GROUP_CONCAT(pr.price) as platform_prices
+      STRING_AGG(pr.platform, ',') as platforms,
+      STRING_AGG(CAST(pr.price AS TEXT), ',') as platform_prices
     FROM products p
     LEFT JOIN prices pr ON p.id = pr.product_id
+    ${where}
     GROUP BY p.id
     ORDER BY p.created_at DESC
-  `, (err, rows) => {
+  `, params, (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
