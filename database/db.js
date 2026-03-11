@@ -63,11 +63,18 @@ async function initDB() {
       image_url TEXT,
       description TEXT,
       category TEXT,
+      brand TEXT,
+      sku TEXT,
       tane_price REAL NOT NULL DEFAULT 0,
+      discount_price REAL,
       tane_url TEXT,
       stock INTEGER DEFAULT 99,
       created_at TIMESTAMP DEFAULT NOW()
     )`);
+    // Var olan tabloya eksik sütunları ekle (idempotent)
+    await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS brand TEXT`);
+    await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS sku TEXT`);
+    await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS discount_price REAL`);
 
     await pool.query(`CREATE TABLE IF NOT EXISTS prices (
       id SERIAL PRIMARY KEY,
