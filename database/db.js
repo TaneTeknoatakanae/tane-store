@@ -155,7 +155,7 @@ async function initDB() {
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
     console.error('DB hatasi:', e.message);
-    process.exit(1);
+    // process.exit kaldırıldı — server ayakta kalır, loglarda hata görünür
   }
 }
 
