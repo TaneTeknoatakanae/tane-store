@@ -4,33 +4,38 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Tane Store — Üye Ol</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh;display:flex;flex-direction:column}
-nav{background:#fff;border-bottom:1px solid #eee;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#1a1a1a;text-decoration:none}
-.logo span{color:#f97316}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#f5f5f7;min-height:100vh;display:flex;flex-direction:column}
+nav{background:#0f0f0f;border-bottom:1px solid #1c1c1e;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-weight:700;font-size:18px;color:#f5f5f7;text-decoration:none;letter-spacing:-0.5px}
+.logo span{color:#e85d00}
+.back{color:#98989d;font-size:13px;text-decoration:none;transition:color .15s}
+.back:hover{color:#f5f5f7}
 .main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px}
-.card{background:#fff;border:1px solid #eee;border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
-.card-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px}
-.card-sub{color:#888;font-size:14px;margin-bottom:28px}
+.card{background:#141414;border:1px solid #2a2a2a;border-radius:16px;padding:40px;width:100%;max-width:400px}
+.card-title{font-size:24px;font-weight:700;margin-bottom:6px;letter-spacing:-0.5px}
+.card-sub{color:#98989d;font-size:14px;margin-bottom:28px}
 .field{margin-bottom:16px}
-label{font-size:13px;font-weight:600;color:#555;display:block;margin-bottom:6px}
-input{width:100%;border:1px solid #e5e5e5;border-radius:10px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border .2s;color:#1a1a1a}
-input:focus{border-color:#f97316}
-.btn{width:100%;background:#f97316;color:#fff;border:none;padding:14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;cursor:pointer;margin-top:8px;transition:background .2s}
-.btn:hover{background:#ea6c0b}
-.btn:disabled{background:#ccc;cursor:default}
-.err{background:#fef2f2;border:1px solid #fecaca;color:#ef4444;padding:10px 14px;border-radius:8px;font-size:14px;margin-bottom:16px;display:none}
-.link-row{text-align:center;margin-top:20px;font-size:14px;color:#888}
-.link-row a{color:#f97316;font-weight:600;text-decoration:none}
+label{font-size:12px;font-weight:500;color:#98989d;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;border:1px solid #2a2a2a;border-radius:10px;padding:12px 14px;font-family:'Inter',sans-serif;font-size:15px;outline:none;transition:border .2s;color:#f5f5f7;background:#1c1c1e}
+input::placeholder{color:#48484a}
+input:focus{border-color:#3a3a3a}
+.opt-label{color:#3a3a3a;font-size:11px;font-weight:400;letter-spacing:0}
+.btn{width:100%;background:#e85d00;color:#fff;border:none;padding:13px;border-radius:10px;font-family:'Inter',sans-serif;font-weight:600;font-size:15px;cursor:pointer;margin-top:8px;transition:background .15s}
+.btn:hover{background:#ff6a00}
+.btn:disabled{background:#2a2a2a;color:#48484a;cursor:default}
+.err{background:#2a0f0f;border:1px solid #4a1a1a;color:#ff453a;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
+.link-row{text-align:center;margin-top:20px;font-size:13px;color:#48484a}
+.link-row a{color:#e85d00;font-weight:500;text-decoration:none}
+.link-row a:hover{color:#ff6a00}
 </style>
 </head>
 <body>
 <nav>
   <a class="logo" href="/">TANE <span>STORE</span></a>
-  <a href="/" style="color:#666;font-size:14px;font-weight:500;text-decoration:none">← Alışverişe Dön</a>
+  <a href="/" class="back">← Alışverişe Dön</a>
 </nav>
 <div class="main">
   <div class="card">
@@ -46,7 +51,7 @@ input:focus{border-color:#f97316}
       <input type="email" id="email" placeholder="ornek@mail.com" autocomplete="email"/>
     </div>
     <div class="field">
-      <label>Telefon <span style="color:#aaa;font-weight:400">(isteğe bağlı)</span></label>
+      <label>Telefon <span class="opt-label">(isteğe bağlı)</span></label>
       <input type="tel" id="phone" placeholder="05XX XXX XXXX"/>
     </div>
     <div class="field">
@@ -71,29 +76,21 @@ async function register() {
   const password = document.getElementById('password').value;
   const password2 = document.getElementById('password2').value;
   const btn = document.getElementById('btn');
-
   if (!name || !email || !password) return showErr('Ad, e-posta ve şifre zorunlu');
   if (password.length < 6) return showErr('Şifre en az 6 karakter olmalı');
   if (password !== password2) return showErr('Şifreler eşleşmiyor');
-
   btn.disabled = true; btn.textContent = 'Kayıt yapılıyor...';
   try {
     const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      credentials: 'include',
-      body: JSON.stringify({ name, email, password, phone })
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      credentials: 'include', body: JSON.stringify({ name, email, password, phone })
     });
     const data = await res.json();
     if (!res.ok) { showErr(data.error); btn.disabled = false; btn.textContent = 'Üye Ol'; return; }
-
-    // Misafir sepetini/favorilerini senkronize et
     await syncGuestData();
-
     window.location.href = '/';
   } catch(e) { showErr('Bağlantı hatası'); btn.disabled = false; btn.textContent = 'Üye Ol'; }
 }
-
 async function syncGuestData() {
   const cart = JSON.parse(localStorage.getItem('tane-cart') || '[]');
   if (cart.length) {
@@ -107,11 +104,7 @@ async function syncGuestData() {
     localStorage.removeItem('tane-wishlist');
   }
 }
-
-function showErr(msg) {
-  const el = document.getElementById('err');
-  el.textContent = msg; el.style.display = 'block';
-}
+function showErr(msg) { const el = document.getElementById('err'); el.textContent = msg; el.style.display = 'block'; }
 </script>
 </body>
 </html>
