@@ -75,6 +75,7 @@ async function initDB() {
     await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS brand TEXT`);
     await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS sku TEXT`);
     await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS discount_price REAL`);
+    await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS images TEXT`);
 
     await pool.query(`CREATE TABLE IF NOT EXISTS prices (
       id SERIAL PRIMARY KEY,

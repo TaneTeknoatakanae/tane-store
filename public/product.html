@@ -8,12 +8,13 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'DM Sans',sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh}
-@keyframes fadeUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
 
 nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:100;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
 .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#1a1a1a;text-decoration:none}
 .logo span{color:#f97316}
 .nav-right{display:flex;align-items:center;gap:10px}
+.nav-link{color:#666;font-size:14px;font-weight:500;text-decoration:none}
 .wishlist-btn-nav{background:none;border:1px solid #eee;padding:7px 14px;border-radius:9px;cursor:pointer;font-size:14px;color:#666;transition:all .15s}
 .wishlist-btn-nav:hover{border-color:#ef4444;color:#ef4444}
 .wishlist-btn-nav.active{background:#fef2f2;border-color:#fecaca;color:#ef4444}
@@ -21,116 +22,131 @@ nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1
 .cart-btn:hover{background:#333}
 .cart-count{background:#f97316;color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 
-.breadcrumb{max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa}
-.breadcrumb a{color:#aaa;text-decoration:none;transition:color .2s}
-.breadcrumb a:hover{color:#f97316}
+.breadcrumb{max-width:1100px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa}
+.breadcrumb a{color:#aaa;text-decoration:none}.breadcrumb a:hover{color:#f97316}
 .breadcrumb span{color:#1a1a1a;font-weight:500}
 
 .main{max-width:1100px;margin:0 auto;padding:0 24px 60px;animation:fadeUp .3s ease}
-
 .product-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;margin-bottom:40px}
-.product-image-wrap{position:sticky;top:80px}
-.product-image{width:100%;aspect-ratio:1;object-fit:cover;border-radius:20px;background:#f3f3f1;display:block}
-.product-image-ph{width:100%;aspect-ratio:1;background:linear-gradient(135deg,#f3f3f1,#e8e8e6);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:100px}
 
-.product-cat{font-size:12px;color:#f97316;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.product-brand{font-size:13px;color:#888;margin-bottom:8px}
-.product-name{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1.3;margin-bottom:10px}
-.rating-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
-.stars-lg{color:#f97316;font-size:18px;letter-spacing:2px}
-.review-count-lg{font-size:13px;color:#888}
-.product-desc{font-size:15px;color:#666;line-height:1.7;margin-bottom:20px}
-.sku-text{font-size:12px;color:#bbb;margin-bottom:20px}
+/* ── GALLERY ── */
+.gallery-wrap{position:sticky;top:80px}
+.gallery-main{position:relative;background:#fff;border-radius:20px;overflow:hidden;border:1px solid #eee;aspect-ratio:1}
+.gallery-main img{width:100%;height:100%;object-fit:contain;display:block;transition:opacity .2s}
+.gallery-ph{width:100%;height:100%;background:linear-gradient(135deg,#f3f3f1,#e8e8e6);display:flex;align-items:center;justify-content:center;font-size:80px}
+.gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.9);border:1px solid #eee;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;z-index:2;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.gallery-arrow:hover{background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.gallery-arrow.prev{left:10px}
+.gallery-arrow.next{right:10px}
+.gallery-arrow.hidden{display:none}
+.gallery-dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
+.gallery-dot{width:6px;height:6px;border-radius:50%;background:#ddd;cursor:pointer;transition:all .2s}
+.gallery-dot.active{background:#f97316;width:18px;border-radius:4px}
+.gallery-thumbs{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.gallery-thumbs::-webkit-scrollbar{display:none}
+.gallery-thumb{flex-shrink:0;width:64px;height:64px;border-radius:10px;object-fit:contain;border:2px solid transparent;cursor:pointer;background:#fff;transition:all .15s;padding:2px}
+.gallery-thumb.active{border-color:#f97316}
+.gallery-thumb:hover{border-color:#ccc}
 
-.price-box{background:#fff;border:1px solid #eee;border-radius:16px;padding:22px;margin-bottom:16px}
-.price-label{font-size:12px;color:#aaa;font-weight:500;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
-.original-price-lg{font-size:16px;color:#bbb;text-decoration:line-through;margin-bottom:4px}
-.main-price{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:#1a1a1a}
+/* ── PRODUCT INFO ── */
+.product-cat{font-size:12px;color:#f97316;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.product-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1.35;margin-bottom:8px}
+.rating-row{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.stars-lg{color:#f97316;font-size:16px;letter-spacing:1px}
+.review-count-lg{font-size:12px;color:#888}
+.sku-text{font-size:12px;color:#bbb}
+
+/* Price */
+.price-section{background:#fff;border:1px solid #eee;border-radius:16px;padding:20px;margin-bottom:14px}
+.price-label{font-size:11px;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.original-price{font-size:14px;color:#bbb;text-decoration:line-through;margin-bottom:2px}
+.main-price{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#1a1a1a}
 .main-price.sale{color:#ef4444}
-.price-badge{display:inline-block;background:#f97316;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-top:6px}
-.stock-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;margin-top:8px}
+.discount-badge{display:inline-block;background:#ef4444;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;margin-left:8px;vertical-align:middle}
+.stock-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;margin-top:10px}
 .in-stock{background:#f0fdf4;color:#16a34a}
 .low-stock{background:#fff3e8;color:#f97316}
 .out-stock{background:#fef2f2;color:#ef4444}
 
-.btn-add-cart{width:100%;background:#1a1a1a;color:#fff;border:none;padding:15px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;cursor:pointer;transition:background .2s;margin-bottom:10px}
+/* Actions */
+.actions-section{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.qty-row-main{display:flex;align-items:center;gap:12px}
+.qty-label{font-size:13px;font-weight:600;color:#555}
+.qty-selector{display:flex;align-items:center;border:1px solid #e5e5e5;border-radius:10px;overflow:hidden}
+.qty-selector button{width:38px;height:40px;border:none;background:#f8f8f6;cursor:pointer;font-size:18px;font-weight:700;color:#555;transition:background .15s}
+.qty-selector button:hover{background:#e8e8e6}
+.qty-selector input{width:52px;height:40px;border:none;border-left:1px solid #e5e5e5;border-right:1px solid #e5e5e5;text-align:center;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;outline:none;color:#1a1a1a}
+.btn-add-cart{width:100%;background:#1a1a1a;color:#fff;border:none;padding:14px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:background .2s}
 .btn-add-cart:hover:not(:disabled){background:#f97316}
 .btn-add-cart:disabled{background:#ccc;cursor:not-allowed}
-.btn-wishlist{width:100%;background:#fff;color:#666;border:1px solid #eee;padding:13px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s;margin-bottom:10px}
+.btn-wishlist{width:100%;background:#fff;color:#666;border:1px solid #eee;padding:12px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s}
 .btn-wishlist:hover{border-color:#ef4444;color:#ef4444}
 .btn-wishlist.active{background:#fef2f2;border-color:#fecaca;color:#ef4444}
-.btn-back{width:100%;background:#f3f3f1;color:#666;border:none;padding:13px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer}
-.btn-back:hover{background:#e8e8e6}
 
-.compare-box{background:#fff;border:1px solid #eee;border-radius:16px;padding:22px;margin-bottom:16px}
-.compare-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:16px}
-.compare-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;margin-bottom:8px;border:1px solid #eee}
-.compare-row.cheapest{background:#f0fdf4;border-color:#bbf7d0}
-.platform-info{display:flex;align-items:center;gap:10px}
-.platform-icon{font-size:18px}
-.platform-name{font-size:14px;font-weight:600}
-.platform-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#f0fdf4;color:#16a34a}
-.platform-price{font-size:15px;font-weight:700}
-.price-diff{font-size:12px;font-weight:600;padding:3px 8px;border-radius:5px;margin-left:8px}
-.diff-higher{background:#fef2f2;color:#ef4444}
-
-.savings-banner{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.savings-left{font-size:14px;font-weight:600;color:#15803d}
-.savings-right{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#16a34a}
-
-/* REVIEWS */
-.reviews-section{background:#fff;border:1px solid #eee;border-radius:16px;padding:28px;margin-top:0}
-.reviews-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px}
-.reviews-summary{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #f3f3f1}
-.rating-big{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:#1a1a1a;line-height:1}
-.rating-detail{display:flex;flex-direction:column;gap:2px}
-.stars-big{color:#f97316;font-size:24px;letter-spacing:2px}
-.reviews-list{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
-.review-card{padding:16px;background:#f8f8f6;border-radius:12px}
-.review-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.reviewer-name{font-weight:600;font-size:14px}
-.review-date{font-size:12px;color:#aaa}
-.review-stars{color:#f97316;font-size:14px;letter-spacing:1px;margin-bottom:6px}
-.review-comment{font-size:14px;color:#555;line-height:1.6}
-
-.add-review{border-top:1px solid #f3f3f1;padding-top:24px}
-.add-review h4{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px}
-.star-selector{display:flex;gap:6px;margin-bottom:14px}
-.star-opt{font-size:32px;cursor:pointer;color:#ddd;transition:color .1s;line-height:1;user-select:none}
-.star-opt.selected,.star-opt:hover{color:#f97316}
-.form-group{margin-bottom:12px}
-.form-label{font-size:13px;color:#555;font-weight:500;margin-bottom:5px;display:block}
-.form-input{width:100%;border:1px solid #e5e5e5;border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;color:#1a1a1a}
-.form-input:focus{border-color:#f97316}
-.btn-review-submit{background:#1a1a1a;color:#fff;border:none;padding:12px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:background .2s}
-.btn-review-submit:hover{background:#f97316}
-
-/* Miktar seçici */
-.qty-selector{display:flex;align-items:center;gap:0;border:1px solid #e5e5e5;border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:12px}
-.qty-selector button{width:40px;height:44px;border:none;background:#f8f8f6;cursor:pointer;font-size:18px;font-weight:700;color:#555;transition:background .15s}
-.qty-selector button:hover{background:#e8e8e6}
-.qty-selector input{width:56px;height:44px;border:none;border-left:1px solid #e5e5e5;border-right:1px solid #e5e5e5;text-align:center;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;outline:none;color:#1a1a1a}
-
-/* Paylaş */
-.share-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.btn-share{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9px;border:1px solid #e5e5e5;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#555;transition:all .15s}
+/* Share */
+.share-row{display:flex;gap:8px}
+.btn-share{display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:9px;border:1px solid #e5e5e5;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:#555;transition:all .15s}
 .btn-share:hover{border-color:#25d366;color:#25d366}
 .btn-share.copy:hover{border-color:#f97316;color:#f97316}
 
-/* Benzer ürünler */
+/* Compare */
+.compare-section{background:#fff;border:1px solid #eee;border-radius:16px;padding:20px;margin-bottom:14px}
+.section-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:12px;color:#1a1a1a}
+.compare-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:9px;margin-bottom:6px;border:1px solid #eee}
+.compare-row.cheapest{background:#f0fdf4;border-color:#bbf7d0}
+.platform-info{display:flex;align-items:center;gap:8px}
+.platform-icon{font-size:16px}
+.platform-name{font-size:13px;font-weight:600}
+.platform-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:#f0fdf4;color:#16a34a}
+.platform-price{font-size:14px;font-weight:700}
+.price-diff{font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;background:#fef2f2;color:#ef4444;margin-left:6px}
+
+/* Tabs (description) */
+.tabs{margin-bottom:20px}
+.tab-list{display:flex;gap:0;border-bottom:2px solid #eee;margin-bottom:20px}
+.tab-btn{background:none;border:none;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#aaa;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn.active{color:#f97316;border-bottom-color:#f97316}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.desc-text{font-size:14px;color:#555;line-height:1.75;max-height:200px;overflow:hidden;transition:max-height .3s}
+.desc-text.expanded{max-height:none}
+.btn-desc-more{background:none;border:none;color:#f97316;font-size:13px;font-weight:600;cursor:pointer;padding:8px 0;display:block}
+
+/* Reviews */
+.reviews-section{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;margin-bottom:20px}
+.reviews-summary{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f3f3f1}
+.rating-big{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;line-height:1}
+.stars-big{color:#f97316;font-size:20px;letter-spacing:2px}
+.reviews-list{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.review-card{padding:14px;background:#f8f8f6;border-radius:12px}
+.review-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.reviewer-name{font-weight:600;font-size:13px}
+.review-date{font-size:12px;color:#aaa}
+.review-stars{color:#f97316;font-size:13px;margin-bottom:5px}
+.review-comment{font-size:13px;color:#555;line-height:1.6}
+.add-review{border-top:1px solid #f3f3f1;padding-top:20px}
+.add-review h4{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:14px}
+.star-selector{display:flex;gap:6px;margin-bottom:12px}
+.star-opt{font-size:28px;cursor:pointer;color:#ddd;transition:color .1s;line-height:1;user-select:none}
+.star-opt.selected,.star-opt:hover{color:#f97316}
+.form-group{margin-bottom:10px}
+.form-label{font-size:12px;color:#555;font-weight:600;margin-bottom:4px;display:block}
+.form-input{width:100%;border:1px solid #e5e5e5;border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;color:#1a1a1a}
+.form-input:focus{border-color:#f97316}
+.btn-review-submit{background:#1a1a1a;color:#fff;border:none;padding:11px 22px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer}
+.btn-review-submit:hover{background:#f97316}
+
+/* Similar */
 .similar-section{margin-top:32px}
-.similar-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:18px}
-.similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
-.sim-card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;transition:box-shadow .2s;cursor:pointer}
+.similar-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px}
+.similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.sim-card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow .2s}
 .sim-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1)}
-.sim-img{width:100%;height:140px;object-fit:cover;background:#f5f5f5}
+.sim-img{width:100%;height:130px;object-fit:contain;background:#f8f8f6;padding:8px}
 .sim-body{padding:10px}
-.sim-name{font-size:12px;color:#555;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.sim-price{font-weight:800;font-size:15px;color:#f97316}
+.sim-name{font-size:12px;color:#555;line-height:1.4;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sim-price{font-weight:800;font-size:14px;color:#f97316}
 
-.loading{text-align:center;padding:80px 0;color:#aaa}
-
-/* CART */
+/* Cart */
 .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
 .cart-overlay.open{opacity:1;pointer-events:all}
 .cart-sidebar{position:fixed;top:0;right:0;bottom:0;width:380px;background:#fff;z-index:201;transform:translateX(100%);transition:transform .3s;display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.12)}
@@ -140,7 +156,7 @@ nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1
 .close-btn{background:none;border:none;cursor:pointer;font-size:22px;color:#666}
 .cart-items{flex:1;overflow-y:auto;padding:16px 24px}
 .cart-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #f3f3f1}
-.cart-item-img{width:56px;height:56px;object-fit:cover;border-radius:10px;background:#f3f3f1;flex-shrink:0}
+.cart-item-img{width:56px;height:56px;object-fit:contain;border-radius:10px;background:#f3f3f1;flex-shrink:0;padding:4px}
 .cart-item-ph{width:56px;height:56px;border-radius:10px;background:#f3f3f1;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
 .cart-item-name{font-size:13px;font-weight:600;margin-bottom:4px;line-height:1.3}
 .cart-item-price{font-size:14px;font-weight:700;color:#f97316}
@@ -155,6 +171,7 @@ nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1
 .cart-total-price{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
 .btn-checkout{width:100%;background:#f97316;color:#fff;border:none;padding:14px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer}
 
+/* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(20px);transition:transform .3s}
@@ -173,10 +190,18 @@ nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1
 .success-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px}
 .success-sub{font-size:14px;color:#888;line-height:1.6}
 
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.2);white-space:nowrap}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.loading{text-align:center;padding:80px 0;color:#aaa}
 .hidden{display:none}
 
-@media(max-width:700px){.product-grid{grid-template-columns:1fr;gap:24px}.product-image-wrap{position:static}.form-row{grid-template-columns:1fr}.cart-sidebar{width:100%}}
+@media(max-width:700px){
+  .product-grid{grid-template-columns:1fr;gap:24px}
+  .gallery-wrap{position:static}
+  .form-row{grid-template-columns:1fr}
+  .cart-sidebar{width:100%}
+  .gallery-thumbs{gap:6px}
+  .gallery-thumb{width:54px;height:54px}
+}
 </style>
 </head>
 <body>
@@ -184,9 +209,9 @@ nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1
 <nav>
   <a class="logo" href="/">TANE <span>STORE</span></a>
   <div class="nav-right">
-    <a href="/track" style="color:#666;font-size:14px;font-weight:500;text-decoration:none">📦 Siparişim</a>
+    <a href="/track" class="nav-link">📦 Siparişim</a>
     <button id="nav-wishlist-btn" class="wishlist-btn-nav" onclick="toggleWishlist()">🤍 Favori</button>
-    <div id="auth-nav"><a href="/login" style="color:#666;font-size:14px;font-weight:500;text-decoration:none">Giriş Yap</a></div>
+    <div id="auth-nav"><a href="/login" class="nav-link">Giriş Yap</a></div>
     <button class="cart-btn" onclick="toggleCart()">
       🛒 Sepet <span class="cart-count" id="cart-count">0</span>
     </button>
@@ -203,7 +228,7 @@ nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1
   <div class="loading">⏳ Yükleniyor...</div>
 </div>
 
-<!-- CART -->
+<!-- CART SIDEBAR -->
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
 <div class="cart-sidebar" id="cart-sidebar">
   <div class="cart-head">
@@ -259,26 +284,24 @@ let cart = [];
 let wishlist = [];
 let currentUser = null;
 let selectedRating = 0;
+let galleryImages = [];
+let currentImg = 0;
 
+// ── AUTH ──
 async function initAuth() {
   try {
     const res = await fetch('/api/auth/me', { credentials: 'include' });
     if (res.ok) {
       currentUser = await res.json();
       document.getElementById('auth-nav').innerHTML =
-        `<a href="/hesabim" style="color:#666;font-size:14px;font-weight:500;text-decoration:none">👤 ${currentUser.name.split(' ')[0]}</a>`;
-      // Server cart
+        `<a href="/hesabim" class="nav-link">👤 ${currentUser.name.split(' ')[0]}</a>`;
       const cr = await fetch('/api/cart', { credentials: 'include' });
       if (cr.ok) {
         const items = await cr.json();
         cart = items.map(i => ({ id: i.product_id, name: i.name, tane_price: i.tane_price, discount_price: i.discount_price, image_url: i.image_url, qty: i.quantity }));
       }
-      // Server wishlist
       const wr = await fetch('/api/wishlist', { credentials: 'include' });
-      if (wr.ok) {
-        const items = await wr.json();
-        wishlist = items.map(i => i.product_id);
-      }
+      if (wr.ok) { const items = await wr.json(); wishlist = items.map(i => i.product_id); }
     } else {
       cart = JSON.parse(localStorage.getItem('tane-cart') || '[]');
       wishlist = JSON.parse(localStorage.getItem('tane-wishlist') || '[]');
@@ -292,6 +315,7 @@ async function initAuth() {
 
 function effectivePrice(p) { return p.discount_price || p.tane_price; }
 
+// ── LOAD PRODUCT ──
 async function loadProduct() {
   if (!productId) { window.location.href = '/'; return; }
   try {
@@ -309,126 +333,273 @@ async function loadProduct() {
   }
 }
 
+// ── GALLERY ──
+function renderGallery() {
+  try {
+    galleryImages = product.images ? JSON.parse(product.images) : [];
+  } catch(e) { galleryImages = []; }
+  if (!galleryImages.length && product.image_url) galleryImages = [product.image_url];
+  currentImg = 0;
+
+  const wrap = document.getElementById('gallery-wrap');
+  if (!wrap) return;
+
+  const mainSrc = galleryImages.length ? galleryImages[0] : null;
+  const mainHTML = mainSrc
+    ? `<img id="gallery-main-img" src="${mainSrc}" alt="${product.name}" onerror="this.src='';this.outerHTML='<div class=gallery-ph>📦</div>'">`
+    : `<div class="gallery-ph">📦</div>`;
+
+  const thumbsHTML = galleryImages.length > 1
+    ? `<div class="gallery-thumbs" id="gallery-thumbs">
+        ${galleryImages.map((src, i) =>
+          `<img class="gallery-thumb ${i===0?'active':''}" src="${src}" data-idx="${i}" onclick="goToImg(${i})" onerror="this.style.display='none'">`
+        ).join('')}
+       </div>` : '';
+
+  const dotsHTML = galleryImages.length > 1
+    ? `<div class="gallery-dots" id="gallery-dots">
+        ${galleryImages.map((_, i) =>
+          `<div class="gallery-dot ${i===0?'active':''}" onclick="goToImg(${i})"></div>`
+        ).join('')}
+       </div>` : '';
+
+  wrap.innerHTML = `
+    <div class="gallery-main">
+      ${mainHTML}
+      <button class="gallery-arrow prev hidden" id="gallery-prev" onclick="prevImg()">‹</button>
+      <button class="gallery-arrow next ${galleryImages.length < 2 ? 'hidden' : ''}" id="gallery-next" onclick="nextImg()">›</button>
+    </div>
+    ${dotsHTML}
+    ${thumbsHTML}`;
+
+  // Touch swipe
+  const gm = wrap.querySelector('.gallery-main');
+  if (gm) {
+    let startX = 0;
+    gm.addEventListener('touchstart', e => startX = e.touches[0].clientX, { passive: true });
+    gm.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      if (dx < -50) nextImg();
+      else if (dx > 50) prevImg();
+    }, { passive: true });
+  }
+}
+
+function goToImg(idx) {
+  if (!galleryImages.length) return;
+  currentImg = Math.max(0, Math.min(galleryImages.length - 1, idx));
+  const mainImg = document.getElementById('gallery-main-img');
+  if (mainImg) { mainImg.style.opacity = '0'; setTimeout(() => { mainImg.src = galleryImages[currentImg]; mainImg.style.opacity = '1'; }, 150); }
+  document.querySelectorAll('.gallery-thumb').forEach((t, i) => t.classList.toggle('active', i === currentImg));
+  document.querySelectorAll('.gallery-dot').forEach((d, i) => d.classList.toggle('active', i === currentImg));
+  document.getElementById('gallery-prev').classList.toggle('hidden', currentImg === 0);
+  document.getElementById('gallery-next').classList.toggle('hidden', currentImg === galleryImages.length - 1);
+}
+function prevImg() { goToImg(currentImg - 1); }
+function nextImg() { goToImg(currentImg + 1); }
+
+// ── RENDER ──
 function renderProduct() {
   const prices = product.prices || [];
   const ep = effectivePrice(product);
   const inWishlist = wishlist.includes(product.id);
 
-  const imgEl = product.image_url
-    ? `<img class="product-image" src="${product.image_url}" alt="${product.name}" onerror="this.outerHTML='<div class=product-image-ph>📦</div>'">`
-    : `<div class="product-image-ph">📦</div>`;
-
   const starsHTML = product.rating
     ? `<div class="rating-row">
         <span class="stars-lg">${'★'.repeat(Math.round(product.rating))}${'☆'.repeat(5 - Math.round(product.rating))}</span>
-        <span class="review-count-lg">${product.rating} / 5 · ${product.review_count || 0} yorum</span>
+        <span class="review-count-lg">${product.rating}/5 · ${product.review_count || 0} yorum</span>
        </div>` : '';
 
-  const priceHTML = product.discount_price
-    ? `<div class="original-price-lg">${product.tane_price.toLocaleString('tr-TR')} ₺</div>
-       <div class="main-price sale">${product.discount_price.toLocaleString('tr-TR')} ₺</div>`
-    : `<div class="main-price">${product.tane_price.toLocaleString('tr-TR')} ₺</div>`;
+  const hasSale = product.discount_price && product.discount_price < product.tane_price;
+  const discPct = hasSale ? Math.round((1 - product.discount_price / product.tane_price) * 100) : 0;
+  const priceHTML = hasSale
+    ? `<div class="original-price">${product.tane_price.toLocaleString('tr-TR')} ₺</div>
+       <div><span class="main-price sale">${product.discount_price.toLocaleString('tr-TR')} ₺</span><span class="discount-badge">-${discPct}%</span></div>`
+    : `<div class="main-price">${product.tane_price > 0 ? product.tane_price.toLocaleString('tr-TR') + ' ₺' : 'Fiyat güncelleniyor...'}</div>`;
 
   const stockHTML = product.stock === 0
-    ? `<div class="stock-badge out-stock">❌ Stok Tükendi</div>`
+    ? `<span class="stock-badge out-stock">❌ Stok Tükendi</span>`
     : product.stock <= 10
-    ? `<div class="stock-badge low-stock">⚠️ Son ${product.stock} ürün!</div>`
-    : `<div class="stock-badge in-stock">✅ Stokta var</div>`;
+    ? `<span class="stock-badge low-stock">⚠️ Son ${product.stock} ürün!</span>`
+    : `<span class="stock-badge in-stock">✅ Stokta var</span>`;
 
-  let compareHTML = '', savingsHTML = '';
+  let compareHTML = '';
   if (prices.length > 0) {
-    const sortedPrices = [...prices].sort((a, b) => a.price - b.price);
-    const maxPrice = Math.max(...prices.map(p => p.price));
-    const savings = maxPrice - ep;
-    const platformIcons = {'Cimri':'🔍','Akakçe':'🛒','Trendyol':'📦','Hepsiburada':'🏪','Amazon':'🌐'};
-
-    const taneRow = `<div class="compare-row cheapest">
-      <div class="platform-info"><span class="platform-icon">⚡</span><span class="platform-name">Tane Store</span><span class="platform-badge">EN UCUZ</span></div>
-      <span class="platform-price" style="color:#16a34a">${ep.toLocaleString('tr-TR')} ₺</span>
-    </div>`;
-
-    const competitorRows = sortedPrices.map(p => {
+    const sorted = [...prices].sort((a, b) => a.price - b.price).slice(0, 3);
+    const icons = { Cimri:'🔍', Akakçe:'🛒', Trendyol:'📦', Hepsiburada:'🏪', Amazon:'🌐' };
+    const rows = sorted.map(p => {
       const diff = p.price - ep;
       return `<div class="compare-row">
-        <div class="platform-info"><span class="platform-icon">${platformIcons[p.platform] || '🏷️'}</span><span class="platform-name">${p.platform}</span></div>
+        <div class="platform-info">
+          <span class="platform-icon">${icons[p.platform] || '🏷️'}</span>
+          <span class="platform-name">${p.platform}</span>
+        </div>
         <div style="display:flex;align-items:center">
           <span class="platform-price">${p.price.toLocaleString('tr-TR')} ₺</span>
-          ${diff > 0 ? `<span class="price-diff diff-higher">+${diff.toLocaleString('tr-TR')} ₺</span>` : ''}
+          ${diff > 0 ? `<span class="price-diff">+${diff.toLocaleString('tr-TR')} ₺</span>` : ''}
         </div>
       </div>`;
     }).join('');
 
-    compareHTML = `<div class="compare-box">
-      <div class="compare-title">📊 Fiyat Karşılaştırması</div>
-      ${taneRow}${competitorRows}
-    </div>`;
+    const taneRow = ep > 0 ? `<div class="compare-row cheapest">
+      <div class="platform-info"><span class="platform-icon">⚡</span><span class="platform-name">Tane Store</span><span class="platform-badge">EN UCUZ</span></div>
+      <span class="platform-price" style="color:#16a34a">${ep.toLocaleString('tr-TR')} ₺</span>
+    </div>` : '';
 
-    if (savings > 0) savingsHTML = `<div class="savings-banner">
-      <span class="savings-left">🏆 Rakiplere göre en ucuz burada!</span>
-      <span class="savings-right">-${savings.toLocaleString('tr-TR')} ₺</span>
+    compareHTML = `<div class="compare-section">
+      <div class="section-title">📊 Fiyat Karşılaştırması</div>
+      ${taneRow}${rows}
     </div>`;
   }
 
+  const descText = product.description || '';
+  const isLongDesc = descText.length > 400;
+  const descHTML = descText ? `
+    <div class="desc-text ${isLongDesc ? '' : 'expanded'}" id="desc-text">${descText}</div>
+    ${isLongDesc ? `<button class="btn-desc-more" id="desc-more" onclick="toggleDesc()">Devamını Göster ▼</button>` : ''}` : '';
+
   document.getElementById('main-content').innerHTML = `
     <div class="product-grid">
-      <div class="product-image-wrap">${imgEl}</div>
+      <div class="gallery-wrap" id="gallery-wrap"><!-- gallery --></div>
       <div>
         <div class="product-cat">${product.category || 'Genel'}</div>
-        ${product.brand ? `<div class="product-brand">${product.brand}</div>` : ''}
         <div class="product-name">${product.name}</div>
         ${starsHTML}
-        <div class="product-desc">${product.description || ''}</div>
-        ${product.sku ? `<div class="sku-text">SKU: ${product.sku}</div>` : ''}
+        ${product.sku ? `<div class="sku-text" style="margin-bottom:16px">SKU: ${product.sku}</div>` : ''}
 
-        <div class="price-box">
+        <div class="price-section">
           <div class="price-label">Tane Store Fiyatı</div>
           ${priceHTML}
-          <span class="price-badge">EN UCUZ FİYAT GARANTİSİ</span>
-          <div>${stockHTML}</div>
+          ${stockHTML}
         </div>
 
-        ${savingsHTML}
         ${compareHTML}
 
-        ${product.stock > 0 ? `
-        <div style="margin-bottom:12px">
-          <div style="font-size:13px;font-weight:600;color:#555;margin-bottom:6px">Adet</div>
-          <div class="qty-selector">
-            <button onclick="changeProductQty(-1)">−</button>
-            <input type="number" id="product-qty" value="1" min="1" max="${product.stock}" oninput="validateQty()"/>
-            <button onclick="changeProductQty(1)">+</button>
+        <div class="actions-section">
+          ${product.stock > 0 ? `
+          <div class="qty-row-main">
+            <span class="qty-label">Adet</span>
+            <div class="qty-selector">
+              <button onclick="changeProductQty(-1)">−</button>
+              <input type="number" id="product-qty" value="1" min="1" max="${product.stock}" oninput="validateQty()"/>
+              <button onclick="changeProductQty(1)">+</button>
+            </div>
+          </div>` : ''}
+          <button class="btn-add-cart" onclick="addToCart()" ${product.stock === 0 ? 'disabled' : ''}>${product.stock === 0 ? '❌ Stok Tükendi' : '🛒 Sepete Ekle'}</button>
+          <button class="btn-wishlist ${inWishlist ? 'active' : ''}" id="wishlist-btn" onclick="toggleWishlist()">${inWishlist ? '❤️ Favorilerimde' : '🤍 Favorilere Ekle'}</button>
+          <div class="share-row">
+            <button class="btn-share" onclick="shareWhatsApp()">📱 WhatsApp</button>
+            <button class="btn-share copy" onclick="copyLink()">🔗 Linki Kopyala</button>
           </div>
-        </div>` : ''}
-        <button class="btn-add-cart" onclick="addToCart()" ${product.stock === 0 ? 'disabled' : ''}>${product.stock === 0 ? '❌ Stok Tükendi' : '🛒 Sepete Ekle'}</button>
-        <button class="btn-wishlist ${inWishlist ? 'active' : ''}" id="wishlist-btn" onclick="toggleWishlist()">${inWishlist ? '❤️ Favorilerimde' : '🤍 Favorilere Ekle'}</button>
-        <div class="share-row">
-          <button class="btn-share" onclick="shareWhatsApp()">📱 WhatsApp'ta Paylaş</button>
-          <button class="btn-share copy" onclick="copyLink()">🔗 Linki Kopyala</button>
         </div>
-        <button class="btn-back" onclick="window.location.href='/'">← Alışverişe Devam Et</button>
       </div>
     </div>
+
+    ${descText ? `<div class="tabs" style="background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;margin-bottom:20px">
+      <div class="section-title" style="margin-bottom:14px">📋 Ürün Açıklaması</div>
+      ${descHTML}
+    </div>` : ''}
 
     <div class="reviews-section" id="reviews-section">
       <div style="text-align:center;color:#aaa;padding:40px">Yorumlar yükleniyor...</div>
     </div>
 
     <div class="similar-section" id="similar-section"></div>`;
+
+  renderGallery();
 }
 
+function toggleDesc() {
+  const el = document.getElementById('desc-text');
+  const btn = document.getElementById('desc-more');
+  if (!el) return;
+  el.classList.toggle('expanded');
+  btn.textContent = el.classList.contains('expanded') ? 'Daha Az Göster ▲' : 'Devamını Göster ▼';
+}
+
+// ── MIKTAR ──
+function changeProductQty(d) {
+  const input = document.getElementById('product-qty'); if (!input) return;
+  input.value = Math.max(1, Math.min(product.stock, (parseInt(input.value) || 1) + d));
+}
+function validateQty() {
+  const input = document.getElementById('product-qty'); if (!input) return;
+  input.value = Math.max(1, Math.min(product.stock, parseInt(input.value) || 1));
+}
+function getSelectedQty() {
+  const input = document.getElementById('product-qty'); return input ? (parseInt(input.value) || 1) : 1;
+}
+
+// ── PAYLAŞ ──
+function shareWhatsApp() {
+  window.open(`https://wa.me/?text=${encodeURIComponent(product.name + ' — Tane Store\n' + window.location.href)}`, '_blank');
+}
+function copyLink() { navigator.clipboard.writeText(window.location.href).then(() => showToast('✅ Link kopyalandı!')); }
+
+// ── REVIEWS ──
 async function loadReviews() {
-  try {
-    const reviews = await fetch(`/api/reviews/${productId}`).then(r => r.json());
-    renderReviews(reviews);
-  } catch(e) {}
+  try { renderReviews(await fetch(`/api/reviews/${productId}`).then(r => r.json())); } catch(e) {}
 }
 
-// Benzer ürünler
+function renderReviews(reviews) {
+  const sec = document.getElementById('reviews-section'); if (!sec) return;
+  const avg = reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) : 0;
+  const filled = Math.round(avg);
+
+  sec.innerHTML = `
+    <div class="section-title">⭐ Müşteri Yorumları</div>
+    <div class="reviews-summary">
+      <div class="rating-big">${avg ? avg.toFixed(1) : '—'}</div>
+      <div>
+        <div class="stars-big">${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}</div>
+        <div style="font-size:13px;color:#888;margin-top:4px">${reviews.length} değerlendirme</div>
+      </div>
+    </div>
+    ${reviews.length ? `<div class="reviews-list">${reviews.map(r => `
+      <div class="review-card">
+        <div class="review-header">
+          <span class="reviewer-name">${r.customer_name}</span>
+          <span class="review-date">${new Date(r.created_at).toLocaleDateString('tr-TR')}</span>
+        </div>
+        <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+        ${r.comment ? `<div class="review-comment">${r.comment}</div>` : ''}
+      </div>`).join('')}</div>`
+    : `<div style="text-align:center;color:#aaa;padding:20px 0">Henüz yorum yok. İlk yorumu sen yaz!</div>`}
+    <div class="add-review">
+      <h4>✍️ Yorum Yaz</h4>
+      <div class="star-selector" id="star-selector">
+        ${[1,2,3,4,5].map(n => `<span class="star-opt" onclick="selectStar(${n})">★</span>`).join('')}
+      </div>
+      <div class="form-group"><label class="form-label">Adınız *</label><input class="form-input" id="r-name" placeholder="Ahmet Y."/></div>
+      <div class="form-group"><label class="form-label">Yorumunuz</label><textarea class="form-input" id="r-comment" rows="3" style="resize:vertical" placeholder="Bu ürün hakkında ne düşünüyorsunuz?"></textarea></div>
+      <button class="btn-review-submit" onclick="submitReview()">📝 Gönder</button>
+    </div>`;
+  selectedRating = 0;
+}
+
+function selectStar(val) {
+  selectedRating = val;
+  document.querySelectorAll('.star-opt').forEach((el, i) => el.classList.toggle('selected', i < val));
+}
+
+async function submitReview() {
+  if (!selectedRating) return showToast('❌ Lütfen puan ver');
+  const name = document.getElementById('r-name').value.trim();
+  if (!name) return showToast('❌ İsim zorunlu');
+  const res = await fetch('/api/reviews', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ product_id: productId, customer_name: name, rating: selectedRating, comment: document.getElementById('r-comment').value })
+  });
+  const data = await res.json();
+  if (data.id) { showToast('✅ Teşekkürler!'); loadReviews(); }
+  else showToast('❌ ' + data.error);
+}
+
+// ── SIMILAR ──
 async function loadSimilar() {
   if (!product) return;
   try {
-    const res = await fetch(`/api/products?category=${encodeURIComponent(product.category)}`);
-    const all = await res.json();
+    const all = await fetch(`/api/products?category=${encodeURIComponent(product.category)}`).then(r => r.json());
     const similar = all.filter(p => p.id !== product.id).slice(0, 6);
     if (!similar.length) return;
     document.getElementById('similar-section').innerHTML = `
@@ -437,10 +608,10 @@ async function loadSimilar() {
         ${similar.map(p => {
           const ep = p.discount_price || p.tane_price;
           return `<div class="sim-card" onclick="window.location.href='/product.html?id=${p.id}'">
-            <img class="sim-img" src="${p.image_url || ''}" alt="${p.name}" onerror="this.style.background='#f5f5f5';this.style.display='none'"/>
+            <img class="sim-img" src="${p.image_url || ''}" alt="${p.name}" onerror="this.style.background='#f5f5f5';this.src=''"/>
             <div class="sim-body">
               <div class="sim-name">${p.name}</div>
-              <div class="sim-price">${ep ? ep.toLocaleString('tr-TR') + ' ₺' : 'Fiyat yok'}</div>
+              <div class="sim-price">${ep > 0 ? ep.toLocaleString('tr-TR') + ' ₺' : 'Fiyat yok'}</div>
             </div>
           </div>`;
         }).join('')}
@@ -448,118 +619,16 @@ async function loadSimilar() {
   } catch(e) {}
 }
 
-// Miktar seçici
-function changeProductQty(d) {
-  const input = document.getElementById('product-qty');
-  if (!input) return;
-  let val = parseInt(input.value) + d;
-  val = Math.max(1, Math.min(product.stock, val));
-  input.value = val;
-}
-function validateQty() {
-  const input = document.getElementById('product-qty');
-  if (!input) return;
-  let val = parseInt(input.value) || 1;
-  val = Math.max(1, Math.min(product.stock, val));
-  input.value = val;
-}
-function getSelectedQty() {
-  const input = document.getElementById('product-qty');
-  return input ? (parseInt(input.value) || 1) : 1;
-}
-
-// Paylaş
-function shareWhatsApp() {
-  const url = encodeURIComponent(window.location.href);
-  const text = encodeURIComponent(`${product.name} — Tane Store'da en ucuz fiyatla!`);
-  window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
-}
-function copyLink() {
-  navigator.clipboard.writeText(window.location.href).then(() => showToast('✅ Link kopyalandı!'));
-}
-
-function renderReviews(reviews) {
-  const sec = document.getElementById('reviews-section');
-  if (!sec) return;
-
-  const avgRating = reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) : 0;
-  const filled = Math.round(avgRating);
-
-  const reviewsHTML = reviews.length > 0
-    ? `<div class="reviews-list">${reviews.map(r => `
-        <div class="review-card">
-          <div class="review-header">
-            <span class="reviewer-name">${r.customer_name}</span>
-            <span class="review-date">${new Date(r.created_at).toLocaleDateString('tr-TR')}</span>
-          </div>
-          <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-          ${r.comment ? `<div class="review-comment">${r.comment}</div>` : ''}
-        </div>`).join('')}
-      </div>`
-    : `<div style="text-align:center;color:#aaa;padding:24px 0">Henüz yorum yok. İlk yorumu sen yaz!</div>`;
-
-  sec.innerHTML = `
-    <div class="reviews-title">⭐ Müşteri Yorumları</div>
-    <div class="reviews-summary">
-      <div class="rating-big">${avgRating ? avgRating.toFixed(1) : '—'}</div>
-      <div class="rating-detail">
-        <div class="stars-big">${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}</div>
-        <div style="font-size:13px;color:#888">${reviews.length} değerlendirme</div>
-      </div>
-    </div>
-    ${reviewsHTML}
-    <div class="add-review">
-      <h4>✍️ Yorum Yaz</h4>
-      <div class="star-selector" id="star-selector">
-        <span class="star-opt" onclick="selectStar(1)">★</span>
-        <span class="star-opt" onclick="selectStar(2)">★</span>
-        <span class="star-opt" onclick="selectStar(3)">★</span>
-        <span class="star-opt" onclick="selectStar(4)">★</span>
-        <span class="star-opt" onclick="selectStar(5)">★</span>
-      </div>
-      <div class="form-group"><label class="form-label">Adınız *</label><input class="form-input" id="r-name" placeholder="Ahmet Y."/></div>
-      <div class="form-group"><label class="form-label">Yorumunuz</label><textarea class="form-input" id="r-comment" rows="3" placeholder="Bu ürün hakkında ne düşünüyorsunuz?" style="resize:vertical"></textarea></div>
-      <button class="btn-review-submit" onclick="submitReview()">📝 Yorumu Gönder</button>
-    </div>`;
-
-  selectedRating = 0;
-}
-
-function selectStar(val) {
-  selectedRating = val;
-  document.querySelectorAll('.star-opt').forEach((el, i) => {
-    el.classList.toggle('selected', i < val);
-  });
-}
-
-async function submitReview() {
-  if (!selectedRating) return showToast('❌ Lütfen puan ver (1-5 yıldız)');
-  const name = document.getElementById('r-name').value.trim();
-  if (!name) return showToast('❌ İsim zorunlu');
-  try {
-    const res = await fetch('/api/reviews', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({product_id: productId, customer_name: name, rating: selectedRating, comment: document.getElementById('r-comment').value})
-    });
-    const data = await res.json();
-    if (data.id) { showToast('✅ Yorumunuz eklendi, teşekkürler!'); loadReviews(); }
-    else showToast('❌ ' + data.error);
-  } catch(e) { showToast('❌ Bir hata oluştu'); }
-}
-
-// WISHLIST
+// ── WISHLIST ──
 async function toggleWishlist() {
   if (!product) return;
   const idx = wishlist.indexOf(product.id);
   if (idx === -1) {
-    wishlist.push(product.id);
-    showToast('❤️ Favorilere eklendi');
+    wishlist.push(product.id); showToast('❤️ Favorilere eklendi');
     if (currentUser) fetch(`/api/wishlist/${product.id}`, { method: 'POST', credentials: 'include' });
     else localStorage.setItem('tane-wishlist', JSON.stringify(wishlist));
   } else {
-    wishlist.splice(idx, 1);
-    showToast('🤍 Favorilerden çıkarıldı');
+    wishlist.splice(idx, 1); showToast('🤍 Favorilerden çıkarıldı');
     if (currentUser) fetch(`/api/wishlist/${product.id}`, { method: 'DELETE', credentials: 'include' });
     else localStorage.setItem('tane-wishlist', JSON.stringify(wishlist));
   }
@@ -568,33 +637,26 @@ async function toggleWishlist() {
 
 function updateWishlistBtn() {
   if (!product) return;
-  const inWishlist = wishlist.includes(product.id);
+  const inWl = wishlist.includes(product.id);
   const btn = document.getElementById('wishlist-btn');
-  if (btn) { btn.textContent = inWishlist ? '❤️ Favorilerimde' : '🤍 Favorilere Ekle'; btn.classList.toggle('active', inWishlist); }
-  const navBtn = document.getElementById('nav-wishlist-btn');
-  if (navBtn) { navBtn.textContent = inWishlist ? '❤️ Favorilerimde' : '🤍 Favori'; navBtn.classList.toggle('active', inWishlist); }
+  if (btn) { btn.textContent = inWl ? '❤️ Favorilerimde' : '🤍 Favorilere Ekle'; btn.classList.toggle('active', inWl); }
+  const nb = document.getElementById('nav-wishlist-btn');
+  if (nb) { nb.textContent = inWl ? '❤️ Favorilerimde' : '🤍 Favori'; nb.classList.toggle('active', inWl); }
 }
 
-// CART
+// ── CART ──
 async function addToCart() {
   if (!product || product.stock === 0) return;
   const qty = getSelectedQty();
   const ex = cart.find(x => x.id === product.id);
   if (ex) ex.qty += qty;
-  else cart.push({id: product.id, name: product.name, tane_price: product.tane_price, discount_price: product.discount_price, image_url: product.image_url, qty});
-  if (currentUser) {
-    await fetch('/api/cart', { method: 'POST', headers: {'Content-Type':'application/json'}, credentials: 'include', body: JSON.stringify({ product_id: product.id, quantity: qty }) });
-  } else {
-    localStorage.setItem('tane-cart', JSON.stringify(cart));
-  }
-  updateCartUI();
-  showToast(`✅ ${product.name} sepete eklendi`);
-  openCart();
+  else cart.push({ id: product.id, name: product.name, tane_price: product.tane_price, discount_price: product.discount_price, image_url: product.image_url, qty });
+  if (currentUser) await fetch('/api/cart', { method: 'POST', headers: {'Content-Type':'application/json'}, credentials: 'include', body: JSON.stringify({ product_id: product.id, quantity: qty }) });
+  else localStorage.setItem('tane-cart', JSON.stringify(cart));
+  updateCartUI(); showToast('✅ Sepete eklendi'); openCart();
 }
 
-function saveCart() {
-  if (!currentUser) localStorage.setItem('tane-cart', JSON.stringify(cart));
-}
+function saveCart() { if (!currentUser) localStorage.setItem('tane-cart', JSON.stringify(cart)); }
 
 function updateCartUI() {
   const count = cart.reduce((s, i) => s + i.qty, 0);
@@ -625,8 +687,8 @@ function updateCartUI() {
 }
 
 function changeQty(id, d) {
-  const item = cart.find(x => x.id === id); if(!item)return;
-  item.qty += d; if(item.qty <= 0) cart = cart.filter(x => x.id !== id);
+  const item = cart.find(x => x.id === id); if (!item) return;
+  item.qty += d; if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
   if (currentUser) {
     if (item.qty <= 0) fetch(`/api/cart/${id}`, { method: 'DELETE', credentials: 'include' });
     else fetch(`/api/cart/${id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, credentials: 'include', body: JSON.stringify({ quantity: item.qty }) });
@@ -662,7 +724,6 @@ function openOrderModal() {
   document.getElementById('cart-sidebar').classList.remove('open');
   document.getElementById('cart-overlay').classList.remove('open');
 }
-
 function closeOrderModal() { document.getElementById('order-modal').classList.remove('open'); }
 
 async function submitOrder() {
@@ -671,28 +732,19 @@ async function submitOrder() {
   const address = document.getElementById('o-address').value.trim();
   const city = document.getElementById('o-city').value.trim();
   if (!name||!phone||!address||!city) return showToast('❌ Zorunlu alanları doldur!');
-  try {
-    const res = await fetch('/api/orders', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      credentials: 'include',
-      body: JSON.stringify({
-        customer_name: name, customer_phone: phone,
-        customer_email: document.getElementById('o-email').value,
-        customer_address: address, customer_city: city,
-        note: document.getElementById('o-note').value,
-        items: cart.map(i => ({product_id: i.id, product_name: i.name, price: effectivePrice(i), quantity: i.qty}))
-      })
-    });
-    const data = await res.json();
-    if (data.id) {
-      cart = [];
-      if (currentUser) fetch('/api/cart', { method: 'DELETE', credentials: 'include' });
-      else saveCart();
-      updateCartUI();
-      document.getElementById('order-form-screen').classList.add('hidden');
-      document.getElementById('order-success-screen').classList.remove('hidden');
-    }
-  } catch(e) { showToast('❌ Bir hata oluştu'); }
+  const res = await fetch('/api/orders', {
+    method: 'POST', headers: {'Content-Type':'application/json'}, credentials: 'include',
+    body: JSON.stringify({ customer_name: name, customer_phone: phone, customer_email: document.getElementById('o-email').value, customer_address: address, customer_city: city, note: document.getElementById('o-note').value, items: cart.map(i => ({ product_id: i.id, product_name: i.name, price: effectivePrice(i), quantity: i.qty })) })
+  });
+  const data = await res.json();
+  if (data.id) {
+    cart = [];
+    if (currentUser) fetch('/api/cart', { method: 'DELETE', credentials: 'include' });
+    else saveCart();
+    updateCartUI();
+    document.getElementById('order-form-screen').classList.add('hidden');
+    document.getElementById('order-success-screen').classList.remove('hidden');
+  }
 }
 
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
