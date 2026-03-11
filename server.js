@@ -78,4 +78,5 @@ app.get('/hakkimizda', (req, res) => res.sendFile(path.join(__dirname, 'public',
 app.get('/teslimat-iade', (req, res) => res.sendFile(path.join(__dirname, 'public', 'teslimat-iade.html')));
 app.get('/gizlilik', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gizlilik.html')));
 app.get('/mesafeli-satis', (req, res) => res.sendFile(path.join(__dirname, 'public', 'mesafeli-satis.html')));
+app.get('/landing', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
 
