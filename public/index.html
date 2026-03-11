@@ -164,6 +164,27 @@ nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.2);white-space:nowrap}
 .hidden{display:none}
 
+/* ── FOOTER ── */
+.site-footer{background:#1a1a1a;color:#fff;margin-top:60px;padding:48px 24px 28px}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;margin-bottom:36px}
+.footer-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;text-decoration:none;display:block;margin-bottom:12px}
+.footer-logo span{color:#f97316}
+.footer-desc{font-size:13px;color:#888;line-height:1.7;max-width:260px}
+.footer-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#666;margin-bottom:14px}
+.footer-col a{display:block;color:#aaa;font-size:13px;text-decoration:none;margin-bottom:9px;transition:color .15s}
+.footer-col a:hover{color:#f97316}
+.footer-divider{border:none;border-top:1px solid #2a2a2a;margin-bottom:22px}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.footer-copy{font-size:12px;color:#555}
+.footer-trust{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ssl-badge{display:flex;align-items:center;gap:5px;background:#0f2010;border:1px solid #1a3d1a;color:#4ade80;font-size:11px;font-weight:700;padding:5px 11px;border-radius:7px}
+.pay-logos{display:flex;align-items:center;gap:8px}
+.pay-logo-box{height:28px;background:#fff;border-radius:5px;padding:4px 10px;display:flex;align-items:center;justify-content:center}
+.iyzico-logo{font-size:11px;font-weight:800;color:#1a1a1a;letter-spacing:-0.3px;white-space:nowrap}
+.iyzico-logo b{color:#f97316}
+@media(max-width:700px){.footer-grid{grid-template-columns:1fr;gap:24px}.footer-bottom{flex-direction:column;align-items:flex-start}}
+
 @media(max-width:600px){
 .hero h1{font-size:26px}
 .products-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
@@ -297,6 +318,62 @@ nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <a class="footer-logo" href="/">TANE <span>STORE</span></a>
+        <p class="footer-desc">Türkiye'nin fiyat karşılaştırmalı alışveriş platformu. En uygun fiyat garantisiyle güvenli alışveriş.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kurumsal</h4>
+        <a href="/hakkimizda">Hakkımızda</a>
+        <a href="/teslimat-iade">Teslimat ve İade</a>
+        <a href="/gizlilik">Gizlilik Politikası</a>
+        <a href="/mesafeli-satis">Mesafeli Satış Sözleşmesi</a>
+      </div>
+      <div class="footer-col">
+        <h4>Müşteri Hizmetleri</h4>
+        <a href="/track">Sipariş Takibi</a>
+        <a href="/hesabim">Hesabım</a>
+        <a href="mailto:info@tanetekno.com">info@tanetekno.com</a>
+      </div>
+    </div>
+    <hr class="footer-divider"/>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Tane Store. Tüm hakları saklıdır.</span>
+      <div class="footer-trust">
+        <div class="ssl-badge">🔒 SSL Güvenli</div>
+        <div class="pay-logos">
+          <!-- Visa -->
+          <div class="pay-logo-box">
+            <svg width="42" height="14" viewBox="0 0 42 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16.2 13.6H13L15 0.4H18.2L16.2 13.6Z" fill="#00579F"/>
+              <path d="M27.4 0.7C26.8 0.5 25.8 0.2 24.6 0.2C21.5 0.2 19.3 1.8 19.3 4.1C19.3 5.8 20.9 6.7 22.1 7.3C23.3 7.9 23.7 8.3 23.7 8.8C23.7 9.6 22.7 10 21.8 10C20.5 10 19.8 9.8 18.7 9.3L18.3 9.1L17.9 12C18.6 12.3 19.9 12.6 21.3 12.6C24.6 12.6 26.8 11 26.8 8.6C26.8 7.2 25.9 6.1 24.1 5.2C23 4.7 22.3 4.3 22.3 3.7C22.3 3.2 22.9 2.7 24.2 2.7C25.3 2.7 26.1 2.9 26.7 3.2L27 3.3L27.4 0.7Z" fill="#00579F"/>
+              <path d="M31.6 9C31.9 8.2 33.1 4.9 33.1 4.9C33.1 4.9 33.4 4.1 33.6 3.6L33.8 4.8C33.8 4.8 34.5 8.1 34.7 9H31.6ZM35.5 0.4H33C32.3 0.4 31.7 0.6 31.4 1.4L26.7 13.6H30L30.6 11.9H34.6L35 13.6H38L35.5 0.4Z" fill="#00579F"/>
+              <path d="M13.2 0.4L10.1 9.4L9.8 7.9C9.2 5.9 7.3 3.7 5.2 2.6L8 13.6H11.4L16.6 0.4H13.2Z" fill="#00579F"/>
+              <path d="M7.1 0.4H2L2 0.6C5.6 1.5 7.9 3.6 8.8 6.1L7.9 1.4C7.7 0.6 7.5 0.4 7.1 0.4Z" fill="#FAA61A"/>
+            </svg>
+          </div>
+          <!-- Mastercard -->
+          <div class="pay-logo-box">
+            <svg width="36" height="22" viewBox="0 0 36 22" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="13" cy="11" r="9" fill="#EB001B"/>
+              <circle cx="23" cy="11" r="9" fill="#F79E1B"/>
+              <path d="M18 4.5a9 9 0 0 1 0 13A9 9 0 0 1 18 4.5z" fill="#FF5F00"/>
+            </svg>
+          </div>
+          <!-- İyzico -->
+          <div class="pay-logo-box">
+            <span class="iyzico-logo">iyzico <b>ile öde</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
 
 <script>
 let allProducts = [], currentCat = 'Tümü';
