@@ -132,3 +132,19 @@ app.get('/api/arbitrage/runs', (_req, res) => {
   );
 });
 
+// Manuel tetikleme: POST /api/admin/run-arbitrage
+let arbRunning = false;
+app.post('/api/admin/run-arbitrage', (_req, res) => {
+  if (arbRunning) return res.json({ message: 'Zaten çalışıyor.' });
+  res.json({ message: 'Arbitraj taraması başlatıldı.' });
+  arbRunning = true;
+  require('./akakce-arbitrage').run()
+    .catch(e => console.error('[admin] Arbitraj hata:', e.message))
+    .finally(() => { arbRunning = false; });
+});
+
+// Admin sayfası
+app.get('/admin/arbitrage', (_req, res) =>
+  res.sendFile(path.join(__dirname, 'public', 'admin-arbitrage.html'))
+);
+

@@ -121,6 +121,31 @@ async function scrapeProduct(page, url) {
       const h1 = document.querySelector('h1[class*="v_h"], h1.v_h, h1');
       const name = h1 ? h1.textContent.trim().replace(/\s+/g, ' ') : '';
 
+      // Ana ürün resmi
+      const imgEl =
+        document.querySelector('img.v_img') ||
+        document.querySelector('img[itemprop="image"]') ||
+        document.querySelector('[class*="v_th"] img');
+      const imageUrl = imgEl
+        ? (imgEl.getAttribute('data-src') || imgEl.getAttribute('data-lazy') || imgEl.src || '')
+        : '';
+
+      // Marka
+      const brandEl =
+        document.querySelector('[itemprop="brand"]') ||
+        document.querySelector('a[class*="brand_"]') ||
+        document.querySelector('[class*="brand_"]');
+      const brand = brandEl ? brandEl.textContent.trim().replace(/\s+/g, ' ') : '';
+
+      // Kısa açıklama
+      const specEl =
+        document.querySelector('[class*="spec_v"]') ||
+        document.querySelector('[class*="ozellik"]') ||
+        document.querySelector('[itemprop="description"]');
+      const description = specEl
+        ? specEl.textContent.trim().replace(/\s+/g, ' ').slice(0, 500)
+        : '';
+
       // Satıcı + fiyat listesi
       const rows = document.querySelectorAll('ul.pl_v9 > li, ul[class*="pl_v"] > li');
       const sellers = [];
@@ -150,7 +175,7 @@ async function scrapeProduct(page, url) {
         if (sellerRaw && price > 0) sellers.push({ sellerRaw, price, offerUrl });
       });
 
-      return { isElec, name, sellers };
+      return { isElec, name, imageUrl, brand, description, sellers };
     });
   } catch (e) {
     console.error(`  [hata] ${url.slice(0, 55)}: ${e.message.slice(0, 60)}`);
@@ -188,7 +213,52 @@ function findArbitrage(sellers) {
   };
 }
 
-// ─── Adım 4: DB'ye kaydet ────────────────────────────────────────────────────
+// ─── Adım 4: Ürünü siteye ekle / güncelle ────────────────────────────────────
+// Satış fiyatı = 2. en ucuz fiyat (kullanıcı bu fiyata satar, Amazon'dan ucuza alır)
+
+function upsertProduct({ name, imageUrl, brand, description, akakceUrl, sellPrice }) {
+  return new Promise(resolve => {
+    db.get(
+      `SELECT id FROM products WHERE name ILIKE $1 LIMIT 1`,
+      [`${name.slice(0, 50)}%`],
+      (_err, existing) => {
+        if (existing) {
+          db.run(
+            `UPDATE products
+               SET tane_price = $1,
+                   image_url  = COALESCE(NULLIF(image_url,''), $2),
+                   tane_url   = $3
+             WHERE id = $4`,
+            [sellPrice, imageUrl || null, akakceUrl, existing.id],
+            () => {
+              console.log(`  ↻ GÜNCELLENDİ  ${name.slice(0, 48).padEnd(50)} → ${sellPrice.toLocaleString('tr-TR')}₺`);
+              resolve(existing.id);
+            }
+          );
+        } else {
+          const desc = description ||
+            `${name}${brand ? ' — ' + brand : ''}. Piyasanın en uygun fiyatı.`;
+          db.run(
+            `INSERT INTO products
+               (name, image_url, description, category, brand, tane_price, tane_url, stock)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,99)`,
+            [name, imageUrl || null, desc.slice(0, 500), 'Elektronik', brand || null, sellPrice, akakceUrl],
+            function(err2) {
+              if (!err2) {
+                console.log(`  + EKLENDI      ${name.slice(0, 48).padEnd(50)} → ${sellPrice.toLocaleString('tr-TR')}₺`);
+              } else {
+                console.error(`  [db hata] ${err2.message.slice(0, 80)}`);
+              }
+              resolve(this?.lastID || null);
+            }
+          );
+        }
+      }
+    );
+  });
+}
+
+// ─── Adım 5: DB'ye arbitraj kaydı ────────────────────────────────────────────
 
 function ensureTables() {
   return Promise.all([
@@ -320,6 +390,16 @@ async function run() {
         `${arb.secondLabel} @ ${arb.secondPrice.toLocaleString('tr-TR')}₺ ` +
         `(+${arb.gapPct.toFixed(1)}%)`
       );
+
+      // Ürünü siteye ekle / güncelle (satış fiyatı = 2. en ucuz fiyat)
+      await upsertProduct({
+        name:        product.name,
+        imageUrl:    product.imageUrl,
+        brand:       product.brand,
+        description: product.description,
+        akakceUrl:   link,
+        sellPrice:   arb.secondPrice,
+      });
 
       await sleep(PRODUCT_DELAY_MS + Math.random() * 500);
     }
