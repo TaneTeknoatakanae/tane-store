@@ -192,11 +192,11 @@ function findTarget(sellers) {
   if (!sellers || sellers.length === 0) return null;
   const sorted = [...sellers].sort((a, b) => a.price - b.price);
 
-  // Listede Amazon Türkiye / Amazon Prime / Media Markt olmalı
-  if (!sorted.some(s => isBig(s.seller))) return null;
+  // En ucuz satıcı Amazon / Prime / Media Markt olmalı
+  if (!isBig(sorted[0].seller)) return null;
 
-  // Bu perakendeciler hariç en ucuz satıcı
-  return sorted.find(s => !isBig(s.seller)) || null;
+  // 2. en ucuz satıcı (kim olursa olsun)
+  return sorted[1] || null;
 }
 
 // ─── Adım 4: DB'ye upsert ────────────────────────────────────────────────────
@@ -288,15 +288,15 @@ async function run() {
       const target = findTarget(product.sellers);
 
       if (!target) {
-        const hasBig = product.sellers.some(s => isBig(s.seller));
-        console.log(`${prefix} atlandı — ${hasBig ? 'başka satıcı yok' : 'Amazon/MediaMarkt yok'}`);
-        hasBig ? stats.noOther++ : stats.noBig++;
+        const sorted0 = [...product.sellers].sort((a, b) => a.price - b.price);
+        const cheapestIsBig = sorted0.length && isBig(sorted0[0].seller);
+        console.log(`${prefix} atlandı — ${cheapestIsBig ? '2. satıcı yok' : 'en ucuz Amazon/MMarkt değil'}`);
+        cheapestIsBig ? stats.noOther++ : stats.noBig++;
         continue;
       }
 
-      // Büyük perakendecilerden hangisi listede?
-      const bigSellers = product.sellers.filter(s => isBig(s.seller)).map(s => s.seller).join(', ');
-      console.log(`${prefix} ${product.name.slice(0, 40)} | ${bigSellers} var → ${target.seller.slice(0, 20)} @ ${target.price.toLocaleString('tr-TR')}₺`);
+      const cheapest = [...product.sellers].sort((a, b) => a.price - b.price)[0];
+      console.log(`${prefix} ${product.name.slice(0, 40)} | en ucuz: ${cheapest.seller.slice(0, 18)} @ ${cheapest.price.toLocaleString('tr-TR')}₺ → 2. fiyat: ${target.seller.slice(0, 18)} @ ${target.price.toLocaleString('tr-TR')}₺`);
 
       await upsertProduct({
         name:         product.name,
