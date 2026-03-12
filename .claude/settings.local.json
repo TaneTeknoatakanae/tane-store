@@ -7,7 +7,9 @@
       "Bash(node:*)",
       "Bash(powershell -Command \"Expand-Archive -Path urunler.zip -DestinationPath xlsx-contents -Force\")",
       "WebFetch(domain:www.hepsiburada.com)",
-      "WebFetch(domain:www.amazon.com.tr)"
+      "WebFetch(domain:www.amazon.com.tr)",
+      "Bash(node -e \"require\\(''''puppeteer''''\\)\")",
+      "Bash(grep -r 'class=\"\"\"\"logo\"\"\"\" href=' *.html)"
     ]
   }
 }
