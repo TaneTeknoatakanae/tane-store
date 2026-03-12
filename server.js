@@ -5,6 +5,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const session = require('express-session');
+const cron = require('node-cron');
 const db = require('./database/db');
 
 const app = express();
@@ -13,6 +14,14 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Tane Store çalışıyor → Port: ${PORT}`);
 });
+
+// ── Akakçe otomatik sync — her gün saat 03:00'da ──────────
+cron.schedule('0 3 * * *', () => {
+  console.log('[cron] Akakçe sync tetiklendi');
+  require('./akakce-sync').run().catch(e =>
+    console.error('[cron] Akakçe sync hata:', e.message)
+  );
+}, { timezone: 'Europe/Istanbul' });
 
 // Uploads klasörünü oluştur
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
