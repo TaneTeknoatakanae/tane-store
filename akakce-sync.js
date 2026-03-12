@@ -2,9 +2,9 @@
  * akakce-sync.js
  *
  * https://www.akakce.com/fark-atan-fiyatlar/ sayfasını tarar.
- * Elektronik kategorisindeki ürünlerde Amazon / Amazon Prime / Media Markt
- * satıcısı varsa; bu büyük perakendeciler hariç en ucuz satıcı fiyatıyla
- * ürünleri sitemize otomatik ekler / günceller.
+ * Elektronik kategorisindeki ürünlerde Amazon Türkiye / Amazon Prime /
+ * Media Markt satıcısı varsa; bu perakendeciler HARİÇ en ucuz satıcı
+ * fiyatıyla ürünleri sitemize otomatik ekler / günceller.
  *
  * Manuel çalıştırma : node akakce-sync.js
  * Cron               : server.js içinde her gün 03:00'da tetiklenir
@@ -16,43 +16,25 @@ const db        = require('./database/db');
 
 // ─── Ayarlar ─────────────────────────────────────────────────────────────────
 
-const DEALS_BASE_URL = 'https://www.akakce.com/fark-atan-fiyatlar/';
-const MAX_PAGES      = 8;      // kaç sayfa taransın (her sayfa ~24 ürün)
-const PAGE_DELAY_MS  = 2500;   // sayfa yüklemesi sonrası bekleme
-const PRODUCT_DELAY_MS = 2000; // ürünler arası bekleme
+const DEALS_BASE_URL   = 'https://www.akakce.com/fark-atan-fiyatlar/';
+const MAX_PAGES        = 8;     // kaç sayfa taransın
+const PAGE_DELAY_MS    = 2500;  // sayfa yüklemesi sonrası bekleme (ms)
+const PRODUCT_DELAY_MS = 2000;  // ürünler arası bekleme (ms)
 
-// Büyük perakendeciler — case-insensitive içerir kontrolü
-const BIG_RETAILERS = ['amazon türkiye', 'amazon prime', 'amazon', 'media markt', 'mediamarkt'];
-
-// Elektronik kategori slug'ları (Akakçe URL'deki ilk path segmenti)
-const ELECTRONICS_SLUGS = [
-  'cep-telefonu', 'notebook', 'laptop', 'tablet', 'televizyon',
-  'kulaklık', 'kulaklik', 'oyun-konsol', 'oyuncu', 'akilli-saat',
-  'kamera', 'fotograf-makinesi', 'bilgisayar', 'monitor', 'fare',
-  'klavye', 'yazici', 'ses-sistemi', 'hoparlor', 'hoparlör',
-  'powerbank', 'sarj-cihazi', 'sarj', 'modem', 'router',
-  'ag-urunleri', 'drone', 'projeksiyon', 'elektronik', 'smartwatch',
-  'e-kitap', 'aksiyon-kamera', 'harddisk', 'ssd', 'ram', 'ekran-karti',
-  'bluetooth', 'mikrofon', 'web-kamerasi', 'ups', 'playstation',
-  'xbox', 'nintendo', 'airpods', 'aksesuar', 'saat',
-];
+// Akakçe'deki satıcı adları — img[alt] değerleriyle birebir eşleşmeli
+const BIG_RETAILER_NAMES = ['Amazon Türkiye', 'Amazon Prime', 'Media Markt'];
 
 // ─── Yardımcı fonksiyonlar ────────────────────────────────────────────────────
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+/**
+ * Satıcı adının büyük perakendecilerden biri olup olmadığını kontrol eder.
+ * Akakçe'de satıcı adları img[alt] attribute'undan gelir; değerler:
+ *   "Amazon Türkiye" | "Amazon Prime" | "Media Markt"
+ */
 function isBig(sellerName) {
-  const n = (sellerName || '').toLowerCase().trim().replace(/\s+/g, ' ');
-  return BIG_RETAILERS.some(r => n.includes(r));
-}
-
-function isElectronics(url) {
-  try {
-    const slug = new URL(url).pathname.split('/')[1] || '';
-    return ELECTRONICS_SLUGS.some(s => slug.includes(s));
-  } catch {
-    return false;
-  }
+  return BIG_RETAILER_NAMES.some(r => r.toLowerCase() === (sellerName || '').toLowerCase().trim());
 }
 
 // ─── Tarayıcı ─────────────────────────────────────────────────────────────────
@@ -77,16 +59,13 @@ async function makePage(browser) {
   return p;
 }
 
-// ─── Adım 1: Ürün URL'lerini topla ───────────────────────────────────────────
+// ─── Adım 1: Fark-atan listesinden ürün URL'lerini topla ─────────────────────
 
 async function collectProductLinks(page) {
   const seen = new Set();
 
   for (let pageNum = 1; pageNum <= MAX_PAGES; pageNum++) {
-    const url = pageNum === 1
-      ? DEALS_BASE_URL
-      : `${DEALS_BASE_URL}?p=${pageNum}`;
-
+    const url = pageNum === 1 ? DEALS_BASE_URL : `${DEALS_BASE_URL}?p=${pageNum}`;
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await sleep(PAGE_DELAY_MS);
@@ -98,19 +77,13 @@ async function collectProductLinks(page) {
           .filter((v, i, arr) => arr.indexOf(v) === i)
       );
 
-      if (links.length === 0) {
-        console.log(`  Sayfa ${pageNum}: boş, duruyorum.`);
-        break;
-      }
+      if (!links.length) { console.log(`  Sayfa ${pageNum}: boş, duruyorum.`); break; }
 
-      let newCount = 0;
-      links.forEach(l => { if (!seen.has(l)) { seen.add(l); newCount++; } });
+      let added = 0;
+      links.forEach(l => { if (!seen.has(l)) { seen.add(l); added++; } });
+      console.log(`  Sayfa ${pageNum}: ${links.length} link  (+${added} yeni, toplam ${seen.size})`);
 
-      console.log(
-        `  Sayfa ${pageNum}: ${links.length} link  (+${newCount} yeni, toplam ${seen.size})`
-      );
-
-      if (newCount === 0) break; // aynı linkler tekrar geliyorsa dur
+      if (added === 0) break;
       await sleep(1000);
     } catch (e) {
       console.error(`  Sayfa ${pageNum} hata: ${e.message.slice(0, 70)}`);
@@ -122,6 +95,18 @@ async function collectProductLinks(page) {
 }
 
 // ─── Adım 2: Ürün sayfasını tara ─────────────────────────────────────────────
+//
+// Doğrulanmış Akakçe HTML yapısı:
+//   ul.pl_v9 > li
+//     span.pt_v8              → fiyat  ("1.234,56 TL" formatında)
+//     span.pt_v8.orig_pt_v8   → üstü çizili orijinal fiyat — ATLANIR
+//     span.pt_v8.cmpgn_pt_v8  → kampanya/indirimli fiyat (varsa bunu kullan)
+//     span.v_v8 > img[alt]    → büyük mağaza logosu, alt = satıcı adı
+//     span.v_v8 (text)        → küçük satıcı adı (bazen "/" ile başlar)
+//
+//  Elektronik filtresi: breadcrumb'da "Elektronik" veya "elektronik" geçiyor mu?
+//  (URL slug yerine sayfa içi breadcrumb kullanılır — direksiyon-seti, powerbank
+//   gibi tüm alt kategoriler otomatik yakalanır)
 
 async function scrapeProductPage(page, url) {
   try {
@@ -129,16 +114,21 @@ async function scrapeProductPage(page, url) {
     await sleep(PAGE_DELAY_MS);
 
     return await page.evaluate(() => {
-      // ── Ürün adı ───────────────────────────────────────────────────────────
+
+      // ── Elektronik mi? (breadcrumb <a> linki kontrolü) ───────────────────
+      const isElectronics = Array.from(document.querySelectorAll('a'))
+        .some(a => a.textContent.trim() === 'Elektronik');
+
+      // ── Ürün adı ──────────────────────────────────────────────────────────
       const h1 = document.querySelector('h1[class*="v_h"], h1.v_h, h1');
       const name = h1 ? h1.textContent.trim().replace(/\s+/g, ' ') : '';
 
-      // ── Resim ─────────────────────────────────────────────────────────────
+      // ── Ana ürün resmi ────────────────────────────────────────────────────
       const imgEl =
         document.querySelector('img.v_img') ||
         document.querySelector('img[itemprop="image"]') ||
-        document.querySelector('[class*="product"] img') ||
-        document.querySelector('[class*="main"] img');
+        document.querySelector('[class*="product-img"] img') ||
+        document.querySelector('[class*="v_th"] img');
       const imageUrl = imgEl
         ? (imgEl.getAttribute('data-src') || imgEl.getAttribute('data-lazy') || imgEl.src || '')
         : '';
@@ -146,57 +136,48 @@ async function scrapeProductPage(page, url) {
       // ── Marka ─────────────────────────────────────────────────────────────
       const brandEl =
         document.querySelector('[itemprop="brand"]') ||
-        document.querySelector('[class*="brand_"]') ||
-        document.querySelector('[class*="marka"]');
+        document.querySelector('a[class*="brand_"]') ||
+        document.querySelector('[class*="brand_"]');
       const brand = brandEl ? brandEl.textContent.trim().replace(/\s+/g, ' ') : '';
 
-      // ── Açıklama / özellikler ─────────────────────────────────────────────
+      // ── Kısa ürün açıklaması ──────────────────────────────────────────────
       const specEl =
-        document.querySelector('[class*="spec"]') ||
+        document.querySelector('[class*="spec_v"]') ||
         document.querySelector('[class*="ozellik"]') ||
-        document.querySelector('[class*="desc"]') ||
-        document.querySelector('[class*="features"]');
+        document.querySelector('[itemprop="description"]');
       const description = specEl
         ? specEl.textContent.trim().replace(/\s+/g, ' ').slice(0, 500)
         : '';
 
-      // ── Satıcı listesi ────────────────────────────────────────────────────
-      // Gerçek yapı (debug'dan doğrulandı):
-      //   ul.pl_v9 > li
-      //     span.pt_v8          → fiyat (TL)
-      //     span.pt_v8.orig_pt_v8 → orijinal fiyat (üstü çizili) — ATLIYORUZ
-      //     span.pt_v8.cmpgn_pt_v8 → kampanya fiyatı (gerçek)
-      //     span.v_v8           → satıcı adı (bazen "/" ile başlar)
-
+      // ── Satıcı + fiyat listesi ────────────────────────────────────────────
       const sellers = [];
       const rows = document.querySelectorAll('ul.pl_v9 > li, ul[class*="pl_v"] > li');
 
       rows.forEach(li => {
-        // Satıcı adı: büyük mağazalar (Amazon, MediaMarkt, Hepsiburada…) logo img kullanır,
-        // küçük satıcılar text kullanır — her ikisini de kontrol ediyoruz.
-        const sellerEl = li.querySelector('span.v_v8');
+        // Satıcı adı
+        const sellerSpan = li.querySelector('span.v_v8');
         let sellerName = '';
-        if (sellerEl) {
-          const img = sellerEl.querySelector('img[alt]');
-          sellerName = img
-            ? img.alt.trim()
-            : sellerEl.textContent.trim().replace(/^\//, '').replace(/\s+/g, ' ');
+        if (sellerSpan) {
+          const logo = sellerSpan.querySelector('img[alt]');
+          sellerName = logo
+            ? logo.alt.trim()                                          // büyük mağaza: img alt
+            : sellerSpan.textContent.trim().replace(/^\//, '').replace(/\s+/g, ' '); // küçük satıcı: text
         }
 
-        // Efektif fiyat: kampanya fiyatı varsa o, yoksa normal pt_v8
-        const campaignEl = li.querySelector('span.pt_v8.cmpgn_pt_v8');
-        const regularEl  = li.querySelector('span.pt_v8:not(.orig_pt_v8):not(.cmpgn_pt_v8)');
-        const priceEl    = campaignEl || regularEl;
-        const priceText  = priceEl ? priceEl.textContent.trim() : '';
+        // Efektif fiyat: kampanya varsa onu al, yoksa normal fiyatı al
+        const priceEl =
+          li.querySelector('span.pt_v8.cmpgn_pt_v8') ||
+          li.querySelector('span.pt_v8:not(.orig_pt_v8):not(.cmpgn_pt_v8)');
+        const rawPrice = priceEl ? priceEl.textContent.replace(/\s/g, '') : '';
 
-        const m = priceText.replace(/\s/g, '').match(/([\d.]+)[,](\d{2})/);
+        const m = rawPrice.match(/([\d.]+)[,](\d{2})/);
         if (m && sellerName) {
           const price = parseFloat(m[1].replace(/\./g, '') + '.' + m[2]);
           if (price > 0) sellers.push({ seller: sellerName.slice(0, 80), price });
         }
       });
 
-      return { name, imageUrl, brand, description, sellers };
+      return { isElectronics, name, imageUrl, brand, description, sellers };
     });
 
   } catch (e) {
@@ -211,14 +192,14 @@ function findTarget(sellers) {
   if (!sellers || sellers.length === 0) return null;
   const sorted = [...sellers].sort((a, b) => a.price - b.price);
 
-  // Listede en az bir büyük perakendeci olmalı
+  // Listede Amazon Türkiye / Amazon Prime / Media Markt olmalı
   if (!sorted.some(s => isBig(s.seller))) return null;
 
-  // Büyük perakendeci olmayan en ucuz satıcı
+  // Bu perakendeciler hariç en ucuz satıcı
   return sorted.find(s => !isBig(s.seller)) || null;
 }
 
-// ─── Adım 4: DB upsert ───────────────────────────────────────────────────────
+// ─── Adım 4: DB'ye upsert ────────────────────────────────────────────────────
 
 function upsertProduct({ name, imageUrl, brand, description, akakceUrl, targetPrice, targetSeller }) {
   return new Promise(resolve => {
@@ -229,15 +210,13 @@ function upsertProduct({ name, imageUrl, brand, description, akakceUrl, targetPr
         if (existing) {
           db.run(
             `UPDATE products
-             SET tane_price = $1,
-                 image_url  = COALESCE(NULLIF(image_url,''), $2),
-                 tane_url   = $3
+               SET tane_price = $1,
+                   image_url  = COALESCE(NULLIF(image_url,''), $2),
+                   tane_url   = $3
              WHERE id = $4`,
             [targetPrice, imageUrl || null, akakceUrl, existing.id],
             () => {
-              console.log(
-                `  ↻ GÜNCELLENDİ  ${name.slice(0, 48).padEnd(50)} → ${targetPrice.toLocaleString('tr-TR')}₺`
-              );
+              console.log(`  ↻ GÜNCELLENDİ  ${name.slice(0, 48).padEnd(50)} → ${targetPrice.toLocaleString('tr-TR')}₺`);
               resolve(existing.id);
             }
           );
@@ -251,9 +230,7 @@ function upsertProduct({ name, imageUrl, brand, description, akakceUrl, targetPr
             [name, imageUrl || null, desc.slice(0, 500), 'Elektronik', brand || null, targetPrice, akakceUrl],
             function (err2) {
               if (!err2) {
-                console.log(
-                  `  + EKLENDI      ${name.slice(0, 48).padEnd(50)} → ${targetPrice.toLocaleString('tr-TR')}₺  (${targetSeller.slice(0, 28)})`
-                );
+                console.log(`  + EKLENDI      ${name.slice(0, 48).padEnd(50)} → ${targetPrice.toLocaleString('tr-TR')}₺  (${targetSeller.slice(0, 28)})`);
               } else {
                 console.error(`  [db hata] ${err2.message.slice(0, 80)}`);
               }
@@ -276,33 +253,22 @@ async function run() {
   console.log(line);
 
   let browser;
-  const stats = { processed: 0, skipped: 0, noElec: 0, noBig: 0, errors: 0 };
+  const stats = { processed: 0, noElec: 0, noBig: 0, noOther: 0, errors: 0 };
 
   try {
     browser = await launchBrowser();
     const page = await makePage(browser);
 
-    // 1) Tüm sayfalardaki ürün linklerini topla
+    // 1) Fark-atan listesindeki tüm ürün linklerini topla
     console.log('\n▶ Ürün linkleri toplanıyor…');
     const allLinks = await collectProductLinks(page);
     console.log(`\n  ${allLinks.length} toplam ürün linki.\n`);
-
-    if (allLinks.length === 0) {
-      console.log('  ⚠ Link bulunamadı, sayfa yapısı değişmiş olabilir.');
-      return;
-    }
+    if (!allLinks.length) { console.log('  ⚠ Link bulunamadı.'); return; }
 
     // 2) Her ürünü tara
     for (let i = 0; i < allLinks.length; i++) {
-      const link = allLinks[i];
-      const prefix = `[${String(i + 1).padStart(3)}/${allLinks.length}]`;
-
-      // Elektronik filtresi (URL slug'ından)
-      if (!isElectronics(link)) {
-        process.stdout.write(`${prefix} atlandı (elektronik değil)\n`);
-        stats.noElec++;
-        continue;
-      }
+      const link    = allLinks[i];
+      const prefix  = `[${String(i + 1).padStart(3)}/${allLinks.length}]`;
 
       const product = await scrapeProductPage(page, link);
 
@@ -312,14 +278,25 @@ async function run() {
         continue;
       }
 
+      // Elektronik filtresi (breadcrumb'dan)
+      if (!product.isElectronics) {
+        console.log(`${prefix} atlandı — elektronik değil`);
+        stats.noElec++;
+        continue;
+      }
+
       const target = findTarget(product.sellers);
 
       if (!target) {
         const hasBig = product.sellers.some(s => isBig(s.seller));
         console.log(`${prefix} atlandı — ${hasBig ? 'başka satıcı yok' : 'Amazon/MediaMarkt yok'}`);
-        hasBig ? stats.skipped++ : stats.noBig++;
+        hasBig ? stats.noOther++ : stats.noBig++;
         continue;
       }
+
+      // Büyük perakendecilerden hangisi listede?
+      const bigSellers = product.sellers.filter(s => isBig(s.seller)).map(s => s.seller).join(', ');
+      console.log(`${prefix} ${product.name.slice(0, 40)} | ${bigSellers} var → ${target.seller.slice(0, 20)} @ ${target.price.toLocaleString('tr-TR')}₺`);
 
       await upsertProduct({
         name:         product.name,
@@ -345,9 +322,12 @@ async function run() {
   const elapsed = ((Date.now() - startedAt) / 1000 / 60).toFixed(1);
   console.log(`\n${line}`);
   console.log(
-    `[${new Date().toISOString()}]  Tamamlandı  ` +
-    `İşlendi:${stats.processed}  Elektronik değil:${stats.noElec}  ` +
-    `Amazon/MMarkt yok:${stats.noBig}  Atlandı:${stats.skipped}  Süre:${elapsed}dk`
+    `[${new Date().toISOString()}]  Tamamlandı` +
+    `  |  Eklendi/Güncellendi: ${stats.processed}` +
+    `  Elektronik değil: ${stats.noElec}` +
+    `  Amazon/MMarkt yok: ${stats.noBig}` +
+    `  Başka satıcı yok: ${stats.noOther}` +
+    `  Süre: ${elapsed}dk`
   );
   console.log(`${line}\n`);
 }
