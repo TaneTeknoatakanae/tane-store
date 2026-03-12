@@ -132,15 +132,42 @@ app.get('/api/arbitrage/runs', (_req, res) => {
   );
 });
 
-// Manuel tetikleme: POST /api/admin/run-arbitrage
+// Manuel tetikleme + durum takibi
 let arbRunning = false;
+let arbStatus  = { running: false, startedAt: null, log: [] };
+
+function arbLog(msg) {
+  const line = `[${new Date().toLocaleTimeString('tr-TR')}] ${msg}`;
+  arbStatus.log.push(line);
+  if (arbStatus.log.length > 200) arbStatus.log.shift();
+  console.log('[arb]', msg);
+}
+
 app.post('/api/admin/run-arbitrage', (_req, res) => {
-  if (arbRunning) return res.json({ message: 'Zaten çalışıyor.' });
-  res.json({ message: 'Arbitraj taraması başlatıldı.' });
-  arbRunning = true;
+  if (arbRunning) return res.json({ running: true, message: 'Zaten çalışıyor.' });
+  res.json({ running: false, message: 'Arbitraj taraması başlatıldı.' });
+  arbRunning        = true;
+  arbStatus.running = true;
+  arbStatus.startedAt = new Date().toISOString();
+  arbStatus.log     = ['Tarama başladı…'];
+
+  // Patch console.log for this run to capture output
+  const origLog = console.log;
+  console.log = (...args) => { origLog(...args); arbLog(args.join(' ')); };
+
   require('./akakce-arbitrage').run()
-    .catch(e => console.error('[admin] Arbitraj hata:', e.message))
-    .finally(() => { arbRunning = false; });
+    .catch(e => arbLog('HATA: ' + e.message))
+    .finally(() => {
+      console.log = origLog;
+      arbRunning        = false;
+      arbStatus.running = false;
+      arbLog('Tarama tamamlandı.');
+    });
+});
+
+// Durum sorgulama: GET /api/admin/arbitrage-status
+app.get('/api/admin/arbitrage-status', (_req, res) => {
+  res.json(arbStatus);
 });
 
 // Admin sayfası

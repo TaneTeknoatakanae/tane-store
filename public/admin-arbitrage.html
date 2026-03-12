@@ -24,6 +24,15 @@
     .search { padding: 9px 14px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 14px; min-width: 220px; }
     .search:focus { outline: 2px solid #0ea5e9; }
     .run-info { font-size: 13px; color: #64748b; margin-left: auto; }
+    .status-bar { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: none; }
+    .status-bar.active { display: block; border-color: #0ea5e9; }
+    .status-bar .status-title { font-size: 13px; font-weight: 700; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .status-bar .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulse 1s infinite; }
+    .status-bar .dot.idle { background: #64748b; animation: none; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .log-box { background: #0f172a; border-radius: 6px; padding: 10px 14px; max-height: 180px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #94a3b8; line-height: 1.6; }
+    .log-box .match { color: #4ade80; }
+    .log-box .err   { color: #f87171; }
     table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 10px; overflow: hidden; border: 1px solid #334155; }
     thead { background: #0f172a; }
     th { padding: 12px 14px; font-size: 12px; font-weight: 600; text-align: left; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
@@ -60,6 +69,14 @@
 </div>
 
 <div class="container">
+  <div class="status-bar" id="status-bar">
+    <div class="status-title">
+      <div class="dot" id="status-dot"></div>
+      <span id="status-title-text">Tarama çalışıyor…</span>
+    </div>
+    <div class="log-box" id="log-box"></div>
+  </div>
+
   <div class="stats" id="stats-row"></div>
 
   <div class="controls">
@@ -173,9 +190,59 @@ async function loadData() {
 }
 
 async function triggerSync() {
-  showToast('Tarama başlatıldı… (arka planda çalışıyor)');
+  const res = await fetch('/api/admin/run-arbitrage', { method: 'POST' }).then(r => r.json()).catch(() => ({}));
+  if (res.running) { showToast('Tarama zaten çalışıyor!'); return; }
+  showToast('Tarama başlatıldı…');
+  startStatusPolling();
+}
+
+// ── Status polling ─────────────────────────────────────────────────────────
+let statusInterval = null;
+let lastLogLen = 0;
+let wasRunning = false;
+
+function startStatusPolling() {
+  if (statusInterval) return;
+  statusInterval = setInterval(pollStatus, 3000);
+  pollStatus();
+}
+
+async function pollStatus() {
   try {
-    await fetch('/api/admin/run-arbitrage', { method: 'POST' });
+    const s = await fetch('/api/admin/arbitrage-status').then(r => r.json());
+    const bar  = document.getElementById('status-bar');
+    const dot  = document.getElementById('status-dot');
+    const title = document.getElementById('status-title-text');
+    const logBox = document.getElementById('log-box');
+
+    if (s.running || (s.log && s.log.length > 0)) {
+      bar.classList.add('active');
+      dot.className = s.running ? 'dot' : 'dot idle';
+      title.textContent = s.running ? 'Tarama çalışıyor…' : 'Son tarama tamamlandı';
+
+      // Only append new lines
+      const newLines = s.log.slice(lastLogLen);
+      if (newLines.length) {
+        lastLogLen = s.log.length;
+        newLines.forEach(line => {
+          const div = document.createElement('div');
+          div.className = line.includes('✓') ? 'match' : line.includes('HATA') ? 'err' : '';
+          div.textContent = line;
+          logBox.appendChild(div);
+        });
+        logBox.scrollTop = logBox.scrollHeight;
+      }
+    }
+
+    // When scan finishes, reload the results table
+    if (wasRunning && !s.running) {
+      setTimeout(loadData, 2000);
+      showToast('Tarama tamamlandı! Sonuçlar güncellendi.');
+      clearInterval(statusInterval);
+      statusInterval = null;
+      lastLogLen = 0;
+    }
+    wasRunning = s.running;
   } catch (_) {}
 }
 
@@ -187,6 +254,8 @@ function showToast(msg) {
 }
 
 loadData();
+// Check if a scan is already running when page opens
+pollStatus().then(() => { if (wasRunning) startStatusPolling(); });
 </script>
 </body>
 </html>
