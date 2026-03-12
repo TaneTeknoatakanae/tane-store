@@ -3,291 +3,725 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tane Store — Koleksiyonlar</title>
+<title>Tane Store — Güvenilir Alışveriş</title>
+<meta name="description" content="Tane Store — teknoloji ve yaşam ürünleri. Güvenli ödeme, 1–3 iş günü kargo, 14 gün iade garantisi."/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
+:root{
+  --bg:#fff;--surface:#f5f5f7;--border-light:#f0f0f0;--border:#e5e5e5;
+  --text:#1d1d1f;--text2:#6e6e73;--text3:#aeaeb2;
+  --accent:#e85d00;--accent-h:#c94d00;
+  --green:#1a7a3a;--green-bg:#f0faf4;--red:#c00;
+  --r:10px;--r-lg:16px;
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06);--shadow:0 4px 20px rgba(0,0,0,.08);
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#f5f5f7;min-height:100vh}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
 
-/* ── LAYOUT ── */
-.container{width:100%;max-width:1280px;margin:0 auto;padding:0 12px;min-height:100vh}
+/* COOKIE CONSENT */
+.cookie-bar{position:fixed;bottom:0;left:0;right:0;background:#1d1d1f;color:#f5f5f7;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:600;font-size:13px;flex-wrap:wrap;border-top:1px solid #2a2a2a}
+.cookie-bar a{color:var(--accent);text-decoration:none}.cookie-bar a:hover{text-decoration:underline}
+.cookie-acts{display:flex;gap:8px;flex-shrink:0}
+.btn-ck-ok{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:background .15s}
+.btn-ck-ok:hover{background:var(--accent-h)}
+.btn-ck-no{background:none;color:#98989d;border:1px solid #3a3a3a;padding:8px 14px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:all .15s}
+.btn-ck-no:hover{color:#f5f5f7;border-color:#5a5a5a}
 
-/* ── HERO CARD ── */
-.hero-card{margin-top:24px;background:#141414;border:1px solid #2a2a2a;border-radius:20px;position:relative;overflow:hidden}
+/* PROMO BAR */
+.promo-bar{background:var(--accent);color:#fff;text-align:center;padding:9px 40px;font-size:13px;font-weight:500;position:relative}
+.promo-x{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;border-radius:4px}
+.promo-x:hover{color:#fff;background:rgba(0,0,0,.15)}
 
-/* ── HEADER ── */
-header{display:flex;align-items:stretch}
-.header-left{background:rgba(15,15,15,.96);border-bottom-right-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:12px;width:55%}
-@media(max-width:900px){.header-left{width:100%;border-bottom-right-radius:16px}}
-.logo{font-size:20px;font-weight:700;color:#f5f5f7;text-decoration:none;letter-spacing:-0.5px;white-space:nowrap}
-.logo span{color:#e85d00}
+/* NAV */
+.nav{background:rgba(255,255,255,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-light);position:sticky;top:0;z-index:100;height:60px}
+.nav-in{max-width:1280px;margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;gap:20px}
+.logo{font-weight:700;font-size:18px;color:var(--text);text-decoration:none;letter-spacing:-.5px;flex-shrink:0}
+.logo em{font-style:normal;color:var(--accent)}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-a{color:var(--text2);font-size:13px;text-decoration:none;padding:6px 10px;border-radius:8px;transition:color .15s;white-space:nowrap}
+.nav-a:hover{color:var(--text)}
+@media(max-width:768px){.nav-links{display:none}}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.nav-auth-link{color:var(--text2);font-size:13px;text-decoration:none;padding:6px 10px;border-radius:8px;transition:color .15s}
+.nav-auth-link:hover{color:var(--text)}
+.btn-login-nav{background:var(--text);color:#fff;border:none;padding:7px 16px;border-radius:8px;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:background .15s}
+.btn-login-nav:hover{background:#333}
+.btn-cart-nav{background:none;border:none;cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--text2);transition:color .15s;position:relative;flex-shrink:0}
+.btn-cart-nav:hover{color:var(--text)}
+.cart-badge{position:absolute;top:5px;right:5px;background:var(--accent);color:#fff;border-radius:50%;width:17px;height:17px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.btn-hamburger{display:none;background:none;border:none;cursor:pointer;width:40px;height:40px;align-items:center;justify-content:center;border-radius:8px;color:var(--text2)}
+@media(max-width:768px){.btn-hamburger{display:flex}}
 
-/* Desktop nav */
-.desktop-nav{display:flex;align-items:center;justify-content:space-between;flex:1;margin-left:8px}
-.nav-link{background:none;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#98989d;cursor:pointer;padding:6px 10px;border-radius:8px;text-decoration:none;transition:color .15s}
-.nav-link:hover{color:#e85d00}
-.icon-btn{background:none;border:none;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#98989d;transition:color .15s}
-.icon-btn:hover{color:#e85d00}
-@media(max-width:900px){.desktop-nav{display:none}}
+/* HERO */
+.hero{padding:80px 24px 72px;text-align:center}
+.hero-in{max-width:600px;margin:0 auto}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--surface);color:var(--text2);border:1px solid var(--border-light);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;margin-bottom:24px;letter-spacing:.3px}
+.hero h1{font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:800;letter-spacing:-2px;line-height:1.1;margin-bottom:18px;color:var(--text)}
+.hero h1 .accent{color:var(--accent)}
+.hero-sub{font-size:clamp(1rem,2vw,1.15rem);color:var(--text2);line-height:1.7;margin-bottom:32px;max-width:480px;margin-left:auto;margin-right:auto}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:#fff;border:none;padding:14px 28px;border-radius:var(--r-lg);font-family:'Inter',sans-serif;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:background .15s}
+.btn-primary:hover{background:var(--accent-h)}
+.btn-secondary{background:#fff;color:var(--text);border:1.5px solid var(--border);padding:12px 24px;border-radius:var(--r-lg);font-family:'Inter',sans-serif;font-weight:500;font-size:15px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .15s}
+.btn-secondary:hover{border-color:var(--text)}
 
-/* Mobile hamburger */
-.hamburger{display:none;background:none;border:none;cursor:pointer;width:36px;height:36px;align-items:center;justify-content:center;border-radius:8px;color:#98989d;margin-left:auto}
-.hamburger:hover{color:#e85d00}
-@media(max-width:900px){.hamburger{display:flex}}
+/* TRUST STRIP */
+.trust-strip{background:var(--surface);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light)}
+.trust-in{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:0 24px}
+@media(max-width:700px){.trust-in{grid-template-columns:repeat(2,1fr)}}
+.trust-item{display:flex;align-items:center;gap:12px;padding:18px 16px;border-right:1px solid var(--border-light)}
+.trust-item:last-child{border-right:none}
+@media(max-width:700px){.trust-item:nth-child(2){border-right:none}}
+.trust-ic{width:36px;height:36px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);color:var(--accent);flex-shrink:0}
+.trust-label{font-size:13px;font-weight:600;color:var(--text);display:block}
+.trust-sub{font-size:11px;color:var(--text2);display:block;margin-top:1px}
 
-/* Login btn right side */
-.header-right{display:flex;align-items:center;justify-content:flex-end;padding-right:16px;flex:1}
-@media(max-width:900px){.header-right{display:none}}
-.login-pill{display:flex;align-items:center;background:#1c1c1e;border-radius:999px;padding:4px 4px 4px 16px;font-size:13px;font-weight:500;color:#f5f5f7;cursor:pointer;border:1px solid #2a2a2a;font-family:'Inter',sans-serif;gap:8px;transition:border-color .2s}
-.login-pill:hover{border-color:#3a3a3a}
-.login-pill .pill-icon{width:36px;height:36px;background:#2a2a2a;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .2s}
-.login-pill:hover .pill-icon{transform:scale(1.1)}
+/* SECTION */
+.section{max-width:1280px;margin:0 auto;padding:64px 24px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.section-h2{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
+.section-lnk{font-size:13px;font-weight:500;color:var(--accent);text-decoration:none}
+.section-lnk:hover{color:var(--accent-h)}
 
-/* ── MOBILE DRAWER ── */
-.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;opacity:0;pointer-events:none;transition:opacity .3s}
-.drawer-overlay.open{opacity:1;pointer-events:all}
-.drawer{position:fixed;top:0;left:0;bottom:0;width:300px;background:#0f0f0f;border-right:1px solid #2a2a2a;z-index:401;transform:translateX(-100%);transition:transform .3s;display:flex;flex-direction:column}
-.drawer.open{transform:translateX(0)}
-.drawer-head{padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between}
-.drawer-logo{font-size:18px;font-weight:700;color:#f5f5f7;text-decoration:none}
-.drawer-logo span{color:#e85d00}
-.drawer-close{background:none;border:none;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#48484a}
-.drawer-close:hover{background:#2a2a2a;color:#f5f5f7}
-.drawer-nav{padding:16px;display:flex;flex-direction:column;gap:2px}
-.drawer-link{background:none;border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#f5f5f7;text-align:left;padding:12px 10px;border-radius:10px;cursor:pointer;transition:background .15s;width:100%}
-.drawer-link:hover{background:#2a2a2a;color:#e85d00}
-.drawer-sep{height:1px;background:#2a2a2a;margin:8px 16px}
-.drawer-actions{padding:16px;display:flex;flex-direction:column;gap:10px}
-.drawer-action-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #2a2a2a;border-radius:10px;background:#141414;font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;transition:background .15s;color:#98989d}
-.drawer-action-btn:hover{background:#2a2a2a}
-.drawer-login{margin:0 16px 16px;background:#e85d00;color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s}
-.drawer-login:hover{background:#ff6a00}
+/* SKELETON */
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel{background:linear-gradient(90deg,var(--surface) 25%,#ebebeb 50%,var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
+.skel-card{background:#fff;border:1px solid var(--border-light);border-radius:var(--r-lg);overflow:hidden}
+.skel-img{aspect-ratio:1}.skel-body{padding:14px;display:flex;flex-direction:column;gap:8px}
+.skel-line{border-radius:4px;height:12px}
 
-/* ── HERO SECTION ── */
-.hero-section{padding:80px 24px;text-align:center;animation:fadeUp .6s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.hero-title{font-size:clamp(2rem,6vw,4.5rem);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:20px}
-.hero-title .gradient{background:linear-gradient(135deg,#f5f5f7 0%,#98989d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-title .accent{background:linear-gradient(135deg,#e85d00,#ff8c42);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-sub{font-size:clamp(.9rem,2vw,1.1rem);color:#98989d;max-width:560px;margin:0 auto;line-height:1.7;animation:fadeUp .6s .2s ease both}
+/* PRODUCT GRID */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+@media(max-width:520px){.products-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
 
-/* ── CATEGORY GRID ── */
-.categories{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:32px;padding-bottom:8px}
-@media(max-width:900px){.categories{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:500px){.categories{grid-template-columns:1fr}}
+/* PRODUCT CARD */
+.prod-card{background:#fff;border:1px solid var(--border-light);border-radius:var(--r-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s;display:flex;flex-direction:column}
+.prod-card:hover{border-color:var(--border);box-shadow:var(--shadow)}
+.prod-img-wrap{position:relative;aspect-ratio:1;background:var(--surface);overflow:hidden;cursor:pointer}
+.prod-img{width:100%;height:100%;object-fit:contain;padding:16px;transition:transform .3s}
+.prod-card:hover .prod-img{transform:scale(1.04)}
+.prod-badge{position:absolute;top:10px;left:10px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
+.prod-body{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1}
+.prod-name{font-size:13px;font-weight:500;line-height:1.5;color:var(--text);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1;cursor:pointer}
+.prod-name:hover{color:var(--accent)}
+.prod-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.prod-price{font-size:17px;font-weight:700;color:var(--text)}
+.prod-price.sale{color:var(--accent)}
+.prod-old{font-size:12px;color:var(--text3);text-decoration:line-through}
+.btn-add{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border);padding:9px;border-radius:8px;font-family:'Inter',sans-serif;font-weight:500;font-size:13px;cursor:pointer;transition:all .15s}
+.btn-add:hover{background:var(--text);color:#fff;border-color:var(--text)}
+.btn-add:disabled{opacity:.45;cursor:not-allowed}
 
-.cat-card{position:relative;background:#141414;border:1px solid #2a2a2a;border-radius:24px;min-height:280px;overflow:hidden;cursor:pointer;transition:border-color .3s,transform .3s;animation:fadeUp .6s ease both}
-.cat-card:hover{border-color:#3a3a3a;transform:translateY(-4px)}
-.cat-card:nth-child(1){animation-delay:.05s}
-.cat-card:nth-child(2){animation-delay:.15s}
-.cat-card:nth-child(3){animation-delay:.25s}
-.cat-card:nth-child(4){animation-delay:.35s}
+/* CATEGORIES */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+@media(max-width:480px){.cat-grid{grid-template-columns:repeat(2,1fr)}}
+.cat-card{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);text-decoration:none;color:var(--text);transition:all .2s}
+.cat-card:hover{border-color:var(--accent);background:#fff8f0;transform:translateY(-2px)}
+.cat-icon{width:44px;height:44px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:var(--shadow-sm)}
+.cat-name{font-size:13px;font-weight:600;text-align:center}
 
-.cat-title{font-size:clamp(1.4rem,3vw,2rem);font-weight:800;color:#e85d00;text-align:center;padding:20px 16px 0;position:relative;z-index:2;transition:color .2s}
-.cat-card:hover .cat-title{color:#ff6a00}
+/* DELIVERY */
+.delivery-wrap{background:var(--surface);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light)}
+.delivery-in{max-width:1280px;margin:0 auto;padding:40px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;text-align:center}
+@media(max-width:640px){.delivery-in{grid-template-columns:1fr;gap:20px;text-align:left}}
+.del-icon{font-size:28px;margin-bottom:10px}
+.del-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.del-sub{font-size:13px;color:var(--text2);line-height:1.6}
+.del-sub a{color:var(--accent);text-decoration:none}
 
-.cat-img-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:50px 24px 24px}
-.cat-img{width:100%;max-width:160px;height:160px;object-fit:contain;transition:transform .4s,opacity .2s;opacity:.7}
-.cat-card:hover .cat-img{transform:scale(1.1);opacity:.9}
+/* FAQ */
+.faq{border:1px solid var(--border-light);border-radius:var(--r-lg);overflow:hidden}
+.faq-item{border-bottom:1px solid var(--border-light)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;background:#fff;border:none;text-align:left;padding:16px 20px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color .15s}
+.faq-q:hover{color:var(--accent)}
+.faq-chevron{flex-shrink:0;transition:transform .25s;color:var(--text3)}
+.faq-q.open .faq-chevron{transform:rotate(180deg)}
+.faq-a{background:#fff;padding:0 20px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .25s}
+.faq-a.open{max-height:200px;padding-bottom:18px}
+.faq-a p{font-size:13px;color:var(--text2);line-height:1.75}
+.faq-a a{color:var(--accent);text-decoration:none}
 
-.cat-arrow{position:absolute;bottom:0;right:0;width:64px;height:64px;background:rgba(10,10,10,.9);border-top-left-radius:14px;display:flex;align-items:center;justify-content:center;z-index:3}
-.cat-arrow-inner{width:44px;height:44px;background:#2a2a2a;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s;color:#98989d}
-.cat-card:hover .cat-arrow-inner{background:#e85d00;color:#fff;transform:scale(1.1)}
+/* FOOTER */
+.footer{background:#1d1d1f;color:#f5f5f7;padding:60px 24px 32px}
+.footer-in{max-width:1280px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:32px}}
+@media(max-width:480px){.footer-grid{grid-template-columns:1fr;gap:28px}}
+.footer-logo{font-size:18px;font-weight:700;color:#f5f5f7;letter-spacing:-.5px;text-decoration:none;display:inline-block;margin-bottom:12px}
+.footer-logo em{font-style:normal;color:var(--accent)}
+.footer-desc{font-size:13px;color:#98989d;line-height:1.7;margin-bottom:14px;max-width:220px}
+.footer-email{font-size:13px;color:#98989d;margin-bottom:4px}
+.footer-email a{color:var(--accent);text-decoration:none}
+.footer-col-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#98989d;margin-bottom:14px}
+.footer-links{display:flex;flex-direction:column;gap:10px}
+.footer-link{color:#f5f5f7;font-size:13px;text-decoration:none;opacity:.7;transition:opacity .15s}
+.footer-link:hover{opacity:1}
+.footer-hr{border:none;border-top:1px solid #2a2a2a;margin-bottom:24px}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-copy{font-size:12px;color:#48484a}
+.footer-legal{display:flex;gap:16px;flex-wrap:wrap}
+.footer-legal a{font-size:12px;color:#48484a;text-decoration:none;transition:color .15s}
+.footer-legal a:hover{color:#98989d}
 
-/* ── SVG ICONS ── */
-svg{display:block}
+/* CART DRAWER */
+.c-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
+.c-overlay.open{opacity:1;pointer-events:all}
+.c-drawer{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:100vw;background:#fff;z-index:201;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;border-left:1px solid var(--border)}
+.c-drawer.open{transform:translateX(0)}
+.c-head{padding:20px 24px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between}
+.c-head-title{font-size:16px;font-weight:600;color:var(--text)}
+.c-close{background:none;border:none;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--text2);transition:all .15s}
+.c-close:hover{background:var(--surface);color:var(--text)}
+.c-items{flex:1;overflow-y:auto;padding:0 24px}
+.c-empty{text-align:center;padding:56px 0;color:var(--text2);font-size:14px}
+.c-item{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--border-light)}
+.ci-img{width:56px;height:56px;object-fit:contain;border-radius:8px;background:var(--surface);flex-shrink:0;padding:4px}
+.ci-body{flex:1;min-width:0}
+.ci-name{font-size:13px;font-weight:500;line-height:1.4;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-price{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px}
+.ci-qty{display:flex;align-items:center;gap:10px}
+.q-btn{width:28px;height:28px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-size:15px;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.q-btn:hover{border-color:var(--text);color:var(--text)}
+.q-num{font-size:14px;font-weight:600;min-width:20px;text-align:center}
+.ci-rm{background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;line-height:1;margin-left:auto;align-self:flex-start;padding:2px 4px;transition:color .15s}
+.ci-rm:hover{color:var(--red)}
+.c-foot{padding:20px 24px;border-top:1px solid var(--border-light)}
+.c-ship{font-size:12px;color:var(--text2);margin-bottom:8px}
+.c-ship-bar{height:3px;background:var(--border-light);border-radius:2px;margin-bottom:6px;overflow:hidden}
+.c-ship-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s}
+.c-ship-free{font-size:12px;font-weight:600;color:var(--green);margin-bottom:12px}
+.c-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.c-total-lbl{font-size:14px;color:var(--text2)}
+.c-total-val{font-size:22px;font-weight:700}
+.btn-checkout{width:100%;background:var(--accent);color:#fff;border:none;padding:14px;border-radius:var(--r);font-family:'Inter',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:background .15s}
+.btn-checkout:hover{background:var(--accent-h)}
+.c-trust{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-size:11px;color:var(--text3)}
+
+/* MOBILE DRAWER */
+.m-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;opacity:0;pointer-events:none;transition:opacity .3s}
+.m-overlay.open{opacity:1;pointer-events:all}
+.m-drawer{position:fixed;top:0;left:0;bottom:0;width:300px;background:#fff;z-index:301;transform:translateX(-100%);transition:transform .3s;display:flex;flex-direction:column;box-shadow:8px 0 40px rgba(0,0,0,.1)}
+.m-drawer.open{transform:translateX(0)}
+.m-head{padding:20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between}
+.m-close{background:none;border:none;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--text2)}
+.m-close:hover{background:var(--surface)}
+.m-nav{padding:16px;display:flex;flex-direction:column;gap:2px;flex:1}
+.m-link{display:block;padding:12px;border-radius:var(--r);font-size:15px;font-weight:500;color:var(--text);text-decoration:none;transition:background .15s}
+.m-link:hover{background:var(--surface);color:var(--accent)}
+.m-foot{padding:16px;border-top:1px solid var(--border-light)}
+.btn-m-login{width:100%;background:var(--accent);color:#fff;border:none;padding:12px;border-radius:var(--r);font-family:'Inter',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:background .15s}
+.btn-m-login:hover{background:var(--accent-h)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;display:none;white-space:nowrap;box-shadow:var(--shadow)}
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="hero-card">
-
-    <!-- HEADER -->
-    <header>
-      <div class="header-left">
-        <a href="/" class="logo">TANE <span>STORE</span></a>
-
-        <!-- Desktop nav -->
-        <nav class="desktop-nav">
-          <a href="/" class="nav-link">Ana Sayfa</a>
-          <a href="/" class="nav-link">Urunler</a>
-          <a href="/hakkimizda" class="nav-link">Hakkimizda</a>
-          <a href="/teslimat-iade" class="nav-link">Teslimat</a>
-          <!-- Search -->
-          <button class="icon-btn" title="Ara">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-          </button>
-          <!-- Cart -->
-          <button class="icon-btn" title="Sepet" onclick="window.location.href='/'">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-            </svg>
-          </button>
-        </nav>
-
-        <!-- Mobile hamburger -->
-        <button class="hamburger" onclick="openDrawer()" title="Menu">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="header-right">
-        <button class="login-pill" onclick="window.location.href='/login'">
-          Giris Yap
-          <div class="pill-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-            </svg>
-          </div>
-        </button>
-      </div>
-    </header>
-
-    <!-- HERO TEXT -->
-    <section class="hero-section">
-      <h1 class="hero-title">
-        <span class="accent">Urunlerinizi</span><br/>
-        <span class="gradient">sade koleksiyonlara</span><br/>
-        <span class="gradient">donusturun.</span>
-      </h1>
-      <p class="hero-sub">
-        Urünlerinizi tematik koleksiyonlar halinde gruplayarak mussterilerin kolayca kesfetmesini saglayin.
-      </p>
-    </section>
-
-  </div><!-- /hero-card -->
-
-  <!-- CATEGORY GRID -->
-  <div class="categories">
-
-    <a href="/" class="cat-card" style="text-decoration:none">
-      <div class="cat-title">Ev & Yasam</div>
-      <div class="cat-img-wrap">
-        <img class="cat-img"
-          src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80"
-          alt="Ev & Yasam"
-          onerror="this.style.opacity='0'"/>
-      </div>
-      <div class="cat-arrow">
-        <div class="cat-arrow-inner">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-          </svg>
-        </div>
-      </div>
-    </a>
-
-    <a href="/" class="cat-card" style="text-decoration:none">
-      <div class="cat-title">Ayakkabi</div>
-      <div class="cat-img-wrap">
-        <img class="cat-img"
-          src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80"
-          alt="Ayakkabi"
-          onerror="this.style.opacity='0'"/>
-      </div>
-      <div class="cat-arrow">
-        <div class="cat-arrow-inner">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-          </svg>
-        </div>
-      </div>
-    </a>
-
-    <a href="/" class="cat-card" style="text-decoration:none">
-      <div class="cat-title">Teknoloji</div>
-      <div class="cat-img-wrap">
-        <img class="cat-img"
-          src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&q=80"
-          alt="Teknoloji"
-          onerror="this.style.opacity='0'"/>
-      </div>
-      <div class="cat-arrow">
-        <div class="cat-arrow-inner">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-          </svg>
-        </div>
-      </div>
-    </a>
-
-    <a href="/" class="cat-card" style="text-decoration:none">
-      <div class="cat-title">Aksesuar</div>
-      <div class="cat-img-wrap">
-        <img class="cat-img"
-          src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80"
-          alt="Aksesuar"
-          onerror="this.style.opacity='0'"/>
-      </div>
-      <div class="cat-arrow">
-        <div class="cat-arrow-inner">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-          </svg>
-        </div>
-      </div>
-    </a>
-
-  </div><!-- /categories -->
-</div><!-- /container -->
-
-<!-- MOBILE DRAWER -->
-<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
-<div class="drawer" id="drawer">
-  <div class="drawer-head">
-    <a href="/" class="drawer-logo">TANE <span>STORE</span></a>
-    <button class="drawer-close" onclick="closeDrawer()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
+<!-- COOKIE CONSENT -->
+<div id="cookie-bar" class="cookie-bar" style="display:none">
+  <p>Bu site çerezler kullanır. Detaylar için <a href="/cerez-politikasi">Çerez Politikamızı</a> inceleyin.</p>
+  <div class="cookie-acts">
+    <button class="btn-ck-ok" onclick="acceptCookies()">Kabul Et</button>
+    <button class="btn-ck-no" onclick="rejectCookies()">Yalnızca Zorunlu</button>
   </div>
-  <nav class="drawer-nav">
-    <button class="drawer-link" onclick="window.location.href='/'">Ana Sayfa</button>
-    <button class="drawer-link" onclick="window.location.href='/'">Urunler</button>
-    <button class="drawer-link" onclick="window.location.href='/hakkimizda'">Hakkimizda</button>
-    <button class="drawer-link" onclick="window.location.href='/teslimat-iade'">Teslimat</button>
-  </nav>
-  <div class="drawer-sep"></div>
-  <div class="drawer-actions">
-    <button class="drawer-action-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-      Ara
-    </button>
-    <button class="drawer-action-btn" onclick="window.location.href='/'">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-      </svg>
-      Sepet
-    </button>
-  </div>
-  <div class="drawer-sep"></div>
-  <button class="drawer-login" onclick="window.location.href='/login'">
-    Giris Yap
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-    </svg>
-  </button>
 </div>
 
+<!-- PROMO BAR -->
+<div class="promo-bar" id="promo-bar">
+  <span>🚚 <strong>500 ₺</strong> ve üzeri alışverişlerde kargo <strong>ücretsiz</strong></span>
+  <button class="promo-x" onclick="document.getElementById('promo-bar').style.display='none'" title="Kapat" aria-label="Kapat">×</button>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="/">TANE <em>STORE</em></a>
+    <div class="nav-links">
+      <a href="/" class="nav-a">Ürünler</a>
+      <a href="/hakkimizda" class="nav-a">Hakkımızda</a>
+      <a href="/iletisim" class="nav-a">İletişim</a>
+      <a href="/teslimat-iade" class="nav-a">Teslimat & İade</a>
+    </div>
+    <div class="nav-right">
+      <div id="nav-auth">
+        <a href="/login" class="btn-login-nav">Giriş Yap</a>
+      </div>
+      <button class="btn-cart-nav" onclick="openCart()" title="Sepetim" aria-label="Sepetimi aç">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="cart-badge" id="cart-count" style="display:none">0</span>
+      </button>
+    </div>
+    <button class="btn-hamburger" onclick="openMob()" title="Menü" aria-label="Menüyü aç">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-in">
+    <div class="hero-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Güvenilir Alışveriş
+    </div>
+    <h1>Teknoloji ve yaşamı<br/><span class="accent">tek bir yerden.</span></h1>
+    <p class="hero-sub">Binlerce ürün, güvenli ödeme, hızlı kargo. Her alışverişte yanınızdayız.</p>
+    <div class="hero-ctas">
+      <a href="#products" class="btn-primary">
+        Ürünleri Keşfet
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <a href="/track" class="btn-secondary">Siparişimi Takip Et</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+  <div class="trust-in">
+    <div class="trust-item">
+      <div class="trust-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div><span class="trust-label">Güvenli Ödeme</span><span class="trust-sub">SSL korumalı · iyzico</span></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+      <div><span class="trust-label">Hızlı Kargo</span><span class="trust-sub">1–3 iş günü teslimat</span></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
+      <div><span class="trust-label">Kolay İade</span><span class="trust-sub">14 gün içinde ücretsiz</span></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <div><span class="trust-label">7/24 Destek</span><span class="trust-sub">info@tanetekno.com</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURED PRODUCTS -->
+<div id="products" class="section">
+  <div class="section-head">
+    <h2 class="section-h2">Öne Çıkan Ürünler</h2>
+    <a href="/" class="section-lnk">Tümünü gör →</a>
+  </div>
+  <div class="products-grid" id="products-grid">
+    <div class="skel-card"><div class="skel-img skel"></div><div class="skel-body"><div class="skel-line skel" style="width:80%"></div><div class="skel-line skel" style="width:50%"></div></div></div>
+    <div class="skel-card"><div class="skel-img skel"></div><div class="skel-body"><div class="skel-line skel" style="width:70%"></div><div class="skel-line skel" style="width:45%"></div></div></div>
+    <div class="skel-card"><div class="skel-img skel"></div><div class="skel-body"><div class="skel-line skel" style="width:85%"></div><div class="skel-line skel" style="width:55%"></div></div></div>
+    <div class="skel-card"><div class="skel-img skel"></div><div class="skel-body"><div class="skel-line skel" style="width:65%"></div><div class="skel-line skel" style="width:40%"></div></div></div>
+    <div class="skel-card"><div class="skel-img skel"></div><div class="skel-body"><div class="skel-line skel" style="width:75%"></div><div class="skel-line skel" style="width:50%"></div></div></div>
+    <div class="skel-card"><div class="skel-img skel"></div><div class="skel-body"><div class="skel-line skel" style="width:90%"></div><div class="skel-line skel" style="width:48%"></div></div></div>
+    <div class="skel-card"><div class="skel-img skel"></div><div class="skel-body"><div class="skel-line skel" style="width:72%"></div><div class="skel-line skel" style="width:52%"></div></div></div>
+    <div class="skel-card"><div class="skel-img skel"></div><div class="skel-body"><div class="skel-line skel" style="width:68%"></div><div class="skel-line skel" style="width:44%"></div></div></div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="section" style="padding-top:0">
+  <div class="section-head">
+    <h2 class="section-h2">Kategoriler</h2>
+    <a href="/" class="section-lnk">Tüm kategoriler →</a>
+  </div>
+  <div class="cat-grid">
+    <a href="/?cat=Elektronik" class="cat-card"><div class="cat-icon">💻</div><span class="cat-name">Elektronik</span></a>
+    <a href="/?cat=Giyim" class="cat-card"><div class="cat-icon">👕</div><span class="cat-name">Giyim</span></a>
+    <a href="/?cat=Ev" class="cat-card"><div class="cat-icon">🏠</div><span class="cat-name">Ev & Yaşam</span></a>
+    <a href="/?cat=Spor" class="cat-card"><div class="cat-icon">⚽</div><span class="cat-name">Spor</span></a>
+    <a href="/?cat=Kozmetik" class="cat-card"><div class="cat-icon">✨</div><span class="cat-name">Kozmetik</span></a>
+    <a href="/?cat=Kitap" class="cat-card"><div class="cat-icon">📚</div><span class="cat-name">Kitap</span></a>
+  </div>
+</div>
+
+<!-- DELIVERY PROMISE -->
+<div class="delivery-wrap">
+  <div class="delivery-in">
+    <div>
+      <div class="del-icon">📦</div>
+      <div class="del-title">Hızlı Hazırlık</div>
+      <div class="del-sub">Siparişiniz 1 iş günü içinde hazırlanır ve kargoya teslim edilir.</div>
+    </div>
+    <div>
+      <div class="del-icon">🚚</div>
+      <div class="del-title">500 ₺ Üzeri Ücretsiz Kargo</div>
+      <div class="del-sub">MNG, Aras veya Yurtiçi ile 1–3 iş günü. Altı için 49,90 ₺ sabit kargo.</div>
+    </div>
+    <div>
+      <div class="del-icon">📍</div>
+      <div class="del-title">Canlı Kargo Takibi</div>
+      <div class="del-sub">Her adımı <a href="/track">sipariş takip</a> sayfasından anlık izleyin.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="section">
+  <div class="section-head">
+    <h2 class="section-h2">Sık Sorulan Sorular</h2>
+  </div>
+  <div class="faq">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        Kargo ne kadar sürer?
+        <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-a"><p>Ödeme onayından sonra 1–3 iş günü içinde kargoya verilir. Takip numarası SMS ve e-posta ile iletilir. <a href="/track">Sipariş Takip</a> sayfasını da kullanabilirsiniz.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        İade nasıl yapılır?
+        <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-a"><p>Teslim tarihinden itibaren <strong>14 gün içinde</strong> cayma hakkınız bulunur. Ürünü orijinal ambalajında, kullanılmamış olarak <a href="mailto:info@tanetekno.com">info@tanetekno.com</a> adresine bildirerek iade başlatabilirsiniz. <a href="/teslimat-iade">Teslimat ve İade</a> sayfasına bakın.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        Ödeme güvenli mi?
+        <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-a"><p>Tüm ödemeler 256-bit SSL şifreleme ile korunur ve iyzico altyapısı üzerinden gerçekleştirilir. Kart bilgileriniz tarafımızca saklanmaz.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        Siparişimi nasıl takip ederim?
+        <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-a"><p>Sipariş numaranızı <a href="/track">Sipariş Takip</a> sayfasına girerek sorgulayabilirsiniz. Hesabınız varsa <a href="/hesabim">Hesabım</a> sayfasında tüm siparişlerinizi görebilirsiniz.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFAQ(this)">
+        Ücretsiz kargo için ne kadar harcamalıyım?
+        <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-a"><p><strong>500 ₺</strong> ve üzeri tüm siparişlerde kargo ücretsizdir. Bu tutarın altı için 49,90 ₺ sabit kargo ücreti uygulanır.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-in">
+    <div class="footer-grid">
+      <div>
+        <a href="/" class="footer-logo">TANE <em>STORE</em></a>
+        <p class="footer-desc">Güvenilir alışverişin adresi. Teknoloji ve yaşam ürünleri tek bir çatı altında.</p>
+        <p class="footer-email">E-posta: <a href="mailto:info@tanetekno.com">info@tanetekno.com</a></p>
+        <p style="margin-top:12px"><a href="/iletisim" style="color:var(--accent);font-size:13px;text-decoration:none">Şirket bilgileri & iletişim →</a></p>
+      </div>
+      <div>
+        <p class="footer-col-title">Alışveriş</p>
+        <div class="footer-links">
+          <a href="/" class="footer-link">Tüm Ürünler</a>
+          <a href="/hesabim" class="footer-link">Hesabım</a>
+          <a href="/track" class="footer-link">Sipariş Takip</a>
+          <a href="/teslimat-iade" class="footer-link">Teslimat & İade</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-col-title">Hukuki</p>
+        <div class="footer-links">
+          <a href="/gizlilik" class="footer-link">Gizlilik Politikası</a>
+          <a href="/kvkk" class="footer-link">KVKK Aydınlatma</a>
+          <a href="/cerez-politikasi" class="footer-link">Çerez Politikası</a>
+          <a href="/mesafeli-satis" class="footer-link">Mesafeli Satış Sözleşmesi</a>
+          <a href="/on-bilgilendirme" class="footer-link">Ön Bilgilendirme Formu</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-col-title">Kurumsal</p>
+        <div class="footer-links">
+          <a href="/hakkimizda" class="footer-link">Hakkımızda</a>
+          <a href="/iletisim" class="footer-link">İletişim</a>
+        </div>
+      </div>
+    </div>
+    <hr class="footer-hr"/>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Tane Store. Tüm hakları saklıdır.</span>
+      <div class="footer-legal">
+        <a href="/gizlilik">Gizlilik</a>
+        <a href="/kvkk">KVKK</a>
+        <a href="/cerez-politikasi">Çerezler</a>
+        <a href="/mesafeli-satis">Sözleşme</a>
+        <a href="/on-bilgilendirme">Ön Bilgi</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="c-overlay" id="c-overlay" onclick="closeCart()"></div>
+<aside class="c-drawer" id="c-drawer" role="dialog" aria-label="Sepetim">
+  <div class="c-head">
+    <span class="c-head-title">Sepetim</span>
+    <button class="c-close" onclick="closeCart()" aria-label="Sepeti kapat">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="c-items" id="c-items"><div class="c-empty">Sepetiniz boş</div></div>
+  <div class="c-foot" id="c-foot" style="display:none">
+    <div id="ship-info"></div>
+    <div class="c-total-row">
+      <span class="c-total-lbl">Toplam</span>
+      <span class="c-total-val" id="cart-total">0 ₺</span>
+    </div>
+    <button class="btn-checkout" onclick="goCheckout()">Siparişi Tamamla →</button>
+    <div class="c-trust">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      256-bit SSL güvenli · iyzico ile ödeme
+    </div>
+  </div>
+</aside>
+
+<!-- MOBILE DRAWER -->
+<div class="m-overlay" id="m-overlay" onclick="closeMob()"></div>
+<div class="m-drawer" id="m-drawer">
+  <div class="m-head">
+    <a href="/" class="logo">TANE <em>STORE</em></a>
+    <button class="m-close" onclick="closeMob()" aria-label="Menüyü kapat">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <nav class="m-nav">
+    <a href="/" class="m-link">🛍️ Ürünler</a>
+    <a href="/hakkimizda" class="m-link">📋 Hakkımızda</a>
+    <a href="/iletisim" class="m-link">📬 İletişim</a>
+    <a href="/teslimat-iade" class="m-link">🚚 Teslimat & İade</a>
+    <a href="/track" class="m-link">📦 Sipariş Takip</a>
+    <a href="/hesabim" class="m-link">👤 Hesabım</a>
+  </nav>
+  <div class="m-foot">
+    <button class="btn-m-login" id="m-login-btn" onclick="window.location.href='/login'">Giriş Yap</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-function openDrawer() {
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawer-overlay').classList.add('open');
+let cart = [], currentUser = null, allProducts = [];
+
+async function init() {
+  initCookies();
+  await checkAuth();
+  await loadProducts();
+}
+
+// ── COOKIE ──
+function initCookies() {
+  if (!localStorage.getItem('cookie-consent')) {
+    document.getElementById('cookie-bar').style.display = 'flex';
+  }
+}
+function acceptCookies() {
+  localStorage.setItem('cookie-consent', 'all');
+  document.getElementById('cookie-bar').style.display = 'none';
+}
+function rejectCookies() {
+  localStorage.setItem('cookie-consent', 'essential');
+  document.getElementById('cookie-bar').style.display = 'none';
+}
+
+// ── AUTH ──
+async function checkAuth() {
+  try {
+    const r = await fetch('/api/auth/me', { credentials: 'include' });
+    if (r.ok) {
+      currentUser = await r.json();
+      const first = currentUser.name ? currentUser.name.split(' ')[0] : 'Hesabım';
+      document.getElementById('nav-auth').innerHTML =
+        `<a href="/hesabim" class="nav-auth-link" style="color:var(--text2);font-size:13px;text-decoration:none;padding:6px 10px;border-radius:8px;">${first}</a>`;
+      const mb = document.getElementById('m-login-btn');
+      mb.textContent = first; mb.onclick = () => window.location.href = '/hesabim';
+      const cr = await fetch('/api/cart', { credentials: 'include' });
+      if (cr.ok) {
+        const items = await cr.json();
+        cart = items.map(i => ({ id: i.product_id, name: i.name, image_url: i.image_url, tane_price: i.tane_price, discount_price: i.discount_price, qty: i.quantity }));
+      }
+    } else {
+      cart = JSON.parse(localStorage.getItem('tane-cart') || '[]');
+    }
+  } catch(e) {
+    cart = JSON.parse(localStorage.getItem('tane-cart') || '[]');
+  }
+  updateCartUI();
+}
+
+// ── PRODUCTS ──
+async function loadProducts() {
+  try {
+    allProducts = await fetch('/api/products').then(r => r.json());
+    if (!Array.isArray(allProducts)) allProducts = [];
+    renderProducts(allProducts.slice(0, 8));
+  } catch(e) {
+    document.getElementById('products-grid').innerHTML =
+      `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:14px">Ürünler yüklenemedi. <a href="/" style="color:var(--accent)">Mağazaya git →</a></div>`;
+  }
+}
+
+function ep(p) { return p.discount_price || p.tane_price || 0; }
+
+function renderProducts(products) {
+  const grid = document.getElementById('products-grid');
+  if (!products.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:14px">Ürün bulunamadı. <a href="/" style="color:var(--accent)">Tüm ürünler →</a></div>`;
+    return;
+  }
+  grid.innerHTML = products.map(p => {
+    const price = ep(p);
+    const disc = p.discount_price && p.tane_price > p.discount_price ? Math.round((1 - p.discount_price / p.tane_price) * 100) : 0;
+    const imgEl = p.image_url
+      ? `<img class="prod-img" src="${p.image_url}" alt="${p.name}" loading="lazy" onerror="this.style.visibility='hidden'">`
+      : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px">—</div>`;
+    return `<article class="prod-card">
+      <div class="prod-img-wrap" onclick="window.location.href='/product.html?id=${p.id}'" title="${p.name} detayına git">
+        ${imgEl}
+        ${disc > 0 ? `<span class="prod-badge">-%${disc}</span>` : ''}
+      </div>
+      <div class="prod-body">
+        <div class="prod-name" onclick="window.location.href='/product.html?id=${p.id}'">${p.name}</div>
+        <div class="prod-price-row">
+          <span class="prod-price${disc > 0 ? ' sale' : ''}">${price > 0 ? price.toLocaleString('tr-TR') + ' ₺' : '—'}</span>
+          ${disc > 0 ? `<span class="prod-old">${p.tane_price.toLocaleString('tr-TR')} ₺</span>` : ''}
+        </div>
+        ${p.stock > 0 && p.stock <= 10 ? `<div style="font-size:11px;color:var(--accent);font-weight:500;margin-bottom:8px">Son ${p.stock} adet</div>` : ''}
+        <button class="btn-add" onclick="addToCart(${p.id})" ${p.stock === 0 ? 'disabled' : ''}>
+          ${p.stock === 0 ? 'Stok tükendi' : 'Sepete Ekle'}
+        </button>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+// ── CART ──
+async function addToCart(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p || p.stock === 0) return;
+  const ex = cart.find(x => x.id === id);
+  if (ex) ex.qty++;
+  else cart.push({ ...p, qty: 1 });
+  if (currentUser) {
+    await fetch('/api/cart', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ product_id: id, quantity: 1 }) });
+  } else {
+    localStorage.setItem('tane-cart', JSON.stringify(cart));
+  }
+  updateCartUI();
+  showToast('Sepete eklendi');
+  openCart();
+}
+
+async function changeQty(id, d) {
+  const item = cart.find(x => x.id === id); if (!item) return;
+  item.qty += d;
+  if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+  if (currentUser) {
+    if (item.qty <= 0) fetch(`/api/cart/${id}`, { method: 'DELETE', credentials: 'include' });
+    else fetch(`/api/cart/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ quantity: item.qty }) });
+  } else {
+    localStorage.setItem('tane-cart', JSON.stringify(cart));
+  }
+  updateCartUI();
+}
+
+async function removeItem(id) {
+  cart = cart.filter(x => x.id !== id);
+  if (currentUser) fetch(`/api/cart/${id}`, { method: 'DELETE', credentials: 'include' });
+  else localStorage.setItem('tane-cart', JSON.stringify(cart));
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const count = cart.reduce((s, i) => s + i.qty, 0);
+  const total = cart.reduce((s, i) => s + ep(i) * i.qty, 0);
+  const badge = document.getElementById('cart-count');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'flex' : 'none';
+  document.getElementById('cart-total').textContent = total.toLocaleString('tr-TR') + ' ₺';
+  const foot = document.getElementById('c-foot');
+  const el = document.getElementById('c-items');
+  if (!cart.length) {
+    el.innerHTML = '<div class="c-empty">Sepetiniz boş</div>';
+    foot.style.display = 'none'; return;
+  }
+  foot.style.display = 'block';
+  const FREE = 500, FEE = 49.90, rem = FREE - total, pct = Math.min(100, (total / FREE) * 100);
+  const si = document.getElementById('ship-info');
+  if (total >= FREE) {
+    si.innerHTML = '<p class="c-ship-free" style="margin-bottom:12px">🎉 Ücretsiz kargo kazandınız!</p>';
+  } else {
+    si.innerHTML = `<p class="c-ship">${rem.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ₺ daha ekleyin, kargo bedava</p>
+      <div class="c-ship-bar"><div class="c-ship-fill" style="width:${pct}%"></div></div>
+      <p class="c-ship" style="margin-bottom:12px">Kargo ücreti: ${FEE.toLocaleString('tr-TR')} ₺</p>`;
+  }
+  el.innerHTML = cart.map(item => {
+    const imgEl = item.image_url
+      ? `<img class="ci-img" src="${item.image_url}" alt="${item.name}" onerror="this.style.visibility='hidden'">`
+      : `<div class="ci-img" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3)">—</div>`;
+    return `<div class="c-item">${imgEl}
+      <div class="ci-body">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-price">${ep(item).toLocaleString('tr-TR')} ₺</div>
+        <div class="ci-qty">
+          <button class="q-btn" onclick="changeQty(${item.id},-1)" aria-label="Azalt">−</button>
+          <span class="q-num">${item.qty}</span>
+          <button class="q-btn" onclick="changeQty(${item.id},1)" aria-label="Artır">+</button>
+        </div>
+      </div>
+      <button class="ci-rm" onclick="removeItem(${item.id})" aria-label="Kaldır">×</button>
+    </div>`;
+  }).join('');
+}
+
+function openCart() {
+  document.getElementById('c-drawer').classList.add('open');
+  document.getElementById('c-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function closeDrawer() {
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawer-overlay').classList.remove('open');
+function closeCart() {
+  document.getElementById('c-drawer').classList.remove('open');
+  document.getElementById('c-overlay').classList.remove('open');
   document.body.style.overflow = '';
 }
+function goCheckout() { window.location.href = '/?checkout=open'; }
+
+// ── FAQ ──
+function toggleFAQ(btn) {
+  const a = btn.nextElementSibling;
+  const isOpen = a.classList.contains('open');
+  document.querySelectorAll('.faq-a').forEach(x => x.classList.remove('open'));
+  document.querySelectorAll('.faq-q').forEach(x => x.classList.remove('open'));
+  if (!isOpen) { a.classList.add('open'); btn.classList.add('open'); }
+}
+
+// ── MOBILE DRAWER ──
+function openMob() {
+  document.getElementById('m-drawer').classList.add('open');
+  document.getElementById('m-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMob() {
+  document.getElementById('m-drawer').classList.remove('open');
+  document.getElementById('m-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── SMOOTH SCROLL ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const el = document.querySelector(a.getAttribute('href'));
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2200);
+}
+
+init();
 </script>
 </body>
 </html>

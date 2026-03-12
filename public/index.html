@@ -190,6 +190,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .btn-back-m{width:100%;background:transparent;color:var(--text2);border:1px solid var(--border);padding:12px;border-radius:var(--r);font-family:inherit;font-size:14px;cursor:pointer;margin-top:8px;transition:all .15s}
 .btn-back-m:hover{border-color:#bbb;color:var(--text)}
 .modal-trust{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;font-size:11px;color:var(--text3)}
+.legal-checks{margin:14px 0 4px;display:flex;flex-direction:column;gap:8px}
+.legal-check{display:flex;align-items:flex-start;gap:8px;cursor:pointer}
+.legal-check input[type=checkbox]{margin-top:2px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.legal-check span{font-size:12px;color:var(--text2);line-height:1.5}
+.legal-check span a{color:var(--accent);text-decoration:none}
+.legal-check span a:hover{text-decoration:underline}
+/* COOKIE BAR */
+.cookie-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-light);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:900;box-shadow:0 -4px 24px rgba(0,0,0,.06);flex-wrap:wrap}
+.cookie-bar p{font-size:13px;color:var(--text2);flex:1;min-width:200px;line-height:1.5}
+.cookie-bar p a{color:var(--accent);text-decoration:none}
+.cookie-bar-btns{display:flex;gap:8px;flex-shrink:0}
+.btn-cookie-accept{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.btn-cookie-accept:hover{background:var(--accent-h)}
+.btn-cookie-essential{background:transparent;color:var(--text2);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer}
+.btn-cookie-essential:hover{border-color:#aaa;color:var(--text)}
 
 /* SUCCESS */
 .success-screen{text-align:center;padding:20px 0 8px}
@@ -376,7 +391,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
           <div class="fg"><label class="fl">Şehir *</label><input class="fi" id="o-city" autocomplete="address-level2" placeholder="İstanbul"/></div>
           <div class="fg"><label class="fl">Kargo Notu</label><input class="fi" id="o-note" placeholder="İsteğe bağlı…"/></div>
         </div>
-        <button class="btn-order" id="btn-order" onclick="submitOrder()">Siparişi Onayla</button>
+        <div class="legal-checks">
+          <label class="legal-check"><input type="checkbox" id="chk-on-bilgi"> <span><a href="/on-bilgilendirme" target="_blank">Ön Bilgilendirme Formu</a>'nu okudum, onaylıyorum.</span></label>
+          <label class="legal-check"><input type="checkbox" id="chk-mesafeli"> <span><a href="/mesafeli-satis" target="_blank">Mesafeli Satış Sözleşmesi</a>'ni okudum, onaylıyorum.</span></label>
+        </div>
+        <button class="btn-order" id="btn-order" onclick="submitOrder()">Siparişi Onayla ve Öde</button>
         <button class="btn-back-m" onclick="closeModal()">Vazgeç</button>
         <div class="modal-trust">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -413,11 +432,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
         <a href="/teslimat-iade">Teslimat ve İade</a>
         <a href="/gizlilik">Gizlilik Politikası</a>
         <a href="/mesafeli-satis">Mesafeli Satış</a>
+        <a href="/on-bilgilendirme">Ön Bilgilendirme</a>
+        <a href="/kvkk">KVKK</a>
+        <a href="/cerez-politikasi">Çerez Politikası</a>
       </div>
       <div class="footer-col">
         <h4>Yardım</h4>
         <a href="/track">Sipariş Takibi</a>
         <a href="/hesabim">Hesabım</a>
+        <a href="/iletisim">İletişim</a>
         <a href="mailto:info@tanetekno.com">info@tanetekno.com</a>
       </div>
     </div>
@@ -434,6 +457,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 </footer>
 
 <div class="toast" id="toast"></div>
+
+<!-- COOKIE BAR -->
+<div class="cookie-bar" id="cookie-bar" style="display:none">
+  <p>Alışveriş deneyiminizi iyileştirmek için çerezler kullanıyoruz. <a href="/cerez-politikasi">Çerez Politikası</a></p>
+  <div class="cookie-bar-btns">
+    <button class="btn-cookie-essential" onclick="setCookies('essential')">Yalnızca Zorunlu</button>
+    <button class="btn-cookie-accept" onclick="setCookies('all')">Tümünü Kabul Et</button>
+  </div>
+</div>
 
 <script>
 let allProducts = [], currentCat = 'Tümü';
@@ -602,6 +634,8 @@ function closeModal() { document.getElementById('order-modal').classList.remove(
 function openOrderModal() {
   if (!cart.length) return showToast('Sepetiniz boş');
   appliedCoupon = null;
+  document.getElementById('chk-on-bilgi').checked = false;
+  document.getElementById('chk-mesafeli').checked = false;
   document.getElementById('coupon-code').value = '';
   document.getElementById('coupon-result').innerHTML = '';
   if (currentUser) {
@@ -646,6 +680,7 @@ async function submitOrder() {
   const address = document.getElementById('o-address').value.trim();
   const city = document.getElementById('o-city').value.trim();
   if (!name || !phone || !address || !city) return showToast('Zorunlu alanları doldurun');
+  if (!document.getElementById('chk-on-bilgi').checked || !document.getElementById('chk-mesafeli').checked) return showToast('Lütfen yasal metinleri onaylayın');
   const btn = document.getElementById('btn-order');
   btn.textContent = 'Gönderiliyor…'; btn.disabled = true;
   const res = await fetch('/api/orders', {
@@ -688,7 +723,27 @@ function handleSearch() {
 function closeAC() { const d = document.getElementById('ac-drop'); if (d) d.style.display = 'none'; }
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2200); }
 
-initAuth().then(() => loadProducts());
+function setCookies(level) {
+  localStorage.setItem('cookie-consent', level);
+  document.getElementById('cookie-bar').style.display = 'none';
+}
+function initCookies() {
+  if (!localStorage.getItem('cookie-consent')) document.getElementById('cookie-bar').style.display = 'flex';
+}
+
+function initUrlParams() {
+  const params = new URLSearchParams(location.search);
+  const cat = params.get('cat');
+  const checkout = params.get('checkout');
+  if (cat) {
+    const btn = Array.from(document.querySelectorAll('.cat-pill')).find(b => b.textContent.trim() === cat);
+    if (btn) setCat(cat, btn);
+  }
+  if (checkout === 'open') setTimeout(openOrderModal, 500);
+}
+
+initCookies();
+initAuth().then(() => { loadProducts(); initUrlParams(); });
 </script>
 </body>
 </html>
