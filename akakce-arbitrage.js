@@ -46,43 +46,95 @@ function toLabel(raw) {
 
 // ─── Tarayıcı ─────────────────────────────────────────────────────────────────
 
+const https = require('https');
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+
+// Basit HTTP fetch (bot tespitini atlamak için Puppeteer yerine)
+function fetchHtml(url) {
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, {
+      headers: {
+        'User-Agent': UA,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'tr-TR,tr;q=0.9,en;q=0.8',
+        'Accept-Encoding': 'identity',
+        'Connection': 'keep-alive',
+        'Cache-Control': 'no-cache',
+        'Upgrade-Insecure-Requests': '1',
+      },
+    }, res => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return fetchHtml(res.headers.location).then(resolve).catch(reject);
+      }
+      let data = '';
+      res.setEncoding('utf8');
+      res.on('data', c => { data += c; });
+      res.on('end', () => resolve(data));
+    });
+    req.on('error', reject);
+    req.setTimeout(20000, () => { req.destroy(); reject(new Error('Timeout')); });
+  });
+}
+
 async function launchBrowser() {
   return puppeteer.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+    args: [
+      '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu',
+      '--disable-blink-features=AutomationControlled',
+      '--disable-infobars',
+    ],
   });
 }
 
 async function makePage(browser) {
   const p = await browser.newPage();
-  await p.setUserAgent(
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
-    '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-  );
-  await p.setExtraHTTPHeaders({ 'Accept-Language': 'tr-TR,tr;q=0.9' });
+  // navigator.webdriver gizle
+  await p.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+  });
+  await p.setUserAgent(UA);
+  await p.setExtraHTTPHeaders({ 'Accept-Language': 'tr-TR,tr;q=0.9,en;q=0.8' });
   return p;
 }
 
 // ─── Adım 1: Ürün linklerini topla ───────────────────────────────────────────
 
-async function collectLinks(page) {
+// Regex ile href'leri çek (browser gerektirmez)
+function extractLinks(html) {
+  const matches = [];
+  const re = /href="(https?:\/\/(?:www\.)?akakce\.com\/[^"?#]+,\d+\.html)"/g;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    if (!matches.includes(m[1])) matches.push(m[1]);
+  }
+  // Göreceli href'ler
+  const re2 = /href="(\/[^"?#]+,\d+\.html)"/g;
+  while ((m = re2.exec(html)) !== null) {
+    const full = 'https://www.akakce.com' + m[1];
+    if (!matches.includes(full)) matches.push(full);
+  }
+  return matches;
+}
+
+async function collectLinks() {
   const seen = new Set();
 
   for (let n = 1; n <= MAX_PAGES; n++) {
     const url = n === 1 ? DEALS_BASE_URL : `${DEALS_BASE_URL}?p=${n}`;
     try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await sleep(PAGE_DELAY_MS);
-
-      const links = await page.evaluate(() =>
-        Array.from(document.querySelectorAll('a[href]'))
-          .map(a => a.href)
-          .filter(h => /akakce\.com\/[^?#]+,\d+\.html/.test(h))
-          .filter((v, i, a) => a.indexOf(v) === i)
-      );
+      const html = await fetchHtml(url);
+      const links = extractLinks(html);
 
       const newCount = links.filter(l => !seen.has(l)).length;
       links.forEach(l => seen.add(l));
+
+      // Debug: ilk sayfada sayfa başlığını ve link sayısını göster
+      if (n === 1) {
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        console.log(`  [debug] title="${titleMatch ? titleMatch[1].slice(0, 60) : '?'}" htmlLen=${html.length} matched=${links.length}`);
+      }
+
       console.log(`  Sayfa ${n}: ${links.length} link (+${newCount} yeni, toplam ${seen.size})`);
 
       if (newCount === 0) { console.log('  Yeni link yok, duruyorum.'); break; }
@@ -347,9 +399,9 @@ async function run() {
     browser = await launchBrowser();
     const page = await makePage(browser);
 
-    // 1) Linkleri topla
+    // 1) Linkleri topla (HTTP fetch kullanır, Puppeteer değil)
     console.log('\n▶ Ürün linkleri toplanıyor…');
-    const allLinks = await collectLinks(page);
+    const allLinks = await collectLinks();
     const total = allLinks.length;
     console.log(`\n  ${total} benzersiz ürün linki.\n`);
     if (!total) { console.log('  ⚠ Link bulunamadı.'); return; }
