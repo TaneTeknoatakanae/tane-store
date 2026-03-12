@@ -24,16 +24,11 @@ cron.schedule('0 3 * * *', () => {
 }, { timezone: 'Europe/Istanbul' });
 
 // ── Arbitraj tarama — her gün saat 04:00'da ────────────────
-const { spawn } = require('child_process');
 cron.schedule('0 4 * * *', () => {
   console.log('[cron] Arbitraj taraması tetiklendi');
-  const py = spawn('python3', ['akakce_arbitrage.py'], {
-    cwd: __dirname,
-    env: process.env,
-  });
-  py.stdout.on('data', d => process.stdout.write('[arb] ' + d));
-  py.stderr.on('data', d => process.stderr.write('[arb] ' + d));
-  py.on('close', code => console.log(`[cron] Arbitraj tamamlandı (exit ${code})`));
+  require('./akakce-arbitrage').run().catch(e =>
+    console.error('[cron] Arbitraj hata:', e.message)
+  );
 }, { timezone: 'Europe/Istanbul' });
 
 // Uploads klasörünü oluştur
