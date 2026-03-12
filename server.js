@@ -140,7 +140,7 @@ function arbLog(msg) {
   const line = `[${new Date().toLocaleTimeString('tr-TR')}] ${msg}`;
   arbStatus.log.push(line);
   if (arbStatus.log.length > 200) arbStatus.log.shift();
-  console.log('[arb]', msg);
+  // origLog is used by the patched console.log — do NOT call console.log here (infinite recursion)
 }
 
 app.post('/api/admin/run-arbitrage', (_req, res) => {
