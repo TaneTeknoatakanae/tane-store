@@ -23,6 +23,19 @@ cron.schedule('0 3 * * *', () => {
   );
 }, { timezone: 'Europe/Istanbul' });
 
+// ── Arbitraj tarama — her gün saat 04:00'da ────────────────
+const { spawn } = require('child_process');
+cron.schedule('0 4 * * *', () => {
+  console.log('[cron] Arbitraj taraması tetiklendi');
+  const py = spawn('python3', ['akakce_arbitrage.py'], {
+    cwd: __dirname,
+    env: process.env,
+  });
+  py.stdout.on('data', d => process.stdout.write('[arb] ' + d));
+  py.stderr.on('data', d => process.stderr.write('[arb] ' + d));
+  py.on('close', code => console.log(`[cron] Arbitraj tamamlandı (exit ${code})`));
+}, { timezone: 'Europe/Istanbul' });
+
 // Uploads klasörünü oluştur
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
@@ -92,4 +105,35 @@ app.get('/iletisim', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 app.get('/kvkk', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kvkk.html')));
 app.get('/cerez-politikasi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cerez-politikasi.html')));
 app.get('/on-bilgilendirme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'on-bilgilendirme.html')));
+
+// ── Arbitraj API ─────────────────────────────────────────────────────────────
+// Son tarama sonuçları: GET /api/arbitrage/latest?limit=50
+app.get('/api/arbitrage/latest', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 50, 200);
+  db.all(
+    `SELECT i.*, r.run_timestamp, r.total_scanned
+       FROM arbitrage_items i
+       JOIN arbitrage_runs r ON r.id = i.run_id
+      WHERE r.id = (SELECT id FROM arbitrage_runs ORDER BY created_at DESC LIMIT 1)
+      ORDER BY i.gap_pct DESC
+      LIMIT $1`,
+    [limit],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    }
+  );
+});
+
+// Tarama geçmişi: GET /api/arbitrage/runs
+app.get('/api/arbitrage/runs', (_req, res) => {
+  db.all(
+    `SELECT * FROM arbitrage_runs ORDER BY created_at DESC LIMIT 30`,
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    }
+  );
+});
 

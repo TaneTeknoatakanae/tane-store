@@ -1,0 +1,15 @@
+# Railway build config — installs both Node.js (auto) and Python + Playwright
+
+[phases.setup]
+nixPkgs = ["python311", "python311Packages.pip"]
+
+[phases.install]
+cmds = [
+  "npm ci",
+  "pip install -r requirements.txt",
+  "playwright install chromium",
+  "playwright install-deps chromium"
+]
+
+[start]
+cmd = "node server.js"
