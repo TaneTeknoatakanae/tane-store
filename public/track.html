@@ -6,88 +6,98 @@
 <title>Tane Store — Sipariş Takip</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
+:root{
+  --bg:#fff;--surface:#f5f5f7;--border-light:#f0f0f0;--border:#e5e5e5;
+  --text:#1d1d1f;--text2:#6e6e73;--text3:#aeaeb2;
+  --accent:#e85d00;--accent-h:#c94d00;
+  --green:#1a7a3a;--green-bg:#f0faf4;--red:#c00;
+  --blue:#0060c7;--blue-bg:#f0f5ff;--blue-border:#c8d8f8;
+  --r:10px;--r-lg:16px;
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06);--shadow:0 4px 20px rgba(0,0,0,.08);
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#f5f5f7;min-height:100vh}
-nav{background:#0f0f0f;border-bottom:1px solid #1c1c1e;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
-.logo{font-weight:700;font-size:18px;color:#f5f5f7;text-decoration:none;letter-spacing:-0.5px}
-.logo span{color:#e85d00}
-.back{color:#98989d;font-size:13px;text-decoration:none;transition:color .15s}
-.back:hover{color:#f5f5f7}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.nav{background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-light);position:sticky;top:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.logo{font-weight:700;font-size:18px;color:var(--text);text-decoration:none;letter-spacing:-0.5px}
+.logo span{color:var(--accent)}
+.back{color:var(--text2);font-size:13px;text-decoration:none;transition:color .15s}
+.back:hover{color:var(--text)}
+
 .main{max-width:620px;margin:48px auto;padding:0 24px}
-.page-title{font-size:28px;font-weight:700;margin-bottom:6px;letter-spacing:-0.5px}
-.page-sub{color:#98989d;font-size:14px;margin-bottom:32px}
+.page-title{font-size:28px;font-weight:700;margin-bottom:6px;letter-spacing:-0.5px;color:var(--text)}
+.page-sub{color:var(--text2);font-size:14px;margin-bottom:32px}
 
-.search-box{background:#141414;border:1px solid #2a2a2a;border-radius:14px;padding:24px;margin-bottom:24px}
-.search-box h3{font-size:15px;font-weight:600;margin-bottom:16px;color:#f5f5f7}
+.search-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:24px;margin-bottom:24px}
+.search-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;display:block}
 .search-row{display:flex;gap:10px}
-.search-input{flex:1;border:1px solid #2a2a2a;border-radius:8px;padding:12px 14px;font-family:'Inter',sans-serif;font-size:15px;outline:none;color:#f5f5f7;background:#1c1c1e;transition:border .2s}
-.search-input::placeholder{color:#48484a}
-.search-input:focus{border-color:#3a3a3a}
-.btn-search{background:#e85d00;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap;transition:background .15s}
-.btn-search:hover{background:#ff6a00}
+.search-input{flex:1;border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;font-family:'Inter',sans-serif;font-size:15px;outline:none;color:var(--text);background:#fff;transition:border .2s}
+.search-input::placeholder{color:var(--text3)}
+.search-input:focus{border-color:var(--accent)}
+.btn-search{background:var(--accent);color:#fff;border:none;padding:12px 24px;border-radius:var(--r);font-family:'Inter',sans-serif;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-search:hover{background:var(--accent-h)}
 
-.result-card{background:#141414;border:1px solid #2a2a2a;border-radius:14px;padding:28px;animation:fadeUp .3s ease}
+.result-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;box-shadow:var(--shadow-sm);animation:fadeUp .3s ease}
 @keyframes fadeUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
 
 .order-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.order-id{font-size:22px;font-weight:700;color:#e85d00}
-.order-date{font-size:13px;color:#48484a;margin-top:2px}
+.order-id{font-size:22px;font-weight:700;color:var(--accent)}
+.order-date{font-size:13px;color:var(--text3);margin-top:2px}
 
 .timeline{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;position:relative}
-.timeline::before{content:'';position:absolute;top:18px;left:18px;right:18px;height:1px;background:#2a2a2a;z-index:0}
+.timeline::before{content:'';position:absolute;top:18px;left:18px;right:18px;height:2px;background:var(--border-light);z-index:0}
 .timeline-step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;z-index:1}
-.step-dot{width:36px;height:36px;border-radius:50%;border:1px solid #2a2a2a;background:#141414;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .3s;color:#48484a}
-.step-dot.done{background:#e85d00;border-color:#e85d00;color:#fff}
-.step-dot.current{background:#141414;border-color:#e85d00;box-shadow:0 0 0 4px rgba(232,93,0,.15);color:#e85d00}
-.step-label{font-size:11px;font-weight:500;text-align:center;color:#48484a;line-height:1.3}
-.step-label.done,.step-label.current{color:#f5f5f7}
+.step-dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .3s;color:var(--text3)}
+.step-dot.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-dot.current{background:#fff;border-color:var(--accent);box-shadow:0 0 0 4px rgba(232,93,0,.12);color:var(--accent)}
+.step-label{font-size:11px;font-weight:500;text-align:center;color:var(--text3);line-height:1.3}
+.step-label.done,.step-label.current{color:var(--text)}
 
 .status-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
-.status-Beklemede{background:#2a1800;color:#e85d00;border:1px solid #3a2000}
-.status-Onaylandı{background:#001a2a;color:#0a84ff;border:1px solid #002a3a}
-.status-Kargoda{background:#001a0a;color:#30d158;border:1px solid #002a10}
-.status-Teslim{background:#001a0a;color:#30d158;border:1px solid #002a10}
-.status-İptal{background:#2a0a0a;color:#ff453a;border:1px solid #3a1010}
+.s-Beklemede{background:#fff8f0;color:var(--accent);border:1px solid #fde0c0}
+.s-Onaylandı{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+.s-Kargoda{background:var(--green-bg);color:var(--green);border:1px solid #b6e8cc}
+.s-Teslim{background:var(--green-bg);color:var(--green);border:1px solid #b6e8cc}
+.s-İptal{background:#fff5f5;color:var(--red);border:1px solid #fcc}
 
-.order-info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;padding:16px;background:#1c1c1e;border-radius:10px;border:1px solid #2a2a2a}
-.info-item label{font-size:10px;color:#48484a;font-weight:600;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px}
-.info-item span{font-size:14px;font-weight:600;color:#f5f5f7}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;padding:16px;background:var(--surface);border-radius:var(--r);border:1px solid var(--border-light)}
+.info-item label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px}
+.info-item span{font-size:14px;font-weight:600;color:var(--text)}
 
-.shipping-box{background:#001a2a;border:1px solid #002a3a;border-radius:10px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
-.shipping-label{font-size:10px;color:#0a84ff;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
-.shipping-carrier{font-weight:600;font-size:14px;color:#f5f5f7;margin-bottom:2px}
-.shipping-code{font-family:monospace;font-size:13px;color:#0a84ff}
+.shipping-box{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--r);padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.shipping-label{font-size:10px;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.shipping-carrier{font-weight:600;font-size:14px;color:var(--text);margin-bottom:2px}
+.shipping-code{font-family:monospace;font-size:13px;color:var(--blue)}
 
-.items-title{font-size:14px;font-weight:600;margin-bottom:12px;color:#f5f5f7}
-.order-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1c1c1e;font-size:14px}
+.items-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.order-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-light);font-size:14px}
 .order-item:last-child{border-bottom:none}
-.item-name{font-weight:400;color:#98989d;flex:1}
-.item-qty{color:#48484a;font-size:13px;margin:0 12px}
-.item-price{font-weight:600;color:#f5f5f7}
+.item-name{font-weight:400;color:var(--text2);flex:1}
+.item-qty{color:var(--text3);font-size:13px;margin:0 12px}
+.item-price{font-weight:600;color:var(--text)}
 
-.total-row{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:4px;border-top:1px solid #2a2a2a}
-.total-label{font-size:14px;color:#98989d}
-.total-amount{font-size:20px;font-weight:700;color:#e85d00}
-.discount-info{font-size:13px;color:#30d158;font-weight:500;margin-top:4px;text-align:right}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:4px;border-top:1px solid var(--border)}
+.total-label{font-size:14px;color:var(--text2)}
+.total-amount{font-size:20px;font-weight:700;color:var(--accent)}
+.discount-info{font-size:13px;color:var(--green);font-weight:500;margin-top:4px;text-align:right}
 
-.btn-home{display:inline-flex;align-items:center;gap:8px;background:#2a2a2a;color:#f5f5f7;border:none;padding:11px 20px;border-radius:10px;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;text-decoration:none;margin-top:20px;transition:background .15s}
-.btn-home:hover{background:#e85d00;color:#fff}
+.btn-home{display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text);border:1px solid var(--border);padding:11px 20px;border-radius:var(--r);font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;text-decoration:none;margin-top:20px;transition:all .15s}
+.btn-home:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-.error-card{background:#141414;border:1px solid #2a0a0a;border-radius:14px;padding:32px;text-align:center}
-.error-msg{font-size:14px;color:#ff453a;font-weight:500;margin-bottom:8px}
-.error-hint{font-size:13px;color:#48484a}
+.error-card{background:#fff5f5;border:1px solid #fcc;border-radius:var(--r-lg);padding:32px;text-align:center}
+.error-msg{font-size:14px;color:var(--red);font-weight:600;margin-bottom:6px}
+.error-hint{font-size:13px;color:var(--text2)}
 </style>
 </head>
 <body>
-<nav>
+<nav class="nav">
   <a class="logo" href="/">TANE <span>STORE</span></a>
   <a href="/" class="back">← Alışverişe Dön</a>
 </nav>
 <div class="main">
   <div class="page-title">Sipariş Takip</div>
   <p class="page-sub">Sipariş numaranızı girerek kargo durumunuzu öğrenin.</p>
-  <div class="search-box">
-    <h3>Sipariş numaranızı girin</h3>
+  <div class="search-card">
+    <span class="search-label">Sipariş numaranızı girin</span>
     <div class="search-row">
       <input class="search-input" id="order-id-input" type="number" placeholder="Sipariş numarası (ör: 42)" onkeydown="if(event.key==='Enter')trackOrder()"/>
       <button class="btn-search" onclick="trackOrder()">Sorgula</button>
@@ -108,7 +118,7 @@ const STATUS_ICONS = {
 async function trackOrder() {
   const id = document.getElementById('order-id-input').value.trim();
   if (!id) return;
-  document.getElementById('result').innerHTML = '<div style="text-align:center;padding:40px;color:#48484a;font-size:14px">Sorgulanıyor...</div>';
+  document.getElementById('result').innerHTML = '<div style="text-align:center;padding:40px;color:#aeaeb2;font-size:14px">Sorgulanıyor…</div>';
   try {
     const res = await fetch(`/api/orders/track/${id}`);
     const data = await res.json();
@@ -143,8 +153,7 @@ function renderOrder(order) {
     </div>`;
   }).join('');
 
-  const statusKey = isCancelled ? 'İptal' : order.status.split(' ')[0];
-  const statusClass = 'status-' + (order.status === 'Teslim Edildi' ? 'Teslim' : statusKey);
+  const statusKey = isCancelled ? 'İptal' : (order.status === 'Teslim Edildi' ? 'Teslim' : order.status.split(' ')[0]);
   const items = order.items || [];
 
   document.getElementById('result').innerHTML = `
@@ -154,12 +163,12 @@ function renderOrder(order) {
           <div class="order-id">#${order.id}</div>
           <div class="order-date">${new Date(order.created_at).toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
         </div>
-        <span class="status-badge ${statusClass}">${order.status}</span>
+        <span class="status-badge s-${statusKey}">${order.status}</span>
       </div>
 
       ${!isCancelled ? `<div class="timeline">${timelineHTML}</div>` : ''}
 
-      <div class="order-info">
+      <div class="info-grid">
         <div class="info-item"><label>Müşteri</label><span>${order.customer_name}</span></div>
         <div class="info-item"><label>Şehir</label><span>${order.customer_city}</span></div>
         <div class="info-item"><label>Durum</label><span>${order.status}</span></div>
@@ -168,7 +177,7 @@ function renderOrder(order) {
 
       ${order.shipping_code ? `
       <div class="shipping-box">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0060c7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         <div>
           <div class="shipping-label">Kargo Bilgisi</div>
           <div class="shipping-carrier">${order.shipping_carrier || 'Kargo Firması'}</div>
