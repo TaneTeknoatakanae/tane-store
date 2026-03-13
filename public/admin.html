@@ -482,16 +482,18 @@ function renderImgGrid(prefix){
   const ph=document.getElementById(prefix+'-upload-ph');
   if(!grid)return;
   if(ph)ph.style.display=arr.length?'none':'block';
-  grid.innerHTML=arr.map((img,i)=>
-    '<div class="img-thumb '+(i===0?'cover':'')+'">' +
-    '<img src="'+img.url+'" alt="">' +
-    (i===0?'<span class="cover-tag">Kapak</span>':'') +
-    '<button class="rm-img" onclick="removeImg(''+prefix+'','+i+')">×</button>' +
-    '</div>'
-  ).join('');
+  grid.innerHTML=arr.map(function(img,i){
+    return '<div class="img-thumb'+(i===0?' cover':'')+'">'
+      +'<img src="'+img.url+'" alt="">'
+      +(i===0?'<span class="cover-tag">Kapak</span>':'')
+      +'<button class="rm-img" onclick="removeImg(this)" data-prefix="'+prefix+'" data-idx="'+i+'">&#215;</button>'
+      +'</div>';
+  }).join('');
 }
 
-function removeImg(prefix,idx){
+function removeImg(btn){
+  const prefix=btn.dataset.prefix;
+  const idx=parseInt(btn.dataset.idx,10);
   const arr=prefix==='add'?addImgs:editImgs;
   if(arr[idx]&&arr[idx].url.startsWith('blob:'))URL.revokeObjectURL(arr[idx].url);
   arr.splice(idx,1);
