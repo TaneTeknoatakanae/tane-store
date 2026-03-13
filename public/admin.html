@@ -7,69 +7,70 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh}
-nav{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:100;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#1a1a1a;text-decoration:none}
-.logo span{color:#f97316}
+:root{--bg:#FDFAF6;--surface:#F5EFE4;--border:#DDD0BC;--text:#1C1814;--accent:#C49660;--accent-h:#A67D48}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);min-height:100vh}
+nav{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
 .container{max-width:1100px;margin:0 auto;padding:32px 24px}
 .page-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px}
 .page-sub{color:#888;font-size:14px;margin-bottom:28px}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
-.stat-card{background:#fff;border:1px solid #eee;border-radius:14px;padding:18px}
+.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:18px}
 .stat-icon{font-size:24px;margin-bottom:8px}
 .stat-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:2px}
 .stat-label{font-size:12px;color:#888}
 .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .tab{padding:9px 20px;border-radius:9px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;transition:all .15s}
-.tab.active{background:#1a1a1a;color:#fff}
-.tab:not(.active){background:#fff;border:1px solid #eee;color:#666}
-.table-wrap{background:#fff;border:1px solid #eee;border-radius:16px;overflow:hidden}
+.tab.active{background:#1C1814;color:#fff}
+.tab:not(.active){background:var(--bg);border:1px solid var(--border);color:#666}
+.table-wrap{background:var(--bg);border:1px solid var(--border);border-radius:16px;overflow:hidden}
 .table-head{padding:18px 22px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
 .table-head h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
 table{width:100%;border-collapse:collapse}
 th{padding:11px 18px;text-align:left;font-size:11px;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #f3f3f1}
 td{padding:13px 18px;border-bottom:1px solid #f5f5f3;font-size:14px;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-.btn-primary{background:#1a1a1a;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:9px;padding:9px 18px;font-size:14px}
-.btn-orange{background:#f97316;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:8px;padding:7px 14px;font-size:13px}
+.btn-primary{background:#1C1814;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:9px;padding:9px 18px;font-size:14px}
+.btn-orange{background:#C49660;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:8px;padding:7px 14px;font-size:13px}
 .btn-blue{background:#3b82f6;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:8px;padding:7px 14px;font-size:13px}
 .btn-danger{background:#fef2f2;border:1px solid #fecaca;color:#ef4444;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border-radius:8px;padding:7px 14px;font-size:13px}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:#fff;border-radius:20px;padding:30px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .3s}
+.modal{background:var(--bg);border-radius:20px;padding:30px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .3s}
 .modal-overlay.open .modal{transform:translateY(0)}
 .modal h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px}
 .form-group{margin-bottom:14px}
 .form-label{font-size:13px;color:#555;font-weight:500;margin-bottom:5px;display:block}
-.form-input{width:100%;border:1px solid #e5e5e5;border-radius:9px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;color:#1a1a1a;background:#fff}
-.form-input:focus{border-color:#f97316}
+.form-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;color:#1C1814;background:var(--bg)}
+.form-input:focus{border-color:#C49660}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.btn-submit{width:100%;background:#f97316;border:none;color:#fff;padding:13px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px}
-.btn-cancel{width:100%;background:#f3f3f1;border:none;color:#666;padding:11px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;margin-top:8px}
-.upload-area{border:2px dashed #e5e5e5;border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafafa}
-.upload-area:hover{border-color:#f97316;background:#fff8f5}
+.btn-submit{width:100%;background:#C49660;border:none;color:#fff;padding:13px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px}
+.btn-cancel{width:100%;background:var(--surface);border:none;color:#666;padding:11px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;margin-top:8px}
+.upload-area{border:2px dashed var(--border);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafafa}
+.upload-area:hover{border-color:#C49660;background:#FDF5EB}
 .upload-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-preview{width:100%;height:140px;object-fit:cover;border-radius:10px;margin-top:12px;display:none}
-.platform-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;background:#f8f8f6;border-radius:9px;padding:10px 12px}
+.platform-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;background:#FDFAF6;border-radius:9px;padding:10px 12px}
 .platform-label{font-size:13px;font-weight:600;min-width:100px;color:#555}
-.platform-input{flex:1;border:1px solid #e5e5e5;border-radius:8px;padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:#fff}
-.platform-input:focus{border-color:#f97316}
+.platform-input{flex:1;border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:var(--bg)}
+.platform-input:focus{border-color:#C49660}
 .badge{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
-.badge-orange{background:#fff3e8;color:#f97316}
+.badge-orange{background:#fff3e8;color:#C49660}
 .badge-green{background:#f0fdf4;color:#16a34a}
-.badge-gray{background:#f3f3f1;color:#888}
+.badge-gray{background:var(--surface);color:#888}
 .badge-blue{background:#eff6ff;color:#3b82f6}
 .badge-red{background:#fef2f2;color:#ef4444}
 .product-img-thumb{width:44px;height:44px;border-radius:9px;object-fit:cover}
-.product-img-ph{width:44px;height:44px;border-radius:9px;background:#f3f3f1;display:flex;align-items:center;justify-content:center;font-size:20px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:11px 22px;border-radius:11px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.15);white-space:nowrap}
+.product-img-ph{width:44px;height:44px;border-radius:9px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:20px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1C1814;color:#fff;padding:11px 22px;border-radius:11px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.15);white-space:nowrap}
 .hidden{display:none}
-.coupon-card{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid #eee;border-radius:10px;margin-bottom:8px;background:#fff}
+.coupon-card{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--bg)}
 .coupon-card.inactive{opacity:.5}
-.coupon-code-text{font-weight:700;font-family:monospace;font-size:16px;color:#1a1a1a}
+.coupon-code-text{font-weight:700;font-family:monospace;font-size:16px;color:#1C1814}
 .coupon-info{font-size:12px;color:#888;margin-top:2px}
-.stars-small{color:#f97316;font-size:11px}
+.stars-small{color:#C49660;font-size:11px}
 @media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row,.form-row-3{grid-template-columns:1fr}}
 </style>
 </head>
@@ -155,11 +156,11 @@ tr:last-child td{border-bottom:none}
 <div class="modal-overlay" id="od-modal">
   <div class="modal">
     <h2>📦 Sipariş Detayı — <span id="od-id"></span></h2>
-    <div style="background:#f8f8f6;border-radius:10px;padding:14px;margin-bottom:18px;font-size:14px">
+    <div style="background:#FDFAF6;border-radius:10px;padding:14px;margin-bottom:18px;font-size:14px">
       <div style="font-weight:600;margin-bottom:4px" id="od-customer"></div>
       <div style="color:#666;margin-bottom:4px" id="od-address"></div>
       <div style="color:#888;font-size:13px;margin-bottom:4px">📦 <span id="od-items"></span></div>
-      <div style="font-weight:700;color:#f97316" id="od-total"></div>
+      <div style="font-weight:700;color:#C49660" id="od-total"></div>
       <div style="color:#888;font-size:12px;margin-top:4px">Not: <span id="od-note"></span></div>
     </div>
     <div class="form-group">
@@ -261,7 +262,7 @@ tr:last-child td{border-bottom:none}
 <div class="modal-overlay" id="price-modal">
   <div class="modal">
     <h2>💰 Rakip Fiyat Gir</h2>
-    <div id="price-modal-product" style="background:#fff8f5;border:1px solid #fed7aa;border-radius:10px;padding:12px;margin-bottom:18px;font-weight:600;font-size:14px"></div>
+    <div id="price-modal-product" style="background:#FDF5EB;border:1px solid #fed7aa;border-radius:10px;padding:12px;margin-bottom:18px;font-weight:600;font-size:14px"></div>
     <div class="platform-row"><span class="platform-label">🔍 Cimri</span><input class="platform-input" id="p-cimri" type="number" placeholder="Fiyat (₺)"/><input class="platform-input" id="u-cimri" placeholder="Link"/></div>
     <div class="platform-row"><span class="platform-label">🛒 Akakçe</span><input class="platform-input" id="p-akakce" type="number" placeholder="Fiyat (₺)"/><input class="platform-input" id="u-akakce" placeholder="Link"/></div>
     <div class="platform-row"><span class="platform-label">📦 Trendyol</span><input class="platform-input" id="p-trendyol" type="number" placeholder="Fiyat (₺)"/><input class="platform-input" id="u-trendyol" placeholder="Link"/></div>
@@ -298,7 +299,7 @@ function renderProducts(){
     const priceCount=p.platforms?p.platforms.split(',').length:0;
     const imgEl=p.image_url?`<img src="${p.image_url}" class="product-img-thumb" onerror="this.outerHTML='<div class=product-img-ph>📦</div>'">`:`<div class="product-img-ph">📦</div>`;
     const ep=p.discount_price||p.tane_price;
-    const priceText=p.discount_price?`<del style="color:#bbb;font-size:12px">${p.tane_price.toLocaleString('tr-TR')} ₺</del><br><span style="color:#ef4444;font-weight:700">${p.discount_price.toLocaleString('tr-TR')} ₺</span>`:`<span style="font-weight:700;color:#f97316">${p.tane_price.toLocaleString('tr-TR')} ₺</span>`;
+    const priceText=p.discount_price?`<del style="color:#bbb;font-size:12px">${p.tane_price.toLocaleString('tr-TR')} ₺</del><br><span style="color:#ef4444;font-weight:700">${p.discount_price.toLocaleString('tr-TR')} ₺</span>`:`<span style="font-weight:700;color:#C49660">${p.tane_price.toLocaleString('tr-TR')} ₺</span>`;
     const stars=p.rating?'★'.repeat(Math.round(p.rating))+'☆'.repeat(5-Math.round(p.rating)):'—';
     const stockBadge=p.stock===0?'<span class="badge badge-red">Stok Yok</span>':p.stock<=10?`<span class="badge badge-orange">Son ${p.stock}</span>`:`<span style="font-size:12px;color:#888">${p.stock||99}</span>`;
     return`<tr>
@@ -320,14 +321,14 @@ function renderProducts(){
 function renderOrders(){
   const tbody=document.getElementById('orders-tbody');
   if(!orders.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:#aaa;padding:40px">Henüz sipariş yok</td></tr>';return;}
-  const statusColors={'Beklemede':'#f97316','Onaylandı':'#3b82f6','Kargoda':'#16a34a','Teslim Edildi':'#16a34a','İptal':'#ef4444'};
+  const statusColors={'Beklemede':'#C49660','Onaylandı':'#3b82f6','Kargoda':'#16a34a','Teslim Edildi':'#16a34a','İptal':'#ef4444'};
   tbody.innerHTML=orders.map(o=>{
     const sc=statusColors[o.status]||'#888';
     const kargoHTML=o.shipping_code
       ?`<div style="font-size:11px"><div style="font-weight:600;color:#555">${o.shipping_carrier||'Kargo'}</div><div style="color:#3b82f6;font-family:monospace">${o.shipping_code}</div></div>`
       :'<span style="color:#ccc;font-size:12px">—</span>';
     return`<tr>
-    <td style="font-family:monospace;color:#f97316">#${o.id}</td>
+    <td style="font-family:monospace;color:#C49660">#${o.id}</td>
     <td style="font-weight:600">${o.customer_name}</td>
     <td>${o.customer_phone}</td>
     <td>${o.customer_city}</td>
@@ -350,7 +351,7 @@ function renderPriceList(){
     return`<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f3f3f1">
       <div style="display:flex;align-items:center;gap:10px">${imgEl}
         <div><div style="font-weight:600;font-size:14px">${p.name}</div>
-        <div style="font-size:12px;color:#f97316">Tane Store: ${(p.discount_price||p.tane_price).toLocaleString('tr-TR')} ₺</div></div>
+        <div style="font-size:12px;color:#C49660">Tane Store: ${(p.discount_price||p.tane_price).toLocaleString('tr-TR')} ₺</div></div>
       </div>
       <button class="btn-orange" onclick="openPriceModal(${p.id})">💰 Fiyat Gir</button>
     </div>`;
