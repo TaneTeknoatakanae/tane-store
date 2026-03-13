@@ -114,12 +114,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-add:disabled{opacity:.45;cursor:not-allowed}
 
 /* CATEGORIES */
-.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
 @media(max-width:480px){.cat-grid{grid-template-columns:repeat(2,1fr)}}
-.cat-card{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);text-decoration:none;color:var(--text);transition:all .2s}
-.cat-card:hover{border-color:var(--accent);background:#FDF5EB;transform:translateY(-2px)}
-.cat-icon{width:44px;height:44px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:var(--shadow-sm)}
-.cat-name{font-size:13px;font-weight:600;text-align:center}
+.cat-card{display:flex;flex-direction:column;border-radius:var(--r-lg);overflow:hidden;text-decoration:none;color:var(--text);background:var(--bg);border:1px solid var(--border-light);transition:border-color .2s,box-shadow .2s,transform .2s;cursor:pointer}
+.cat-card:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:translateY(-3px)}
+.cat-img-wrap{aspect-ratio:1;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px}
+.cat-img{width:100%;height:100%;object-fit:contain;transition:transform .35s}
+.cat-card:hover .cat-img{transform:scale(1.06)}
+.cat-icon-fb{font-size:36px}
+.cat-foot{background:var(--surface);padding:12px 14px}
+.cat-name{font-size:14px;font-weight:700;color:var(--text)}
+.cat-count{font-size:12px;color:var(--text3);margin-top:2px}
 
 /* DELIVERY */
 .delivery-wrap{background:var(--surface);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light)}
@@ -216,6 +221,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;display:none;white-space:nowrap;box-shadow:var(--shadow)}
+.why-section{background:#1C1814;padding:88px 24px}
+.why-in{max-width:1280px;margin:0 auto;text-align:center}
+.why-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.why-title{font-size:clamp(2rem,4.5vw,3rem);font-weight:800;letter-spacing:-1.5px;color:#FDFAF6;line-height:1.1;margin-bottom:60px}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(255,255,255,.07);border-radius:20px;overflow:hidden}
+@media(max-width:760px){.why-grid{grid-template-columns:1fr}}
+.why-card{background:#231E18;padding:44px 36px;text-align:left;transition:background .2s}
+.why-card:hover{background:#2a2318}
+.why-icon{width:52px;height:52px;background:rgba(196,150,96,.15);border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:22px}
+.why-card-title{font-size:19px;font-weight:700;color:#FDFAF6;margin-bottom:10px;letter-spacing:-.3px}
+.why-card-text{font-size:14px;color:rgba(253,250,246,.5);line-height:1.75}
 </style>
 </head>
 <body>
@@ -325,36 +341,40 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <h2 class="section-h2">Kategoriler</h2>
     <a href="/" class="section-lnk">Tüm kategoriler →</a>
   </div>
-  <div class="cat-grid">
-    <a href="/?cat=Elektronik" class="cat-card"><div class="cat-icon">💻</div><span class="cat-name">Elektronik</span></a>
-    <a href="/?cat=Giyim" class="cat-card"><div class="cat-icon">👕</div><span class="cat-name">Giyim</span></a>
-    <a href="/?cat=Ev" class="cat-card"><div class="cat-icon">🏠</div><span class="cat-name">Ev & Yaşam</span></a>
-    <a href="/?cat=Spor" class="cat-card"><div class="cat-icon">⚽</div><span class="cat-name">Spor</span></a>
-    <a href="/?cat=Kozmetik" class="cat-card"><div class="cat-icon">✨</div><span class="cat-name">Kozmetik</span></a>
-    <a href="/?cat=Kitap" class="cat-card"><div class="cat-icon">📚</div><span class="cat-name">Kitap</span></a>
+  <div class="cat-grid" id="cat-grid">
   </div>
 </div>
 
-<!-- DELIVERY PROMISE -->
-<div class="delivery-wrap">
-  <div class="delivery-in">
-    <div>
-      <div class="del-icon">📦</div>
-      <div class="del-title">Hızlı Hazırlık</div>
-      <div class="del-sub">Siparişiniz 1 iş günü içinde hazırlanır ve kargoya teslim edilir.</div>
-    </div>
-    <div>
-      <div class="del-icon">🚚</div>
-      <div class="del-title">500 ₺ Üzeri Ücretsiz Kargo</div>
-      <div class="del-sub">MNG, Aras veya Yurtiçi ile 1–3 iş günü. Altı için 49,90 ₺ sabit kargo.</div>
-    </div>
-    <div>
-      <div class="del-icon">📍</div>
-      <div class="del-title">Canlı Kargo Takibi</div>
-      <div class="del-sub">Her adımı <a href="/track">sipariş takip</a> sayfasından anlık izleyin.</div>
+<!-- NEDEN TANE -->
+<section class="why-section">
+  <div class="why-in">
+    <div class="why-tag">Neden Tane?</div>
+    <h2 class="why-title">Alışverişin en<br>sade hali.</h2>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <div class="why-card-title">1–3 İş Günü Teslimat</div>
+        <div class="why-card-text">Siparişiniz aynı gün hazırlanır ve kargoya teslim edilir. Türkiye'nin her yerine hızlı teslimat.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="why-card-title">Güvenli Ödeme</div>
+        <div class="why-card-text">iyzico altyapısı ve 256-bit SSL şifreleme. Kart bilgileriniz hiçbir zaman saklanmaz.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
+        </div>
+        <div class="why-card-title">14 Gün İade Hakkı</div>
+        <div class="why-card-text">Beğenmediğiniz ürünü 14 gün içinde koşulsuz iade edin. Ücretsiz ve zahmetsiz.</div>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- FAQ -->
 <div class="section">
@@ -554,6 +574,7 @@ async function loadProducts() {
     allProducts = await fetch('/api/products').then(r => r.json());
     if (!Array.isArray(allProducts)) allProducts = [];
     renderProducts(allProducts.slice(0, 8));
+    renderCategories();
   } catch(e) {
     document.getElementById('products-grid').innerHTML =
       `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:14px">Ürünler yüklenemedi. <a href="/" style="color:var(--accent)">Mağazaya git →</a></div>`;
@@ -594,6 +615,34 @@ function renderProducts(products) {
       </div>
     </article>`;
   }).join('');
+}
+
+function renderCategories() {
+  const CATS = [
+    {key:'Elektronik',label:'Elektronik',fb:'💻'},
+    {key:'Giyim',label:'Giyim & Aksesuar',fb:'👕'},
+    {key:'Ev',label:'Ev & Yaşam',fb:'🏠'},
+    {key:'Spor',label:'Spor & Outdoor',fb:'⚽'},
+    {key:'Kozmetik',label:'Kozmetik',fb:'✨'},
+    {key:'Kitap',label:'Kitap & Kırtasiye',fb:'📚'},
+  ];
+  const grid = document.getElementById('cat-grid');
+  if (!grid) return;
+  const rows = CATS.map(cat => {
+    const prods = allProducts.filter(p => p.category === cat.key);
+    if (!prods.length) return '';
+    const img = prods.find(p => p.image_url)?.image_url;
+    return `<a href="/?cat=${encodeURIComponent(cat.key)}" class="cat-card">
+      <div class="cat-img-wrap">
+        ${img ? `<img class="cat-img" src="${img}" alt="${cat.label}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=cat-icon-fb>${cat.fb}</span>'">` : `<span class="cat-icon-fb">${cat.fb}</span>`}
+      </div>
+      <div class="cat-foot">
+        <div class="cat-name">${cat.label}</div>
+        <div class="cat-count">${prods.length} ürün</div>
+      </div>
+    </a>`;
+  }).join('');
+  grid.innerHTML = rows || CATS.map(c => `<a href="/?cat=${encodeURIComponent(c.key)}" class="cat-card"><div class="cat-img-wrap"><span class="cat-icon-fb">${c.fb}</span></div><div class="cat-foot"><div class="cat-name">${c.label}</div></div></a>`).join('');
 }
 
 // ── CART ──

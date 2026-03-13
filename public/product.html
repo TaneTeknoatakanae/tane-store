@@ -153,15 +153,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .btn-review:hover{background:#333}
 
 /* SIMILAR */
-.similar-wrap{margin-top:24px}
-.section-title{font-size:17px;font-weight:600;margin-bottom:16px}
-.similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.similar-wrap{margin-top:0;padding:64px 24px;max-width:1400px;margin-left:auto;margin-right:auto}
+.section-title{font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--text);margin-bottom:28px}
+.similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
 .sim-card{background:var(--bg);border:1px solid var(--border-light);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:border-color .2s,box-shadow .2s}
 .sim-card:hover{border-color:var(--border);box-shadow:var(--shadow-sm)}
-.sim-img{width:100%;height:130px;object-fit:contain;background:var(--surface);padding:8px}
-.sim-body{padding:10px 12px}
-.sim-name{font-size:12px;color:var(--text2);line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.sim-price{font-weight:700;font-size:13px;color:var(--accent)}
+.sim-img{width:100%;height:160px;object-fit:contain;background:#fff;padding:12px}
+.sim-body{padding:12px 14px 14px;background:var(--surface)}
+.sim-name{font-size:13px;font-weight:500;color:var(--text);line-height:1.5;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sim-price{font-weight:700;font-size:15px;color:var(--text)}
 
 /* CART DRAWER */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -565,7 +565,7 @@ function renderProduct() {
     <div class="reviews-box" id="reviews-section">
       <div class="loading" style="padding:30px 0">Değerlendirmeler yükleniyor…</div>
     </div>
-    <div id="similar-section"></div>`;
+    <div style="background:var(--surface);border-top:1px solid var(--border-light)"><div id="similar-section"></div></div>`;
 
   renderGallery();
 }
@@ -631,7 +631,7 @@ async function loadSimilar() {
   if (!product) return;
   try {
     const all = await fetch(`/api/products?category=${encodeURIComponent(product.category)}`).then(r => r.json());
-    const similar = all.filter(p => p.id !== product.id).slice(0, 6);
+    const similar = all.filter(p => p.id !== product.id).slice(0, 4);
     if (!similar.length) return;
     document.getElementById('similar-section').innerHTML = `<div class="similar-wrap">
       <div class="section-title">Benzer Ürünler</div>
@@ -639,7 +639,13 @@ async function loadSimilar() {
         const ep = p.discount_price || p.tane_price;
         return `<div class="sim-card" onclick="window.location.href='/product.html?id=${p.id}'">
           <img class="sim-img" src="${p.image_url || ''}" alt="${p.name}" loading="lazy" onerror="this.style.visibility='hidden'"/>
-          <div class="sim-body"><div class="sim-name">${p.name}</div><div class="sim-price">${ep > 0 ? ep.toLocaleString('tr-TR') + ' ₺' : '—'}</div></div>
+          <div class="sim-body">
+            <div class="sim-name">${p.name}</div>
+            <div class="sim-price">${ep > 0 ? ep.toLocaleString('tr-TR') + ' ₺' : '—'}</div>
+            <button class="btn-add-card" style="width:100%;margin-top:10px" onclick="event.stopPropagation();addToCart(${p.id})" ${p.stock===0?'disabled':''}>
+              ${p.stock===0?'Stok tükendi':'Sepete Ekle'}
+            </button>
+          </div>
         </div>`;
       }).join('')}</div></div>`;
   } catch(e) {}
