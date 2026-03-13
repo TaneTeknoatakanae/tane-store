@@ -71,16 +71,16 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 /* TRUST STRIP */
 .trust-strip{display:flex;align-items:stretch;border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light);background:var(--surface);overflow-x:auto;scrollbar-width:none}
 .trust-strip::-webkit-scrollbar{display:none}
-.trust-item{display:flex;align-items:center;gap:12px;padding:20px 32px;border-right:1px solid var(--border-light);flex-shrink:0}
+.trust-item{display:flex;align-items:center;gap:16px;padding:32px 40px;border-right:1px solid var(--border-light);flex-shrink:0}
 .trust-item:last-child{border-right:none}
 .trust-icon{color:var(--accent);flex-shrink:0}
-.trust-label{font-size:13px;font-weight:600;color:var(--text);display:block;line-height:1.3}
-.trust-sub{font-size:12px;color:var(--text2);display:block;margin-top:2px}
+.trust-label{font-size:15px;font-weight:700;color:var(--text);display:block;line-height:1.3}
+.trust-sub{font-size:13px;color:var(--text2);display:block;margin-top:3px}
 
 /* PRODUCTS */
 .products-wrap{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
 .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-.section-title{font-size:18px;font-weight:600;color:var(--text)}
+.section-title{font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--text)}
 .section-count{font-size:13px;color:var(--text3)}
 
 /* GRID */
@@ -107,7 +107,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .card-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
 .card-price{font-size:18px;font-weight:700;color:var(--text)}
 .card-price.sale{color:var(--accent)}
-.card-price-old{font-size:13px;color:var(--text3);text-decoration:line-through}
+.card-price-old{font-size:13px;color:var(--text3);text-decoration:line-through}.card-rating{display:flex;align-items:center;gap:5px;margin-bottom:6px}.card-stars{color:var(--accent);font-size:11px;letter-spacing:.5px}.card-rating-text{font-size:11px;color:var(--text3)}
 .stock-low{font-size:11px;color:var(--accent);font-weight:500;margin-bottom:8px}
 .btn-add-card{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border);padding:9px;border-radius:8px;font-family:inherit;font-weight:500;font-size:13px;cursor:pointer;transition:all .15s}
 .btn-add-card:hover{background:var(--text);color:#fff;border-color:var(--text)}
@@ -306,19 +306,19 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 <!-- TRUST STRIP -->
 <div class="trust-strip">
   <div class="trust-item">
-    <svg class="trust-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <svg class="trust-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
     <div><span class="trust-label">Güvenli Ödeme</span><span class="trust-sub">iyzico · SSL şifreli</span></div>
   </div>
   <div class="trust-item">
-    <svg class="trust-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    <svg class="trust-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
     <div><span class="trust-label">Hızlı Teslimat</span><span class="trust-sub">1–3 iş günü içinde</span></div>
   </div>
   <div class="trust-item">
-    <svg class="trust-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
+    <svg class="trust-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
     <div><span class="trust-label">Kolay İade</span><span class="trust-sub">14 gün içinde</span></div>
   </div>
   <div class="trust-item">
-    <svg class="trust-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <svg class="trust-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
     <div><span class="trust-label">7/24 Destek</span><span class="trust-sub">info@tanetekno.com</span></div>
   </div>
 </div>
@@ -534,6 +534,7 @@ function renderProducts(list) {
   grid.innerHTML = list.map(p => {
     const price = ep(p);
     const disc = p.discount_price && p.tane_price > p.discount_price ? Math.round((1 - p.discount_price / p.tane_price) * 100) : 0;
+    const ratingHtml = p.rating ? `<div class="card-rating"><span class="card-stars">${('★'.repeat(Math.round(p.rating)) + '☆'.repeat(5-Math.round(p.rating)))}</span><span class="card-rating-text">${p.rating.toFixed(1)}${p.review_count ? ' · ' + p.review_count + ' yorum' : ''}</span></div>` : '';
     const imgEl = p.image_url
       ? `<img class="card-img" src="${p.image_url}" alt="${p.name}" loading="lazy" onerror="this.outerHTML='<div class=card-img-ph>—</div>'">`
       : `<div class="card-img-ph">—</div>`;
@@ -544,6 +545,7 @@ function renderProducts(list) {
       </div>
       <div class="card-body">
         <div class="card-name" onclick="window.location.href='/product.html?id=${p.id}'">${p.name}</div>
+        ${ratingHtml}
         <div class="card-price-row">
           <span class="card-price${disc > 0 ? ' sale' : ''}">${price > 0 ? price.toLocaleString('tr-TR') + ' ₺' : 'Fiyat bekleniyor'}</span>
           ${p.discount_price ? `<span class="card-price-old">${p.tane_price.toLocaleString('tr-TR')} ₺</span>` : ''}

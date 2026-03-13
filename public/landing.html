@@ -70,17 +70,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .trust-strip{background:var(--surface);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light)}
 .trust-in{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:0 24px}
 @media(max-width:700px){.trust-in{grid-template-columns:repeat(2,1fr)}}
-.trust-item{display:flex;align-items:center;gap:12px;padding:18px 16px;border-right:1px solid var(--border-light)}
+.trust-item{display:flex;align-items:center;gap:16px;padding:32px 28px;border-right:1px solid var(--border-light)}
 .trust-item:last-child{border-right:none}
 @media(max-width:700px){.trust-item:nth-child(2){border-right:none}}
-.trust-ic{width:36px;height:36px;background:var(--bg);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);color:var(--accent);flex-shrink:0}
-.trust-label{font-size:13px;font-weight:600;color:var(--text);display:block}
-.trust-sub{font-size:11px;color:var(--text2);display:block;margin-top:1px}
+.trust-ic{width:48px;height:48px;background:var(--bg);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);color:var(--accent);flex-shrink:0}
+.trust-label{font-size:15px;font-weight:700;color:var(--text);display:block}
+.trust-sub{font-size:13px;color:var(--text2);display:block;margin-top:3px}
 
 /* SECTION */
 .section{max-width:1280px;margin:0 auto;padding:64px 24px}
 .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-.section-h2{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
+.section-h2{font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--text)}
 .section-lnk{font-size:13px;font-weight:500;color:var(--accent);text-decoration:none}
 .section-lnk:hover{color:var(--accent-h)}
 
@@ -107,7 +107,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .prod-name:hover{color:var(--accent)}
 .prod-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
 .prod-price{font-size:17px;font-weight:700;color:var(--text)}
-.prod-price.sale{color:var(--accent)}
+.prod-price.sale{color:var(--accent)}.prod-rating{display:flex;align-items:center;gap:5px;margin-bottom:6px}.prod-stars{color:var(--accent);font-size:11px;letter-spacing:.5px}.prod-rating-text{font-size:11px;color:var(--text3)}
 .prod-old{font-size:12px;color:var(--text3);text-decoration:line-through}
 .btn-add{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border);padding:9px;border-radius:8px;font-family:'Inter',sans-serif;font-weight:500;font-size:13px;cursor:pointer;transition:all .15s}
 .btn-add:hover{background:var(--text);color:#fff;border-color:var(--text)}
@@ -250,12 +250,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <a href="/login" class="btn-login-nav">Giriş Yap</a>
       </div>
       <button class="btn-cart-nav" onclick="openCart()" title="Sepetim" aria-label="Sepetimi aç">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         <span class="cart-badge" id="cart-count" style="display:none">0</span>
       </button>
     </div>
     <button class="btn-hamburger" onclick="openMob()" title="Menü" aria-label="Menüyü aç">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
   </div>
 </nav>
@@ -272,7 +272,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="hero-ctas">
       <a href="#products" class="btn-primary">
         Ürünleri Keşfet
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>
       <a href="/track" class="btn-secondary">Siparişimi Takip Et</a>
     </div>
@@ -283,19 +283,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="trust-strip">
   <div class="trust-in">
     <div class="trust-item">
-      <div class="trust-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
       <div><span class="trust-label">Güvenli Ödeme</span><span class="trust-sub">SSL korumalı · iyzico</span></div>
     </div>
     <div class="trust-item">
-      <div class="trust-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+      <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
       <div><span class="trust-label">Hızlı Kargo</span><span class="trust-sub">1–3 iş günü teslimat</span></div>
     </div>
     <div class="trust-item">
-      <div class="trust-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
+      <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
       <div><span class="trust-label">Kolay İade</span><span class="trust-sub">14 gün içinde ücretsiz</span></div>
     </div>
     <div class="trust-item">
-      <div class="trust-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
       <div><span class="trust-label">7/24 Destek</span><span class="trust-sub">info@tanetekno.com</span></div>
     </div>
   </div>
@@ -481,7 +481,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="m-head">
     <a href="/" class="logo"><img src="/AmblemTane.png" alt="Tane Store" style="height:38px;display:block"></a>
     <button class="m-close" onclick="closeMob()" aria-label="Menüyü kapat">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
   <nav class="m-nav">
@@ -571,6 +571,7 @@ function renderProducts(products) {
   grid.innerHTML = products.map(p => {
     const price = ep(p);
     const disc = p.discount_price && p.tane_price > p.discount_price ? Math.round((1 - p.discount_price / p.tane_price) * 100) : 0;
+    const ratingHtml = p.rating ? `<div class="prod-rating"><span class="prod-stars">${('★'.repeat(Math.round(p.rating)) + '☆'.repeat(5-Math.round(p.rating)))}</span><span class="prod-rating-text">${p.rating.toFixed(1)}${p.review_count ? ' · ' + p.review_count + ' yorum' : ''}</span></div>` : '';
     const imgEl = p.image_url
       ? `<img class="prod-img" src="${p.image_url}" alt="${p.name}" loading="lazy" onerror="this.style.visibility='hidden'">`
       : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px">—</div>`;
@@ -581,6 +582,7 @@ function renderProducts(products) {
       </div>
       <div class="prod-body">
         <div class="prod-name" onclick="window.location.href='/product.html?id=${p.id}'">${p.name}</div>
+        ${ratingHtml}
         <div class="prod-price-row">
           <span class="prod-price${disc > 0 ? ' sale' : ''}">${price > 0 ? price.toLocaleString('tr-TR') + ' ₺' : '—'}</span>
           ${disc > 0 ? `<span class="prod-old">${p.tane_price.toLocaleString('tr-TR')} ₺</span>` : ''}
