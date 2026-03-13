@@ -73,6 +73,12 @@ tr:last-child td{border-bottom:none}
 .coupon-info{font-size:12px;color:#888;margin-top:2px}
 .stars-small{color:#C49660;font-size:11px}
 @media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row,.form-row-3{grid-template-columns:1fr}}
+.img-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:0}
+.img-thumb{position:relative;width:76px;height:76px;flex-shrink:0}
+.img-thumb img{width:100%;height:100%;object-fit:cover;border-radius:8px;border:2px solid transparent;display:block}
+.img-thumb.cover img{border-color:var(--accent)}
+.img-thumb .cover-tag{position:absolute;bottom:3px;left:3px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;pointer-events:none}
+.img-thumb .rm-img{position:absolute;top:-5px;right:-5px;width:20px;height:20px;background:#ef4444;color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
 </style>
 </head>
 <body>
@@ -94,6 +100,7 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="setTab('orders',this)">📦 Siparişler</button>
     <button class="tab" onclick="setTab('prices',this)">💰 Fiyat Gir</button>
     <button class="tab" onclick="setTab('coupons',this)">🎟 Kuponlar</button>
+    <button class="tab" onclick="setTab('analytics',this)">📊 Analitik</button>
   </div>
 
   <!-- ÜRÜNLER -->
@@ -151,6 +158,57 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
   </div>
+
+  <!-- ANALİTİK -->
+  <div id="tab-analytics" class="hidden">
+    <div style="margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="page-title" style="font-size:20px;margin-bottom:2px">📊 Analitik</div>
+        <div class="page-sub" style="margin-bottom:0">Son 30 günlük ziyaretçi ve satış verileri</div>
+      </div>
+      <button class="btn-primary" onclick="loadAnalytics()" style="font-size:13px;padding:8px 16px">↻ Yenile</button>
+    </div>
+    <div style="height:1px;background:var(--border);margin:18px 0 20px"></div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+      <div class="stat-card"><div class="stat-label">Bugün Ziyaret</div><div class="stat-num" id="an-today-views" style="font-size:28px">—</div></div>
+      <div class="stat-card"><div class="stat-label">Bu Hafta Ziyaret</div><div class="stat-num" id="an-week-views" style="font-size:28px">—</div></div>
+      <div class="stat-card"><div class="stat-label">Bu Ay Ziyaret</div><div class="stat-num" id="an-month-views" style="font-size:28px">—</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+      <div class="stat-card"><div class="stat-label">Bugün Ciro</div><div class="stat-num" id="an-today-rev" style="font-size:22px;color:var(--accent)">—</div></div>
+      <div class="stat-card"><div class="stat-label">Bu Hafta Ciro</div><div class="stat-num" id="an-week-rev" style="font-size:22px;color:var(--accent)">—</div></div>
+      <div class="stat-card"><div class="stat-label">Bu Ay Ciro</div><div class="stat-num" id="an-month-rev" style="font-size:22px;color:var(--accent)">—</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+      <div class="stat-card"><div class="stat-label">Bekleyen Sipariş</div><div class="stat-num" id="an-pending">—</div></div>
+      <div class="stat-card"><div class="stat-label">Toplam Sipariş</div><div class="stat-num" id="an-total-orders">—</div></div>
+      <div class="stat-card"><div class="stat-label">Toplam Ürün</div><div class="stat-num" id="an-total-products">—</div></div>
+      <div class="stat-card"><div class="stat-label">Müşteri</div><div class="stat-num" id="an-customers">—</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div class="table-wrap" style="padding:20px 22px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:#555">Son 30 Gün — Ziyaretçi</div>
+        <div id="an-views-chart" style="display:flex;align-items:flex-end;gap:2px;height:72px;background:var(--surface);border-radius:8px;padding:6px 8px"></div>
+      </div>
+      <div class="table-wrap" style="padding:20px 22px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:#555">Son 30 Gün — Sipariş Sayısı</div>
+        <div id="an-orders-chart" style="display:flex;align-items:flex-end;gap:2px;height:72px;background:var(--surface);border-radius:8px;padding:6px 8px"></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="table-wrap" style="padding:20px 22px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:16px">En Çok Ziyaret Edilen Sayfalar</div>
+        <div id="an-top-pages"><div style="color:#aaa;font-size:13px">Yükleniyor...</div></div>
+      </div>
+      <div class="table-wrap" style="padding:20px 22px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:16px">En Çok Satan Ürünler (30 Gün)</div>
+        <div id="an-top-products"><div style="color:#aaa;font-size:13px">Yükleniyor...</div></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- SİPARİŞ DETAY MODAL -->
@@ -190,12 +248,12 @@ tr:last-child td{border-bottom:none}
   <div class="modal">
     <h2>➕ Yeni Ürün Ekle</h2>
     <div class="form-group">
-      <label class="form-label">Ürün Fotoğrafı</label>
-      <div class="upload-area">
-        <input type="file" class="upload-input" id="img-file" accept="image/*" onchange="previewImage(this,'add')"/>
-        <div id="upload-placeholder"><div style="font-size:32px;margin-bottom:8px">📸</div><div style="font-size:14px;color:#888;font-weight:500">Fotoğraf seç veya sürükle bırak</div><div style="font-size:12px;color:#bbb;margin-top:4px">JPG, PNG, WEBP — Max 5MB</div></div>
-        <img id="upload-preview" class="upload-preview"/>
+      <label class="form-label">Ürün Fotoğrafları <span style="color:#aaa;font-weight:400;font-size:11px">İlki kapak · Max 8 adet</span></label>
+      <div class="upload-area" style="cursor:pointer" onclick="document.getElementById('add-img-files').click()">
+        <input type="file" id="add-img-files" accept="image/*" multiple style="display:none" onchange="pickImages(this,'add')"/>
+        <div id="add-upload-ph"><div style="font-size:28px;margin-bottom:6px">📸</div><div style="font-size:13px;color:#888;font-weight:500">Fotoğraf seç — birden fazla seçebilirsin</div><div style="font-size:11px;color:#bbb;margin-top:3px">JPG, PNG, WEBP — Max 5MB her biri</div></div>
       </div>
+      <div id="add-img-grid" class="img-grid"></div>
     </div>
     <div class="form-group"><label class="form-label">Ürün Adı *</label><input class="form-input" id="new-name" placeholder="Örn: Sony WH-1000XM5 Kulaklık"/></div>
     <div class="form-row">
@@ -227,13 +285,13 @@ tr:last-child td{border-bottom:none}
     <h2>✏️ Ürünü Düzenle</h2>
     <input type="hidden" id="edit-id"/>
     <div class="form-group">
-      <label class="form-label">Fotoğraf URL veya Yükle</label>
-      <div class="upload-area">
-        <input type="file" class="upload-input" id="edit-img-file" accept="image/*" onchange="previewImage(this,'edit')"/>
-        <div id="edit-upload-placeholder"><div style="font-size:32px;margin-bottom:8px">📸</div><div style="font-size:14px;color:#888">Değiştirmek için tıkla</div></div>
-        <img id="edit-upload-preview" class="upload-preview"/>
+      <label class="form-label">Ürün Fotoğrafları <span style="color:#aaa;font-weight:400;font-size:11px">İlki kapak · Yeni eklemek için tıkla</span></label>
+      <div class="upload-area" style="cursor:pointer" onclick="document.getElementById('edit-img-files').click()">
+        <input type="file" id="edit-img-files" accept="image/*" multiple style="display:none" onchange="pickImages(this,'edit')"/>
+        <div style="font-size:13px;color:#888;font-weight:500">+ Yeni fotoğraf ekle</div>
       </div>
-      <input class="form-input" id="edit-image-url" placeholder="veya fotoğraf URL'si gir" style="margin-top:8px"/>
+      <div id="edit-img-grid" class="img-grid"></div>
+      <input type="hidden" id="edit-image-url"/>
     </div>
     <div class="form-group"><label class="form-label">Ürün Adı *</label><input class="form-input" id="edit-name"/></div>
     <div class="form-row">
@@ -407,23 +465,54 @@ async function deleteCoupon(id){
   showToast('✅ Kupon silindi');loadCoupons();
 }
 
-function previewImage(input, prefix){
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const preview=document.getElementById(prefix==='add'?'upload-preview':'edit-upload-preview');
-    const ph=document.getElementById(prefix==='add'?'upload-placeholder':'edit-upload-placeholder');
-    preview.src=e.target.result;preview.style.display='block';ph.style.display='none';
-  };
-  reader.readAsDataURL(file);
+let addImgs=[], editImgs=[];
+
+function pickImages(input, prefix){
+  const files=Array.from(input.files).slice(0,8);
+  const arr=prefix==='add'?addImgs:editImgs;
+  files.forEach(f=>arr.push({url:URL.createObjectURL(f),file:f}));
+  if(arr.length>8)arr.splice(8);
+  renderImgGrid(prefix);
+  input.value='';
 }
 
-async function uploadImage(prefix){
-  const fileInput=document.getElementById(prefix==='add'?'img-file':'edit-img-file');
-  const file=fileInput.files[0];if(!file)return null;
+function renderImgGrid(prefix){
+  const arr=prefix==='add'?addImgs:editImgs;
+  const grid=document.getElementById(prefix+'-img-grid');
+  const ph=document.getElementById(prefix+'-upload-ph');
+  if(!grid)return;
+  if(ph)ph.style.display=arr.length?'none':'block';
+  grid.innerHTML=arr.map((img,i)=>
+    '<div class="img-thumb '+(i===0?'cover':'')+'">' +
+    '<img src="'+img.url+'" alt="">' +
+    (i===0?'<span class="cover-tag">Kapak</span>':'') +
+    '<button class="rm-img" onclick="removeImg(''+prefix+'','+i+')">×</button>' +
+    '</div>'
+  ).join('');
+}
+
+function removeImg(prefix,idx){
+  const arr=prefix==='add'?addImgs:editImgs;
+  if(arr[idx]&&arr[idx].url.startsWith('blob:'))URL.revokeObjectURL(arr[idx].url);
+  arr.splice(idx,1);
+  renderImgGrid(prefix);
+}
+
+async function uploadOneImage(file){
   const fd=new FormData();fd.append('image',file);
-  try{const res=await fetch('/api/upload',{method:'POST',body:fd});const d=await res.json();return d.url;}
-  catch(e){showToast('❌ Fotoğraf yüklenemedi');return null;}
+  try{const r=await fetch('/api/upload',{method:'POST',body:fd});const d=await r.json();return d.url||null;}
+  catch(e){return null;}
+}
+
+async function uploadAllImages(prefix){
+  const arr=prefix==='add'?addImgs:editImgs;
+  const urls=[];
+  for(const img of arr){
+    if(!img.file){urls.push(img.url);continue;}
+    const url=await uploadOneImage(img.file);
+    if(url)urls.push(url);
+  }
+  return urls;
 }
 
 async function addProduct(){
@@ -431,10 +520,11 @@ async function addProduct(){
   const price=document.getElementById('new-price').value;
   if(!name||!price)return showToast('❌ Ad ve fiyat zorunlu!');
   showToast('📤 Yükleniyor...');
-  const imageUrl=await uploadImage('add');
+  const imageUrls=await uploadAllImages('add');
+  if(!imageUrls.length)return showToast('❌ En az bir fotoğraf ekleyin!');
   try{
     const res=await fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      name,image_url:imageUrl,
+      name,image_url:imageUrls[0],images:JSON.stringify(imageUrls),
       description:document.getElementById('new-desc').value,
       category:document.getElementById('new-category').value,
       brand:document.getElementById('new-brand').value,
@@ -444,7 +534,7 @@ async function addProduct(){
       stock:document.getElementById('new-stock').value||99
     })});
     const d=await res.json();
-    if(d.id){showToast('✅ Ürün eklendi!');closeModal('add-modal');loadAll();}
+    if(d.id){showToast('✅ Ürün eklendi!');closeModal('add-modal');loadAll();addImgs=[];renderImgGrid('add');}
     else showToast('❌ '+d.error);
   }catch(e){showToast('❌ Hata oluştu');}
 }
@@ -462,9 +552,12 @@ function openEditModal(id){
   document.getElementById('edit-image-url').value=p.image_url||'';
   const sel=document.getElementById('edit-category');
   for(let i=0;i<sel.options.length;i++)if(sel.options[i].value===p.category){sel.selectedIndex=i;break;}
-  document.getElementById('edit-upload-preview').style.display='none';
-  document.getElementById('edit-upload-placeholder').style.display='block';
-  document.getElementById('edit-img-file').value='';
+  editImgs=[];
+  try{const imgs=p.images?JSON.parse(p.images):[];
+    if(imgs.length)editImgs=imgs.map(u=>({url:u,file:null}));
+    else if(p.image_url)editImgs=[{url:p.image_url,file:null}];
+  }catch(e){if(p.image_url)editImgs=[{url:p.image_url,file:null}];}
+  renderImgGrid('edit');
   document.getElementById('edit-modal').classList.add('open');
 }
 
@@ -474,12 +567,13 @@ async function saveEdit(){
   const price=document.getElementById('edit-price').value;
   if(!name||!price)return showToast('❌ Ad ve fiyat zorunlu!');
   showToast('💾 Kaydediliyor...');
-  let imageUrl=document.getElementById('edit-image-url').value||null;
-  const uploadedUrl=await uploadImage('edit');
-  if(uploadedUrl)imageUrl=uploadedUrl;
+  const imageUrls=await uploadAllImages('edit');
+  const imageUrl=imageUrls[0]||null;
+  const imagesJson=imageUrls.length>0?JSON.stringify(imageUrls):null;
   try{
     const res=await fetch('/api/products/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      name,image_url:imageUrl,
+      name,image_url:imageUrl||null,
+      images:imagesJson,
       description:document.getElementById('edit-desc').value,
       category:document.getElementById('edit-category').value,
       brand:document.getElementById('edit-brand').value,
@@ -548,9 +642,7 @@ async function saveOrderDetail(){
 function openAddModal(){
   ['new-name','new-desc','new-price','new-brand','new-sku','new-discount-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('new-stock').value=99;
-  document.getElementById('upload-preview').style.display='none';
-  document.getElementById('upload-placeholder').style.display='block';
-  document.getElementById('img-file').value='';
+  addImgs=[];renderImgGrid('add');
   document.getElementById('add-modal').classList.add('open');
 }
 
@@ -559,8 +651,51 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 function setTab(tab,btn){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  ['products','orders','prices','coupons'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==tab));
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.add('hidden'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
   if(tab==='coupons')loadCoupons();
+  if(tab==='analytics')loadAnalytics();
+}
+
+async function loadAnalytics(){
+  try{
+    const [summary,daily,pages,topProds]=await Promise.all([
+      fetch('/api/analytics/summary').then(r=>r.json()),
+      fetch('/api/analytics/daily').then(r=>r.json()),
+      fetch('/api/analytics/pages').then(r=>r.json()),
+      fetch('/api/analytics/top-products').then(r=>r.json())
+    ]);
+    document.getElementById('an-today-views').textContent=summary.today_views||0;
+    document.getElementById('an-week-views').textContent=summary.week_views||0;
+    document.getElementById('an-month-views').textContent=summary.month_views||0;
+    document.getElementById('an-today-rev').textContent=(+summary.today_rev||0).toLocaleString('tr-TR')+' ₺';
+    document.getElementById('an-week-rev').textContent=(+summary.week_rev||0).toLocaleString('tr-TR')+' ₺';
+    document.getElementById('an-month-rev').textContent=(+summary.month_rev||0).toLocaleString('tr-TR')+' ₺';
+    document.getElementById('an-pending').textContent=summary.pending||0;
+    document.getElementById('an-total-orders').textContent=summary.total_orders||0;
+    document.getElementById('an-total-products').textContent=summary.total_products||0;
+    document.getElementById('an-customers').textContent=summary.total_customers||0;
+
+    const vd=daily.views||[];const mv=Math.max(...vd.map(d=>+d.views),1);
+    document.getElementById('an-views-chart').innerHTML=vd.length
+      ?vd.map(d=>'<div title="'+d.date+': '+d.views+'" style="flex:1;background:var(--accent);border-radius:2px 2px 0 0;height:'+Math.round((+d.views/mv)*100)+'%;min-height:2px"></div>').join('')
+      :'<div style="color:#aaa;font-size:12px;margin:auto">Veri yok</div>';
+
+    const od=daily.revenue||[];const mo=Math.max(...od.map(d=>+d.orders),1);
+    document.getElementById('an-orders-chart').innerHTML=od.length
+      ?od.map(d=>'<div title="'+d.date+': '+d.orders+' sipariş" style="flex:1;background:#3b82f6;border-radius:2px 2px 0 0;height:'+Math.round((+d.orders/mo)*100)+'%;min-height:2px"></div>').join('')
+      :'<div style="color:#aaa;font-size:12px;margin:auto">Veri yok</div>';
+
+    const pageLabels={'/':'Ana Sayfa','/landing':'Landing','/product.html':'Ürün Sayfası','/track':'Sipariş Takip','/hesabim':'Hesabım','/login':'Giriş'};
+    const maxPg=(pages[0]&&pages[0].views)||1;
+    document.getElementById('an-top-pages').innerHTML=(pages||[]).length
+      ?(pages||[]).map(function(p){var pct=Math.round((+p.views/maxPg)*100);return'<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="font-weight:500">'+(pageLabels[p.page]||p.page)+'</span><span style="color:#888">'+p.views+'</span></div><div style="background:var(--surface);border-radius:3px;height:4px"><div style="background:var(--accent);height:4px;border-radius:3px;width:'+pct+'%"></div></div></div>';}).join('')
+      :'<div style="color:#aaa;font-size:13px">Henüz veri yok</div>';
+
+    document.getElementById('an-top-products').innerHTML=(topProds||[]).length
+      ?(topProds||[]).map(function(p,i){return'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)"><span style="font-size:12px;font-weight:700;color:#aaa;min-width:16px">'+(i+1)+'</span><div style="flex:1"><div style="font-size:13px;font-weight:500">'+p.product_name+'</div><div style="font-size:11px;color:#aaa">'+p.sold+' adet</div></div><span style="font-size:13px;font-weight:700;color:var(--accent)">'+(+p.revenue||0).toLocaleString('tr-TR')+' ₺</span></div>';}).join('')
+      :'<div style="color:#aaa;font-size:13px">Henüz sipariş yok</div>';
+  }catch(e){console.error('Analytics hata:',e);}
 }
 
 function showToast(msg){

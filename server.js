@@ -7,6 +7,7 @@ const fs = require('fs');
 const session = require('express-session');
 const cron = require('node-cron');
 const db = require('./database/db');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000; 
@@ -52,6 +53,45 @@ app.use(session({
   saveUninitialized: false,
   cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 gün
 }));
+// SEO: Serve product.html with injected meta tags for crawlers
+app.get('/product.html', (req, res, next) => {
+  const { id } = req.query;
+  if (!id) return next();
+  db.get('SELECT * FROM products WHERE id = ?', [id], (err, p) => {
+    if (err || !p) return next();
+    const fs = require('fs');
+    let html = fs.readFileSync(path.join(__dirname, 'public', 'product.html'), 'utf8');
+    const title = `${p.name} — Tane Store`;
+    const desc = (p.description || `${p.name} - Tane Store'da satın al`).substring(0, 160).replace(/"/g, '&quot;');
+    const img = p.image_url ? `https://tanetekno.com${p.image_url}` : 'https://tanetekno.com/AmblemTane.png';
+    const meta = `<meta name="description" content="${desc}">
+    <meta property="og:title" content="${title.replace(/"/g,'&quot;')}">
+    <meta property="og:description" content="${desc}">
+    <meta property="og:image" content="${img}">
+    <meta property="og:url" content="https://tanetekno.com/product.html?id=${id}">
+    <meta property="og:type" content="product">
+    <meta name="twitter:card" content="summary_large_image">`;
+    html = html.replace('<!-- OG_META -->', meta);
+    html = html.replace('<title>Tane Store — Ürün</title>', `<title>${title}</title>`);
+    res.send(html);
+  });
+});
+
+// Pageview tracking middleware
+const TRACKED_PAGES = ['/', '/landing', '/product.html', '/track', '/login', '/register', '/hesabim', '/hakkimizda', '/iletisim'];
+app.use((req, res, next) => {
+  if (req.method === 'GET' && TRACKED_PAGES.includes(req.path)) {
+    const ua = req.headers['user-agent'] || '';
+    const device = /mobile|android|iphone|ipad/i.test(ua) ? 'mobile' : 'desktop';
+    const referrer = (req.headers['referer'] || '').substring(0, 200);
+    const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
+    const ip_hash = crypto.createHash('md5').update(ip).digest('hex');
+    db.run('INSERT INTO pageviews (page, referrer, device, ip_hash) VALUES (?, ?, ?, ?)',
+      [req.path, referrer, device, ip_hash]);
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Fotoğraf yükleme endpoint'i
@@ -69,6 +109,7 @@ const couponRoutes = require('./routes/coupons');
 const authRoutes = require('./routes/auth');
 const cartRoutes = require('./routes/cart');
 const wishlistRoutes = require('./routes/wishlist');
+const analyticsRoutes = require('./routes/analytics');
 app.use('/api/products', productRoutes);
 app.use('/api/prices', priceRoutes);
 app.use('/api/orders', orderRoutes);
@@ -77,6 +118,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/track', (req, res) => res.sendFile(path.join(__dirname, 'public', 'track.html')));

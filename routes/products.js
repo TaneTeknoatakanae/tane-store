@@ -36,13 +36,13 @@ router.get('/:id', (req, res) => {
 
 // Yeni ürün ekle
 router.post('/', (req, res) => {
-  const { name, image_url, description, category, brand, sku, tane_price, discount_price, tane_url, stock } = req.body;
+  const { name, image_url, images, description, category, brand, sku, tane_price, discount_price, tane_url, stock } = req.body;
   if (!name) return res.status(400).json({ error: 'Ürün adı zorunlu' });
 
   db.run(`
-    INSERT INTO products (name, image_url, description, category, brand, sku, tane_price, discount_price, tane_url, stock)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `, [name, image_url || null, description || null, category || 'Genel', brand || null, sku || null,
+    INSERT INTO products (name, image_url, images, description, category, brand, sku, tane_price, discount_price, tane_url, stock)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [name, image_url || null, images || null, description || null, category || 'Genel', brand || null, sku || null,
     parseFloat(tane_price) || 0, discount_price ? parseFloat(discount_price) : null, tane_url || null, parseInt(stock) || 99],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
@@ -52,12 +52,12 @@ router.post('/', (req, res) => {
 
 // Ürün güncelle
 router.put('/:id', (req, res) => {
-  const { name, image_url, description, category, brand, sku, tane_price, discount_price, tane_url, stock } = req.body;
+  const { name, image_url, images, description, category, brand, sku, tane_price, discount_price, tane_url, stock } = req.body;
   db.run(`
-    UPDATE products SET name=?, image_url=?, description=?, category=?, brand=?, sku=?,
+    UPDATE products SET name=?, image_url=?, images=?, description=?, category=?, brand=?, sku=?,
       tane_price=?, discount_price=?, tane_url=?, stock=?
     WHERE id=?
-  `, [name, image_url || null, description || null, category || 'Genel', brand || null, sku || null,
+  `, [name, image_url || null, images || null, description || null, category || 'Genel', brand || null, sku || null,
     parseFloat(tane_price) || 0, discount_price ? parseFloat(discount_price) : null, tane_url || null,
     parseInt(stock) || 99, req.params.id],
     function(err) {

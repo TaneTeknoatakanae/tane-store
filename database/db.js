@@ -160,6 +160,15 @@ async function initDB() {
       UNIQUE(user_id, product_id)
     )`);
 
+    await pool.query(`CREATE TABLE IF NOT EXISTS pageviews (
+      id SERIAL PRIMARY KEY,
+      page TEXT NOT NULL,
+      referrer TEXT,
+      device TEXT,
+      ip_hash TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`);
+
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
     console.error('DB hatasi:', e.message);
