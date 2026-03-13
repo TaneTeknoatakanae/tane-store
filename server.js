@@ -23,14 +23,6 @@ cron.schedule('0 3 * * *', () => {
   );
 }, { timezone: 'Europe/Istanbul' });
 
-// ── Arbitraj tarama — her gün saat 04:00'da ────────────────
-cron.schedule('0 4 * * *', () => {
-  console.log('[cron] Arbitraj taraması tetiklendi');
-  require('./akakce-arbitrage').run().catch(e =>
-    console.error('[cron] Arbitraj hata:', e.message)
-  );
-}, { timezone: 'Europe/Istanbul' });
-
 // Uploads klasörünü oluştur
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
@@ -101,77 +93,4 @@ app.get('/kvkk', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kvkk
 app.get('/cerez-politikasi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cerez-politikasi.html')));
 app.get('/on-bilgilendirme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'on-bilgilendirme.html')));
 
-// ── Arbitraj API ─────────────────────────────────────────────────────────────
-// Son tarama sonuçları: GET /api/arbitrage/latest?limit=50
-app.get('/api/arbitrage/latest', (req, res) => {
-  const limit = Math.min(parseInt(req.query.limit) || 50, 200);
-  db.all(
-    `SELECT i.*, r.run_timestamp, r.total_scanned
-       FROM arbitrage_items i
-       JOIN arbitrage_runs r ON r.id = i.run_id
-      WHERE r.id = (SELECT id FROM arbitrage_runs ORDER BY created_at DESC LIMIT 1)
-      ORDER BY i.gap_pct DESC
-      LIMIT $1`,
-    [limit],
-    (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows);
-    }
-  );
-});
-
-// Tarama geçmişi: GET /api/arbitrage/runs
-app.get('/api/arbitrage/runs', (_req, res) => {
-  db.all(
-    `SELECT * FROM arbitrage_runs ORDER BY created_at DESC LIMIT 30`,
-    [],
-    (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows);
-    }
-  );
-});
-
-// Manuel tetikleme + durum takibi
-let arbRunning = false;
-let arbStatus  = { running: false, startedAt: null, log: [] };
-
-function arbLog(msg) {
-  const line = `[${new Date().toLocaleTimeString('tr-TR')}] ${msg}`;
-  arbStatus.log.push(line);
-  if (arbStatus.log.length > 200) arbStatus.log.shift();
-  // origLog is used by the patched console.log — do NOT call console.log here (infinite recursion)
-}
-
-app.post('/api/admin/run-arbitrage', (_req, res) => {
-  if (arbRunning) return res.json({ running: true, message: 'Zaten çalışıyor.' });
-  res.json({ running: false, message: 'Arbitraj taraması başlatıldı.' });
-  arbRunning        = true;
-  arbStatus.running = true;
-  arbStatus.startedAt = new Date().toISOString();
-  arbStatus.log     = ['Tarama başladı…'];
-
-  // Patch console.log for this run to capture output
-  const origLog = console.log;
-  console.log = (...args) => { origLog(...args); arbLog(args.join(' ')); };
-
-  require('./akakce-arbitrage').run()
-    .catch(e => arbLog('HATA: ' + e.message))
-    .finally(() => {
-      console.log = origLog;
-      arbRunning        = false;
-      arbStatus.running = false;
-      arbLog('Tarama tamamlandı.');
-    });
-});
-
-// Durum sorgulama: GET /api/admin/arbitrage-status
-app.get('/api/admin/arbitrage-status', (_req, res) => {
-  res.json(arbStatus);
-});
-
-// Admin sayfası
-app.get('/admin/arbitrage', (_req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'admin-arbitrage.html'))
-);
 
