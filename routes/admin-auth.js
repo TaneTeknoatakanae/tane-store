@@ -57,7 +57,10 @@ router.post('/login', async (req, res) => {
   req.session.cookie.maxAge = ADMIN_SESSION_TIMEOUT;
 
   audit(req, 'admin.login.success', {});
-  res.json({ ok: true });
+  req.session.save(err => {
+    if (err) return res.status(500).json({ error: 'Oturum kaydedilemedi.' });
+    res.json({ ok: true });
+  });
 });
 
 // ── POST /api/admin/logout ──────────────────────────────────────────────────

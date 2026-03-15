@@ -47,6 +47,7 @@ const upload = multer({
   }
 });
 
+app.set('trust proxy', 1); // Railway reverse proxy
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(session({
