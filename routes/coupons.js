@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+const adminAuth = require('../middleware/adminAuth');
+const { audit } = adminAuth;
 
-// Kupon doğrula (checkout'ta kullanılır)
+// Kupon doğrula — public (checkout)
 router.post('/apply', (req, res) => {
   const { code, total } = req.body;
   if (!code) return res.status(400).json({ error: 'Kupon kodu gerekli' });
@@ -30,16 +32,16 @@ router.post('/apply', (req, res) => {
   });
 });
 
-// Admin: Tüm kuponları listele
-router.get('/', (req, res) => {
+// Admin: Tüm kuponları listele — admin only
+router.get('/', adminAuth, (req, res) => {
   db.all('SELECT * FROM coupons ORDER BY created_at DESC', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 });
 
-// Admin: Kupon oluştur
-router.post('/', (req, res) => {
+// Admin: Kupon oluştur — admin only
+router.post('/', adminAuth, (req, res) => {
   const { code, type, value, min_order, usage_limit } = req.body;
   if (!code || !type || !value) return res.status(400).json({ error: 'Kod, tür ve değer zorunlu' });
 
@@ -50,20 +52,22 @@ router.post('/', (req, res) => {
         if (err.code === '23505') return res.status(400).json({ error: 'Bu kupon kodu zaten kullanılıyor' });
         return res.status(500).json({ error: err.message });
       }
+      audit(req, 'coupon.create', { code: code.toUpperCase().trim() });
       res.json({ id: this.lastID, message: '✅ Kupon oluşturuldu' });
     });
 });
 
-// Admin: Kupon sil
-router.delete('/:id', (req, res) => {
+// Admin: Kupon sil — admin only
+router.delete('/:id', adminAuth, (req, res) => {
   db.run('DELETE FROM coupons WHERE id = ?', [req.params.id], err => {
     if (err) return res.status(500).json({ error: err.message });
+    audit(req, 'coupon.delete', { id: req.params.id });
     res.json({ message: '✅ Kupon silindi' });
   });
 });
 
-// Admin: Kupon aktif/pasif
-router.put('/:id', (req, res) => {
+// Admin: Kupon aktif/pasif — admin only
+router.put('/:id', adminAuth, (req, res) => {
   const { active } = req.body;
   db.run('UPDATE coupons SET active = ? WHERE id = ?', [active ? 1 : 0, req.params.id], err => {
     if (err) return res.status(500).json({ error: err.message });

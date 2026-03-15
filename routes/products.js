@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+const adminAuth = require('../middleware/adminAuth');
+const { audit } = adminAuth;
 
 // Tüm ürünleri getir
 router.get('/', (req, res) => {
@@ -34,8 +36,8 @@ router.get('/:id', (req, res) => {
   });
 });
 
-// Yeni ürün ekle
-router.post('/', (req, res) => {
+// Yeni ürün ekle — admin only
+router.post('/', adminAuth, (req, res) => {
   const { name, image_url, images, description, category, brand, sku, tane_price, discount_price, tane_url, stock } = req.body;
   if (!name) return res.status(400).json({ error: 'Ürün adı zorunlu' });
 
@@ -46,12 +48,13 @@ router.post('/', (req, res) => {
     parseFloat(tane_price) || 0, discount_price ? parseFloat(discount_price) : null, tane_url || null, parseInt(stock) || 99],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
+      audit(req, 'product.create', { name, id: this.lastID });
       res.json({ id: this.lastID, message: '✅ Ürün eklendi' });
     });
 });
 
-// Ürün güncelle
-router.put('/:id', (req, res) => {
+// Ürün güncelle — admin only
+router.put('/:id', adminAuth, (req, res) => {
   const { name, image_url, images, description, category, brand, sku, tane_price, discount_price, tane_url, stock } = req.body;
   db.run(`
     UPDATE products SET name=?, image_url=?, images=?, description=?, category=?, brand=?, sku=?,
@@ -62,16 +65,18 @@ router.put('/:id', (req, res) => {
     parseInt(stock) || 99, req.params.id],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
+      audit(req, 'product.update', { id: req.params.id, name });
       res.json({ message: '✅ Ürün güncellendi' });
     });
 });
 
-// Ürün sil
-router.delete('/:id', (req, res) => {
+// Ürün sil — admin only
+router.delete('/:id', adminAuth, (req, res) => {
   db.run('DELETE FROM prices WHERE product_id = ?', [req.params.id]);
   db.run('DELETE FROM reviews WHERE product_id = ?', [req.params.id]);
   db.run('DELETE FROM products WHERE id = ?', [req.params.id], function(err) {
     if (err) return res.status(500).json({ error: err.message });
+    audit(req, 'product.delete', { id: req.params.id });
     res.json({ message: '✅ Ürün silindi' });
   });
 });

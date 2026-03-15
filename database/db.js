@@ -169,6 +169,14 @@ async function initDB() {
       created_at TIMESTAMP DEFAULT NOW()
     )`);
 
+    await pool.query(`CREATE TABLE IF NOT EXISTS admin_audit_log (
+      id SERIAL PRIMARY KEY,
+      action TEXT NOT NULL,
+      details TEXT,
+      ip TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`);
+
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
     console.error('DB hatasi:', e.message);

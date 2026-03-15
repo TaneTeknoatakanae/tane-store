@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+const adminAuth = require('../middleware/adminAuth');
+
+// All analytics routes are admin-only
+router.use(adminAuth);
 
 // Summary stats
 router.get('/summary', (req, res) => {

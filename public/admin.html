@@ -84,7 +84,10 @@ tr:last-child td{border-bottom:none}
 <body>
 <nav>
   <a class="logo" href="/landing"><img src="/AmblemTane.png" alt="Tane Store" style="height:38px;display:block;mix-blend-mode:multiply"></a>
-  <a href="/" style="color:#666;font-size:14px;font-weight:500;text-decoration:none">🌐 Siteyi Gör</a>
+  <div style="display:flex;align-items:center;gap:16px">
+    <a href="/" style="color:#666;font-size:14px;font-weight:500;text-decoration:none">🌐 Siteyi Gör</a>
+    <button onclick="adminLogout()" style="background:none;border:1px solid #ddd;color:#888;font-size:13px;font-weight:500;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif" title="Çıkış Yap">Çıkış</button>
+  </div>
 </nav>
 <div class="container">
   <div class="page-title">⚙️ Admin Paneli</div>
@@ -334,6 +337,48 @@ tr:last-child td{border-bottom:none}
 
 <div class="toast" id="toast"></div>
 <script>
+// ── Auth gate + global CSRF injection ─────────────────────────────────────
+let CSRF_TOKEN = '';
+
+// Override fetch: auto-add CSRF token and credentials to all /api/ calls,
+// and redirect to login on any 401 response.
+const _fetch = window.fetch.bind(window);
+window.fetch = function(url, opts = {}) {
+  if (typeof url === 'string' && url.startsWith('/api/')) {
+    const headers = Object.assign({}, opts.headers || {});
+    if (!(opts.body instanceof FormData) && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    if (CSRF_TOKEN) headers['X-CSRF-Token'] = CSRF_TOKEN;
+    opts = Object.assign({}, opts, { credentials: 'include', headers });
+  }
+  return _fetch(url, opts).then(function(res) {
+    if (res.status === 401) {
+      window.location.href = '/admin-login.html';
+      return Promise.reject(new Error('Session expired'));
+    }
+    return res;
+  });
+};
+
+async function checkAdminAuth() {
+  try {
+    const r = await _fetch('/api/admin/me', { credentials: 'include' });
+    if (!r.ok) { window.location.href = '/admin-login.html'; return; }
+    const data = await r.json();
+    CSRF_TOKEN = data.csrfToken || '';
+    loadAll();
+  } catch(e) {
+    window.location.href = '/admin-login.html';
+  }
+}
+
+async function adminLogout() {
+  await fetch('/api/admin/logout', { method: 'POST' });
+  window.location.href = '/admin-login.html';
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 let products=[],orders=[],selectedProductId=null,editImageUrl=null;
 
 async function loadAll(){
@@ -705,7 +750,7 @@ function showToast(msg){
   setTimeout(()=>t.style.display='none',2500);
 }
 
-loadAll();
+checkAdminAuth();
 </script>
 </body>
 </html>

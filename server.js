@@ -6,8 +6,10 @@ const multer = require('multer');
 const fs = require('fs');
 const session = require('express-session');
 const cron = require('node-cron');
+const rateLimit = require('express-rate-limit');
 const db = require('./database/db');
 const crypto = require('crypto');
+const adminAuth = require('./middleware/adminAuth');
 
 const app = express();
 const PORT = process.env.PORT || 3000; 
@@ -51,8 +53,51 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'tane-store-secret-2026',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 gün
+  name: 'ts_sid', // don't reveal default connect.sid
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  }
 }));
+
+// ── Rate limiters ──────────────────────────────────────────────────────────
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // 15 minutes
+  max: 5,                     // 5 attempts per window
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Çok fazla giriş denemesi. 15 dakika sonra tekrar deneyin.' }
+});
+
+const adminApiLimiter = rateLimit({
+  windowMs: 60 * 1000,  // 1 minute
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'İstek limiti aşıldı.' }
+});
+// ── Admin routes (before static) ──────────────────────────────────────────
+const adminAuthRoutes = require('./routes/admin-auth');
+app.use('/api/admin', adminApiLimiter);
+app.post('/api/admin/login', adminLoginLimiter, (req, res, next) => next()); // extra rate limit on login
+app.use('/api/admin', adminAuthRoutes);
+
+// Protect /admin.html — redirect unauthenticated requests server-side
+app.get('/admin.html', (req, res, next) => {
+  if (!req.session || !req.session.isAdmin) {
+    return res.redirect('/admin-login.html');
+  }
+  const ADMIN_TIMEOUT = 4 * 60 * 60 * 1000;
+  if (Date.now() - (req.session.adminLoginTime || 0) > ADMIN_TIMEOUT) {
+    req.session.destroy(() => {});
+    return res.redirect('/admin-login.html');
+  }
+  next(); // serve the file
+});
+
 // SEO: Serve product.html with injected meta tags for crawlers
 app.get('/product.html', (req, res, next) => {
   const { id } = req.query;
@@ -94,8 +139,8 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Fotoğraf yükleme endpoint'i
-app.post('/api/upload', upload.single('image'), (req, res) => {
+// Fotoğraf yükleme endpoint'i — admin only
+app.post('/api/upload', upload.single('image'), adminAuth, (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Dosya yüklenemedi' });
   const imageUrl = '/uploads/' + req.file.filename;
   res.json({ url: imageUrl, message: '✅ Fotoğraf yüklendi' });

@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../database/db');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const adminAuth = require('../middleware/adminAuth');
 
 // Belirli bir ürünün tüm fiyatlarını getir
 router.get('/:productId', (req, res) => {
@@ -18,8 +19,8 @@ router.get('/:productId', (req, res) => {
   });
 });
 
-// Manuel fiyat ekle veya güncelle (Admin panelden)
-router.post('/manual', (req, res) => {
+// Manuel fiyat ekle veya güncelle — admin only
+router.post('/manual', adminAuth, (req, res) => {
   const { product_id, platform, price, url } = req.body;
 
   if (!product_id || !platform || !price) {
@@ -116,8 +117,8 @@ async function scrapeAkakce(productName) {
   }
 }
 
-// Otomatik fiyat çekme — bir ürün için tüm platformları tara
-router.post('/scrape/:productId', async (req, res) => {
+// Otomatik fiyat çekme — admin only
+router.post('/scrape/:productId', adminAuth, async (req, res) => {
   const { productId } = req.params;
 
   db.get('SELECT * FROM products WHERE id = ?', [productId], async (err, product) => {
@@ -161,8 +162,8 @@ router.post('/scrape/:productId', async (req, res) => {
   });
 });
 
-// En ucuz fiyat karşılaştırması — tüm ürünler için
-router.get('/compare/all', (req, res) => {
+// En ucuz fiyat karşılaştırması — admin only
+router.get('/compare/all', adminAuth, (req, res) => {
   db.all(`
     SELECT 
       p.id,

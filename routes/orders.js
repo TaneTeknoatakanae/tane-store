@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+const adminAuth = require('../middleware/adminAuth');
+const { audit } = adminAuth;
 
-// Tüm siparişleri getir (Admin)
-router.get('/', (req, res) => {
+// Tüm siparişleri getir — admin only
+router.get('/', adminAuth, (req, res) => {
   db.all(`
     SELECT o.*, STRING_AGG(oi.product_name || ' x' || oi.quantity::text, ',') as items
     FROM orders o
@@ -51,8 +53,8 @@ router.get('/track/:id', (req, res) => {
     });
 });
 
-// Tek sipariş detayı (Admin)
-router.get('/:id', (req, res) => {
+// Tek sipariş detayı — admin only
+router.get('/:id', adminAuth, (req, res) => {
   db.get('SELECT * FROM orders WHERE id = ?', [req.params.id], (err, order) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!order) return res.status(404).json({ error: 'Sipariş bulunamadı' });
@@ -102,14 +104,15 @@ router.post('/', (req, res) => {
     });
 });
 
-// Sipariş durumu + kargo bilgisi güncelle (Admin)
-router.put('/:id/status', (req, res) => {
+// Sipariş durumu + kargo bilgisi güncelle — admin only
+router.put('/:id/status', adminAuth, (req, res) => {
   const { status, shipping_carrier, shipping_code } = req.body;
   db.run(
     'UPDATE orders SET status = ?, shipping_carrier = COALESCE(?, shipping_carrier), shipping_code = COALESCE(?, shipping_code) WHERE id = ?',
     [status, shipping_carrier || null, shipping_code || null, req.params.id],
     err => {
       if (err) return res.status(500).json({ error: err.message });
+      audit(req, 'order.status_update', { id: req.params.id, status, shipping_code });
       res.json({ message: '✅ Güncellendi' });
     }
   );
