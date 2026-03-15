@@ -77,11 +77,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* TRUST STRIP */
 .trust-strip{background:var(--surface);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light)}
-.trust-in{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);padding:0 24px}
-@media(max-width:700px){.trust-in{grid-template-columns:repeat(2,1fr)}}
-.trust-item{display:flex;align-items:center;gap:16px;padding:32px 28px;border-right:1px solid var(--border-light)}
+.trust-in{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);padding:0 24px}
+@media(max-width:860px){.trust-in{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:580px){.trust-in{grid-template-columns:repeat(2,1fr)}}
+.trust-item{display:flex;align-items:center;gap:14px;padding:26px 16px;border-right:1px solid var(--border-light)}
 .trust-item:last-child{border-right:none}
-@media(max-width:700px){.trust-item:nth-child(2){border-right:none}}
+@media(max-width:860px){.trust-item{border-right:none;border-bottom:1px solid var(--border-light)}.trust-item:last-child{border-bottom:none}}
 .trust-ic{width:48px;height:48px;background:var(--bg);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);color:var(--accent);flex-shrink:0}
 .trust-label{font-size:15px;font-weight:700;color:var(--text);display:block}
 .trust-sub{font-size:13px;color:var(--text2);display:block;margin-top:3px}
@@ -160,7 +161,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* FOOTER */
 .footer{background:#1d1d1f;color:#f5f5f7;padding:60px 24px 32px}
 .footer-in{max-width:1280px;margin:0 auto}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
 @media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:32px}}
 @media(max-width:480px){.footer-grid{grid-template-columns:1fr;gap:28px}}
 .footer-logo{text-decoration:none;display:inline-block;margin-bottom:12px}
@@ -270,7 +271,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <!-- PROMO BAR -->
 <div class="promo-bar" id="promo-bar">
-  <span>🚚 <strong>500 ₺</strong> ve üzeri alışverişlerde kargo <strong>ücretsiz</strong></span>
+  <span>🚚 <strong>500 ₺</strong> ve üzeri alışverişlerde kargo <strong>ücretsiz</strong> · Güvenli ödeme · 14 gün iade hakkı</span>
   <button class="promo-x" onclick="document.getElementById('promo-bar').style.display='none'" title="Kapat" aria-label="Kapat">×</button>
 </div>
 
@@ -305,16 +306,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="hero-text-side">
       <div class="hero-tag">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Güvenilir Alışveriş
+        Güvenli Online Alışveriş
       </div>
-      <h1>En iyi fiyat.<br>En hızlı<br><span class="accent">teslimat.</span></h1>
-      <p class="hero-sub">Doğru ürünler, güvenli ödeme, hızlı kargo ve sade alışveriş deneyimi.</p>
+      <h1>Güvenilir ürünler.<br>Güvenli ödeme.<br><span class="accent">Kapıya teslimat.</span></h1>
+      <p class="hero-sub">Tane Store'da elektronikten eve, giyimden kozmetiğe yüzlerce ürün arasından seçiminizi yapın. Güvenli ödeme, 1–3 iş günü kargo, 14 gün koşulsuz iade.</p>
       <div class="hero-ctas">
         <a href="#products" class="btn-primary">
-          Ürünleri Keşfet
+          Ürünleri İncele
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
-        <a href="/track" class="btn-secondary">Siparişimi Takip Et</a>
+        <a href="#featured" class="btn-secondary">Öne Çıkanları Gör</a>
       </div>
     </div>
     <div class="hero-img-side" id="hero-img-side" style="display:none">
@@ -334,7 +335,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="trust-in">
     <div class="trust-item">
       <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-      <div><span class="trust-label">Güvenli Ödeme</span><span class="trust-sub">SSL korumalı · iyzico</span></div>
+      <div><span class="trust-label">Güvenli Ödeme</span><span class="trust-sub">256-bit SSL · iyzico altyapısı</span></div>
     </div>
     <div class="trust-item">
       <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
@@ -342,20 +343,27 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="trust-item">
       <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div>
-      <div><span class="trust-label">Kolay İade</span><span class="trust-sub">14 gün içinde ücretsiz</span></div>
+      <div><span class="trust-label">Kolay İade</span><span class="trust-sub">14 gün koşulsuz, ücretsiz</span></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div><span class="trust-label">Sipariş Takibi</span><span class="trust-sub">SMS ile anlık bildirim</span></div>
     </div>
     <div class="trust-item">
       <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-      <div><span class="trust-label">7/24 Destek</span><span class="trust-sub">info@tanetekno.com</span></div>
+      <div><span class="trust-label">Müşteri Desteği</span><span class="trust-sub">info@tanetekno.com</span></div>
     </div>
   </div>
 </div>
 
 <!-- FEATURED PRODUCTS -->
-<div id="products" class="section reveal">
+<div id="featured" class="section reveal">
   <div class="section-head">
-    <h2 class="section-h2">Öne Çıkan Ürünler</h2>
-    <a href="/" class="section-lnk">Tümünü gör →</a>
+    <div>
+      <h2 class="section-h2" id="products">Öne Çıkan Ürünler</h2>
+      <p style="font-size:13px;color:var(--text3);margin-top:4px">Özenle seçilmiş, en çok tercih edilen ürünler</p>
+    </div>
+    <a href="/" class="section-lnk">Tüm ürünlere git →</a>
   </div>
   <div class="products-grid" id="products-grid">
     <div class="skel-card"><div class="skel-img skel"></div><div class="skel-body"><div class="skel-line skel" style="width:80%"></div><div class="skel-line skel" style="width:50%"></div></div></div>
@@ -372,8 +380,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <!-- CATEGORIES -->
 <div class="section reveal" style="padding-top:0">
   <div class="section-head">
-    <h2 class="section-h2">Kategoriler</h2>
-    <a href="/" class="section-lnk">Tüm kategoriler →</a>
+    <div>
+      <h2 class="section-h2">Kategoriye Göre Alışveriş</h2>
+      <p style="font-size:13px;color:var(--text3);margin-top:4px">İhtiyacınıza göre kategori seçin, hemen inceleyin</p>
+    </div>
+    <a href="/" class="section-lnk">Tüm ürünler →</a>
   </div>
   <div class="cat-grid" id="cat-grid">
   </div>
@@ -382,29 +393,29 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <!-- NEDEN TANE -->
 <section class="why-section reveal">
   <div class="why-in">
-    <div class="why-tag">Neden Tane?</div>
-    <h2 class="why-title">Alışverişin en<br>sade hali.</h2>
+    <div class="why-tag">Neden Tane Store?</div>
+    <h2 class="why-title">Sadece iyi ürünler.<br>Sadece güvenilir alışveriş.</h2>
     <div class="why-grid">
       <div class="why-card">
         <div class="why-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         </div>
-        <div class="why-card-title">1–3 İş Günü Teslimat</div>
-        <div class="why-card-text">Siparişiniz aynı gün hazırlanır ve kargoya teslim edilir. Türkiye'nin her yerine hızlı teslimat.</div>
+        <div class="why-card-title">Aynı Gün Kargo</div>
+        <div class="why-card-text">Siparişiniz iş günü saat 14:00'a kadar verilirse aynı gün kargoya teslim edilir. Türkiye genelinde 1–3 iş günü içinde kapınıza gelir.</div>
       </div>
       <div class="why-card">
         <div class="why-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
-        <div class="why-card-title">Güvenli Ödeme</div>
-        <div class="why-card-text">iyzico altyapısı ve 256-bit SSL şifreleme. Kart bilgileriniz hiçbir zaman saklanmaz.</div>
+        <div class="why-card-title">%100 Güvenli Ödeme</div>
+        <div class="why-card-text">Tüm ödemeler iyzico altyapısı ve 256-bit SSL şifreleme ile korunur. Kart numaranız tarafımızca asla saklanmaz.</div>
       </div>
       <div class="why-card">
         <div class="why-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
         </div>
-        <div class="why-card-title">14 Gün İade Hakkı</div>
-        <div class="why-card-text">Beğenmediğiniz ürünü 14 gün içinde koşulsuz iade edin. Ücretsiz ve zahmetsiz.</div>
+        <div class="why-card-title">14 Gün Koşulsuz İade</div>
+        <div class="why-card-text">Ürünü aldıktan sonra 14 gün içinde herhangi bir neden belirtmeden iade edebilirsiniz. İade kargo ücreti bizden.</div>
       </div>
     </div>
   </div>
@@ -460,21 +471,32 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="footer-grid">
       <div>
         <a href="/" class="footer-logo"><img src="/AmblemTane.png" alt="Tane Store" style="height:38px;display:block;mix-blend-mode:multiply"></a>
-        <p class="footer-desc">Teknoloji ve yaşam ürünlerinde sade, hızlı ve güvenilir alışveriş.</p>
-        <p class="footer-email">E-posta: <a href="mailto:info@tanetekno.com">info@tanetekno.com</a></p>
-        <p style="margin-top:12px"><a href="/iletisim" style="color:var(--accent);font-size:13px;text-decoration:none">Şirket bilgileri & iletişim →</a></p>
+        <p class="footer-desc">Tane Store, elektronik, ev, giyim ve daha fazlasını güvenle satın alabileceğiniz Türkiye'nin online mağazasıdır.</p>
+        <p class="footer-email">Destek: <a href="mailto:info@tanetekno.com">info@tanetekno.com</a></p>
+        <p style="margin-top:8px;font-size:13px;color:#98989d">Hafta içi 09:00 – 18:00</p>
+        <p style="margin-top:12px"><a href="/iletisim" style="color:var(--accent);font-size:13px;text-decoration:none">Tüm iletişim bilgileri →</a></p>
       </div>
       <div>
         <p class="footer-col-title">Alışveriş</p>
         <div class="footer-links">
           <a href="/" class="footer-link">Tüm Ürünler</a>
+          <a href="/?cat=Elektronik" class="footer-link">Elektronik</a>
+          <a href="/?cat=Ev" class="footer-link">Ev & Yaşam</a>
+          <a href="/?cat=Giyim" class="footer-link">Giyim & Aksesuar</a>
           <a href="/hesabim" class="footer-link">Hesabım</a>
-          <a href="/track" class="footer-link">Sipariş Takip</a>
-          <a href="/teslimat-iade" class="footer-link">Teslimat & İade</a>
         </div>
       </div>
       <div>
-        <p class="footer-col-title">Hukuki</p>
+        <p class="footer-col-title">Yardım & Destek</p>
+        <div class="footer-links">
+          <a href="/track" class="footer-link">Sipariş Takip</a>
+          <a href="/teslimat-iade" class="footer-link">Teslimat & İade</a>
+          <a href="/iletisim" class="footer-link">İletişim</a>
+          <a href="/hakkimizda" class="footer-link">Hakkımızda</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-col-title">Yasal</p>
         <div class="footer-links">
           <a href="/gizlilik" class="footer-link">Gizlilik Politikası</a>
           <a href="/kvkk" class="footer-link">KVKK Aydınlatma</a>
@@ -483,17 +505,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           <a href="/on-bilgilendirme" class="footer-link">Ön Bilgilendirme Formu</a>
         </div>
       </div>
-      <div>
-        <p class="footer-col-title">Kurumsal</p>
-        <div class="footer-links">
-          <a href="/hakkimizda" class="footer-link">Hakkımızda</a>
-          <a href="/iletisim" class="footer-link">İletişim</a>
-        </div>
-      </div>
     </div>
     <hr class="footer-hr"/>
     <div class="footer-bottom">
-      <span class="footer-copy">© 2026 Tane Store. Tüm hakları saklıdır.</span>
+      <span class="footer-copy">© 2026 Tane Store · Güvenli alışveriş, hızlı teslimat · iyzico ile ödeme</span>
       <div class="footer-legal">
         <a href="/gizlilik">Gizlilik</a>
         <a href="/kvkk">KVKK</a>
