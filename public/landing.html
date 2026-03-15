@@ -256,6 +256,43 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .c-upsell-add:hover{background:var(--text);color:#fff}
 .reveal{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .55s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
+
+/* HOW IT WORKS */
+.process-section{background:var(--surface);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light);padding:56px 24px}
+.process-in{max-width:1280px;margin:0 auto;text-align:center}
+.process-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.process-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-1px;color:var(--text);margin-bottom:44px}
+.process-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+@media(max-width:760px){.process-steps{grid-template-columns:repeat(2,1fr);gap:24px}}
+@media(max-width:480px){.process-steps{grid-template-columns:1fr;gap:20px}}
+.process-step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 24px;position:relative}
+.process-step:not(:last-child)::after{content:'';position:absolute;top:28px;right:-8px;width:16px;height:2px;background:var(--border);z-index:1}
+@media(max-width:760px){.process-step::after{display:none}}
+.process-num{width:56px;height:56px;border-radius:50%;background:var(--bg);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--accent);margin-bottom:16px;flex-shrink:0;z-index:2}
+.process-step-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+.process-step-text{font-size:13px;color:var(--text2);line-height:1.65}
+
+/* PAYMENT STRIP */
+.payment-strip{background:var(--surface);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light);padding:36px 24px}
+.payment-in{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:20px}
+.payment-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3)}
+.payment-groups{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;align-items:center}
+.payment-group{display:flex;align-items:center;gap:10px}
+.payment-group-label{font-size:12px;font-weight:600;color:var(--text3);white-space:nowrap}
+.payment-tags{display:flex;flex-wrap:wrap;gap:6px}
+.payment-tag{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--text2)}
+.secure-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.secure-badge{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 14px}
+.secure-badge svg{color:var(--accent)}
+
+/* CREDIBILITY BAR */
+.cred-bar{background:#1C1814;border-top:1px solid #2a2318;padding:32px 24px}
+.cred-in{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+@media(max-width:840px){.cred-in{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.cred-in{grid-template-columns:1fr}}
+.cred-item{display:flex;flex-direction:column;gap:4px}
+.cred-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(196,150,96,.7)}
+.cred-value{font-size:13px;color:rgba(253,250,246,.8);line-height:1.5}
 </style>
 </head>
 <body>
@@ -352,6 +389,36 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="trust-item">
       <div class="trust-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
       <div><span class="trust-label">Müşteri Desteği</span><span class="trust-sub">info@tanetekno.com</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="process-section reveal">
+  <div class="process-in">
+    <div class="process-tag">Alışveriş Adımları</div>
+    <h2 class="process-title">Nasıl Çalışır?</h2>
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="process-num">1</div>
+        <div class="process-step-title">Ürün Seç</div>
+        <div class="process-step-text">Yüzlerce ürün arasından ihtiyacınıza uygun olanı bulun, sepete ekleyin.</div>
+      </div>
+      <div class="process-step">
+        <div class="process-num">2</div>
+        <div class="process-step-title">Güvenli Öde</div>
+        <div class="process-step-text">Kredi kartı, banka kartı veya taksit seçenekleriyle iyzico altyapısında güvenle ödeyin.</div>
+      </div>
+      <div class="process-step">
+        <div class="process-num">3</div>
+        <div class="process-step-title">Kargoya Verilir</div>
+        <div class="process-step-text">Saat 14:00'a kadar verilen siparişler aynı iş günü kargoya teslim edilir.</div>
+      </div>
+      <div class="process-step">
+        <div class="process-num">4</div>
+        <div class="process-step-title">Kapıya Gelir</div>
+        <div class="process-step-text">1–3 iş günü içinde takip numarasıyla kapınıza teslim. Memnun kalmazsanız 14 günde iade.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -461,6 +528,72 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div class="faq-a"><p><strong>500 ₺</strong> ve üzeri tüm siparişlerde kargo ücretsizdir. Bu tutarın altı için 49,90 ₺ sabit kargo ücreti uygulanır.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT & SECURITY STRIP -->
+<div class="payment-strip">
+  <div class="payment-in">
+    <div class="payment-title">Ödeme & Güvenlik</div>
+    <div class="payment-groups">
+      <div class="payment-group">
+        <span class="payment-group-label">Kart:</span>
+        <div class="payment-tags">
+          <span class="payment-tag">Visa</span>
+          <span class="payment-tag">Mastercard</span>
+          <span class="payment-tag">Troy</span>
+          <span class="payment-tag">Amex</span>
+        </div>
+      </div>
+      <div class="payment-group">
+        <span class="payment-group-label">Taksit:</span>
+        <div class="payment-tags">
+          <span class="payment-tag">3 taksit</span>
+          <span class="payment-tag">6 taksit</span>
+          <span class="payment-tag">9 taksit</span>
+        </div>
+      </div>
+    </div>
+    <div class="secure-badges">
+      <span class="secure-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        256-bit SSL Şifreleme
+      </span>
+      <span class="secure-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        3D Secure
+      </span>
+      <span class="secure-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        iyzico Altyapısı
+      </span>
+      <span class="secure-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Kart bilgisi saklanmaz
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- CREDIBILITY BAR -->
+<div class="cred-bar">
+  <div class="cred-in">
+    <div class="cred-item">
+      <span class="cred-label">Şirket</span>
+      <span class="cred-value">Tane Store<br>Vergi No: 3280623883<br>Kozyatağı Vergi Dairesi</span>
+    </div>
+    <div class="cred-item">
+      <span class="cred-label">Adres</span>
+      <span class="cred-value">Atatürk Mahallesi, Meriç Caddesi<br>Ataşehir / İstanbul</span>
+    </div>
+    <div class="cred-item">
+      <span class="cred-label">İletişim</span>
+      <span class="cred-value"><a href="mailto:info@tanetekno.com" style="color:var(--accent);text-decoration:none">info@tanetekno.com</a><br>+90 216 314 58 70 – 1040</span>
+    </div>
+    <div class="cred-item">
+      <span class="cred-label">Çalışma Saatleri</span>
+      <span class="cred-value">Pazartesi – Cuma<br>09:00 – 18:00<br><span style="color:rgba(196,150,96,.6);font-size:12px">1 iş günü içinde yanıt</span></span>
     </div>
   </div>
 </div>
