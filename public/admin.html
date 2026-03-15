@@ -174,9 +174,21 @@ tr:last-child td{border-bottom:none}
     <div style="height:1px;background:var(--border);margin:18px 0 20px"></div>
 
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
-      <div class="stat-card"><div class="stat-label">Bugün Ziyaret</div><div class="stat-num" id="an-today-views" style="font-size:28px">—</div></div>
-      <div class="stat-card"><div class="stat-label">Bu Hafta Ziyaret</div><div class="stat-num" id="an-week-views" style="font-size:28px">—</div></div>
-      <div class="stat-card"><div class="stat-label">Bu Ay Ziyaret</div><div class="stat-num" id="an-month-views" style="font-size:28px">—</div></div>
+      <div class="stat-card">
+        <div class="stat-label">Bugün Ziyaret</div>
+        <div class="stat-num" id="an-today-views" style="font-size:28px">—</div>
+        <div style="font-size:12px;color:#aaa;margin-top:4px"><span id="an-today-unique">—</span> tekil ziyaretçi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Bu Hafta Ziyaret</div>
+        <div class="stat-num" id="an-week-views" style="font-size:28px">—</div>
+        <div style="font-size:12px;color:#aaa;margin-top:4px"><span id="an-week-unique">—</span> tekil ziyaretçi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Bu Ay Ziyaret</div>
+        <div class="stat-num" id="an-month-views" style="font-size:28px">—</div>
+        <div style="font-size:12px;color:#aaa;margin-top:4px"><span id="an-month-unique">—</span> tekil ziyaretçi</div>
+      </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
       <div class="stat-card"><div class="stat-label">Bugün Ciro</div><div class="stat-num" id="an-today-rev" style="font-size:22px;color:var(--accent)">—</div></div>
@@ -201,10 +213,21 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
       <div class="table-wrap" style="padding:20px 22px">
         <div style="font-size:13px;font-weight:700;margin-bottom:16px">En Çok Ziyaret Edilen Sayfalar</div>
         <div id="an-top-pages"><div style="color:#aaa;font-size:13px">Yükleniyor...</div></div>
+      </div>
+      <div class="table-wrap" style="padding:20px 22px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:16px">Trafik Kaynakları (30 Gün)</div>
+        <div id="an-traffic-sources"><div style="color:#aaa;font-size:13px">Yükleniyor...</div></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="table-wrap" style="padding:20px 22px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:16px">En Çok İncelenen Ürünler (30 Gün)</div>
+        <div id="an-top-viewed"><div style="color:#aaa;font-size:13px">Yükleniyor...</div></div>
       </div>
       <div class="table-wrap" style="padding:20px 22px">
         <div style="font-size:13px;font-weight:700;margin-bottom:16px">En Çok Satan Ürünler (30 Gün)</div>
@@ -706,15 +729,21 @@ function setTab(tab,btn){
 
 async function loadAnalytics(){
   try{
-    const [summary,daily,pages,topProds]=await Promise.all([
+    const [summary,daily,pages,topProds,traffic,topViewed]=await Promise.all([
       fetch('/api/analytics/summary').then(r=>r.json()),
       fetch('/api/analytics/daily').then(r=>r.json()),
       fetch('/api/analytics/pages').then(r=>r.json()),
-      fetch('/api/analytics/top-products').then(r=>r.json())
+      fetch('/api/analytics/top-products').then(r=>r.json()),
+      fetch('/api/analytics/traffic-sources').then(r=>r.json()),
+      fetch('/api/analytics/top-viewed-products').then(r=>r.json())
     ]);
+
     document.getElementById('an-today-views').textContent=summary.today_views||0;
     document.getElementById('an-week-views').textContent=summary.week_views||0;
     document.getElementById('an-month-views').textContent=summary.month_views||0;
+    document.getElementById('an-today-unique').textContent=summary.today_unique||0;
+    document.getElementById('an-week-unique').textContent=summary.week_unique||0;
+    document.getElementById('an-month-unique').textContent=summary.month_unique||0;
     document.getElementById('an-today-rev').textContent=(+summary.today_rev||0).toLocaleString('tr-TR')+' ₺';
     document.getElementById('an-week-rev').textContent=(+summary.week_rev||0).toLocaleString('tr-TR')+' ₺';
     document.getElementById('an-month-rev').textContent=(+summary.month_rev||0).toLocaleString('tr-TR')+' ₺';
@@ -725,7 +754,7 @@ async function loadAnalytics(){
 
     const vd=daily.views||[];const mv=Math.max(...vd.map(d=>+d.views),1);
     document.getElementById('an-views-chart').innerHTML=vd.length
-      ?vd.map(d=>'<div title="'+d.date+': '+d.views+'" style="flex:1;background:var(--accent);border-radius:2px 2px 0 0;height:'+Math.round((+d.views/mv)*100)+'%;min-height:2px"></div>').join('')
+      ?vd.map(d=>'<div title="'+d.date+': '+d.views+' görüntüleme / '+d.unique_visitors+' tekil" style="flex:1;background:var(--accent);border-radius:2px 2px 0 0;height:'+Math.round((+d.views/mv)*100)+'%;min-height:2px"></div>').join('')
       :'<div style="color:#aaa;font-size:12px;margin:auto">Veri yok</div>';
 
     const od=daily.revenue||[];const mo=Math.max(...od.map(d=>+d.orders),1);
@@ -736,11 +765,21 @@ async function loadAnalytics(){
     const pageLabels={'/':'Ana Sayfa','/landing':'Landing','/product.html':'Ürün Sayfası','/track':'Sipariş Takip','/hesabim':'Hesabım','/login':'Giriş'};
     const maxPg=(pages[0]&&pages[0].views)||1;
     document.getElementById('an-top-pages').innerHTML=(pages||[]).length
-      ?(pages||[]).map(function(p){var pct=Math.round((+p.views/maxPg)*100);return'<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="font-weight:500">'+(pageLabels[p.page]||p.page)+'</span><span style="color:#888">'+p.views+'</span></div><div style="background:var(--surface);border-radius:3px;height:4px"><div style="background:var(--accent);height:4px;border-radius:3px;width:'+pct+'%"></div></div></div>';}).join('')
+      ?(pages||[]).map(function(p){var pct=Math.round((+p.views/maxPg)*100);return'<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="font-weight:500">'+(pageLabels[p.page]||p.page)+'</span><span style="color:#888">'+p.views+' <span style="font-size:11px;color:#bbb">('+p.unique_visitors+' tekil)</span></span></div><div style="background:var(--surface);border-radius:3px;height:4px"><div style="background:var(--accent);height:4px;border-radius:3px;width:'+pct+'%"></div></div></div>';}).join('')
       :'<div style="color:#aaa;font-size:13px">Henüz veri yok</div>';
 
+    const srcColors={'Direkt':'#6b7280','Arama Motoru':'#3b82f6','Sosyal Medya':'#ec4899','Dahili':'var(--accent)','Diğer':'#9ca3af'};
+    const maxSrc=(traffic[0]&&traffic[0].views)||1;
+    document.getElementById('an-traffic-sources').innerHTML=(traffic||[]).length
+      ?(traffic||[]).map(function(s){var pct=Math.round((+s.views/maxSrc)*100);var col=srcColors[s.source]||'#9ca3af';return'<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="font-weight:600">'+s.source+'</span><span style="color:#888">'+s.views+' <span style="font-size:11px;color:#bbb">('+s.unique_visitors+' tekil)</span></span></div><div style="background:var(--surface);border-radius:3px;height:5px"><div style="background:'+col+';height:5px;border-radius:3px;width:'+pct+'%"></div></div></div>';}).join('')
+      :'<div style="color:#aaa;font-size:13px">Henüz veri yok</div>';
+
+    document.getElementById('an-top-viewed').innerHTML=(topViewed||[]).length
+      ?(topViewed||[]).map(function(p,i){var price=(p.discount_price||p.tane_price||0);return'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)"><span style="font-size:12px;font-weight:700;color:#aaa;min-width:16px">'+(i+1)+'</span><img src="'+(p.image_url||'')+'" style="width:36px;height:36px;object-fit:contain;border-radius:6px;background:#f5f5f5;padding:3px;flex-shrink:0"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:11px;color:#aaa">'+p.views+' görüntüleme · '+p.unique_visitors+' tekil</div></div><span style="font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap">'+price.toLocaleString('tr-TR')+' ₺</span></div>';}).join('')
+      :'<div style="color:#aaa;font-size:13px">Henüz ürün sayfası ziyareti yok</div>';
+
     document.getElementById('an-top-products').innerHTML=(topProds||[]).length
-      ?(topProds||[]).map(function(p,i){return'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)"><span style="font-size:12px;font-weight:700;color:#aaa;min-width:16px">'+(i+1)+'</span><div style="flex:1"><div style="font-size:13px;font-weight:500">'+p.product_name+'</div><div style="font-size:11px;color:#aaa">'+p.sold+' adet</div></div><span style="font-size:13px;font-weight:700;color:var(--accent)">'+(+p.revenue||0).toLocaleString('tr-TR')+' ₺</span></div>';}).join('')
+      ?(topProds||[]).map(function(p,i){return'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)"><span style="font-size:12px;font-weight:700;color:#aaa;min-width:16px">'+(i+1)+'</span><div style="flex:1"><div style="font-size:13px;font-weight:500">'+p.product_name+'</div><div style="font-size:11px;color:#aaa">'+p.sold+' adet satıldı</div></div><span style="font-size:13px;font-weight:700;color:var(--accent)">'+(+p.revenue||0).toLocaleString('tr-TR')+' ₺</span></div>';}).join('')
       :'<div style="color:#aaa;font-size:13px">Henüz sipariş yok</div>';
   }catch(e){console.error('Analytics hata:',e);}
 }

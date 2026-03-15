@@ -176,6 +176,7 @@ async function initDB() {
       ip TEXT,
       created_at TIMESTAMP DEFAULT NOW()
     )`);
+    await pool.query(`ALTER TABLE pageviews ADD COLUMN IF NOT EXISTS product_id INTEGER`);
 
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {

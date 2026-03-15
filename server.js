@@ -132,8 +132,9 @@ app.use((req, res, next) => {
     const referrer = (req.headers['referer'] || '').substring(0, 200);
     const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
     const ip_hash = crypto.createHash('md5').update(ip).digest('hex');
-    db.run('INSERT INTO pageviews (page, referrer, device, ip_hash) VALUES (?, ?, ?, ?)',
-      [req.path, referrer, device, ip_hash]);
+    const product_id = (req.path === '/product.html' && req.query.id) ? (parseInt(req.query.id) || null) : null;
+    db.run('INSERT INTO pageviews (page, referrer, device, ip_hash, product_id) VALUES (?, ?, ?, ?, ?)',
+      [req.path, referrer, device, ip_hash, product_id]);
   }
   next();
 });
