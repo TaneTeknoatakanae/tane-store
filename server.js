@@ -168,6 +168,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/scrape-url', scrapeUrlRoutes);
+app.use('/api/price-compare', require('./routes/price-compare'));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/track', (req, res) => res.sendFile(path.join(__dirname, 'public', 'track.html')));

@@ -131,6 +131,7 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="setTab('prices',this)">💰 Fiyat Gir</button>
     <button class="tab" onclick="setTab('coupons',this)">🎟 Kuponlar</button>
     <button class="tab" onclick="setTab('analytics',this)">📊 Analitik</button>
+    <button class="tab" onclick="setTab('pricecompare',this)">🏷 Rakip Fiyat</button>
   </div>
 
   <!-- ÜRÜNLER -->
@@ -262,6 +263,60 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
   </div>
+
+  <!-- RAKİP FİYAT -->
+  <div id="tab-pricecompare" class="hidden">
+    <div style="margin-bottom:20px">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px">🏷 Rakip Fiyat Karşılaştırma</div>
+      <div class="page-sub" style="margin-bottom:0">Akakçe'den fiyat çek → onayla → ürün sayfasında göster. Mevcut ürün verisine dokunmaz.</div>
+    </div>
+
+    <div class="table-wrap" style="padding:22px 24px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:16px;color:#555">Yeni Fiyat Çek</div>
+      <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:10px;align-items:end">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Ürün ID <span style="color:#bbb;font-weight:400">(URL'deki ?id=)</span></label>
+          <input class="form-input" id="pc-product-id" type="number" placeholder="örn: 42"/>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Akakçe Ürün URL</label>
+          <input class="form-input" id="pc-akakce-url" placeholder="https://www.akakce.com/..."/>
+        </div>
+        <button class="btn-orange" id="pc-fetch-btn" onclick="pcFetch()" style="height:40px;padding:0 20px">Fiyat Çek</button>
+      </div>
+    </div>
+
+    <div id="pc-preview" style="display:none;margin-bottom:16px">
+      <div class="table-wrap" style="padding:22px 24px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;color:#555">Önizleme — Onaylanmadı</div>
+        <div id="pc-preview-name" style="font-size:15px;font-weight:600;margin-bottom:16px;color:#1c1814"></div>
+        <div style="display:flex;gap:16px;margin-bottom:20px">
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px 20px;text-align:center;min-width:140px">
+            <div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Trendyol</div>
+            <div id="pc-prev-trendyol" style="font-size:22px;font-weight:800;color:#f97316">—</div>
+          </div>
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px 20px;text-align:center;min-width:140px">
+            <div style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Hepsiburada</div>
+            <div id="pc-prev-hepsi" style="font-size:22px;font-weight:800;color:#f97316">—</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-primary" onclick="pcApprove()" style="background:#16a34a;border:none">✅ Onayla ve Yayınla</button>
+          <button class="btn-danger" onclick="pcReject()">✕ Reddet</button>
+        </div>
+        <div style="font-size:12px;color:#aaa;margin-top:10px">Onaylanmadan ürün sayfasında görünmez.</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div style="padding:18px 22px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:700">Yayındaki Fiyatlar</div>
+        <button class="btn-primary" onclick="pcLoadList()" style="font-size:12px;padding:6px 14px">↻ Yenile</button>
+      </div>
+      <div id="pc-list"><div style="padding:20px;color:#aaa;font-size:13px">Yükleniyor...</div></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- SİPARİŞ DETAY MODAL -->
@@ -864,6 +919,7 @@ function setTab(tab,btn){
   document.getElementById('tab-'+tab).classList.remove('hidden');
   if(tab==='coupons')loadCoupons();
   if(tab==='analytics')loadAnalytics();
+  if(tab==='pricecompare')pcLoadList();
 }
 
 async function loadAnalytics(){
@@ -994,6 +1050,98 @@ async function fillFromUrl(prefix) {
 function showToast(msg){
   const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
   setTimeout(()=>t.style.display='none',2500);
+}
+
+// ── Rakip Fiyat Karşılaştırma ─────────────────────────────────────────────
+let _pcPending = null; // holds fetched data awaiting approval
+
+async function pcFetch() {
+  const productId = document.getElementById('pc-product-id').value.trim();
+  const akakceUrl = document.getElementById('pc-akakce-url').value.trim();
+  if (!akakceUrl) return showToast('Akakçe URL girin');
+  const btn = document.getElementById('pc-fetch-btn');
+  btn.disabled = true; btn.textContent = 'Yükleniyor…';
+  document.getElementById('pc-preview').style.display = 'none';
+  try {
+    const r = await fetch('/api/price-compare/fetch', {
+      method: 'POST',
+      body: JSON.stringify({ akakce_url: akakceUrl })
+    });
+    const d = await r.json();
+    if (!r.ok) return showToast('❌ ' + (d.error || 'Hata'));
+    _pcPending = { product_id: productId || null, akakce_url: akakceUrl,
+                   trendyol: d.trendyol, hepsiburada: d.hepsiburada };
+    document.getElementById('pc-preview-name').textContent = d.product_name || '';
+    document.getElementById('pc-prev-trendyol').textContent = d.trendyol ? d.trendyol.toLocaleString('tr-TR') + ' ₺' : 'Bulunamadı';
+    document.getElementById('pc-prev-hepsi').textContent = d.hepsiburada ? d.hepsiburada.toLocaleString('tr-TR') + ' ₺' : 'Bulunamadı';
+    document.getElementById('pc-preview').style.display = 'block';
+  } catch(e) {
+    showToast('❌ Bağlantı hatası');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Fiyat Çek';
+  }
+}
+
+async function pcApprove() {
+  if (!_pcPending) return;
+  const key = _pcPending.product_id ? 'product_' + _pcPending.product_id : 'url_' + Date.now();
+  const r = await fetch('/api/price-compare/approve', {
+    method: 'POST',
+    body: JSON.stringify({ key, ..._pcPending })
+  });
+  const d = await r.json();
+  if (r.ok) {
+    showToast('✅ Yayınlandı');
+    document.getElementById('pc-preview').style.display = 'none';
+    document.getElementById('pc-product-id').value = '';
+    document.getElementById('pc-akakce-url').value = '';
+    _pcPending = null;
+    pcLoadList();
+  } else {
+    showToast('❌ ' + (d.error || 'Kaydedilemedi'));
+  }
+}
+
+function pcReject() {
+  _pcPending = null;
+  document.getElementById('pc-preview').style.display = 'none';
+  showToast('Reddedildi — hiçbir şey kaydedilmedi');
+}
+
+async function pcDelete(key) {
+  if (!confirm('Bu fiyat kaydını kaldır?')) return;
+  const r = await fetch('/api/price-compare/' + encodeURIComponent(key), { method: 'DELETE' });
+  if (r.ok) { showToast('Kaldırıldı'); pcLoadList(); }
+}
+
+async function pcLoadList() {
+  const el = document.getElementById('pc-list');
+  if (!el) return;
+  try {
+    const r = await fetch('/api/price-compare');
+    const data = await r.json();
+    const keys = Object.keys(data);
+    if (!keys.length) { el.innerHTML = '<div style="padding:20px;color:#aaa;font-size:13px">Henüz onaylanmış fiyat yok.</div>'; return; }
+    el.innerHTML = '<table style="width:100%;border-collapse:collapse">' +
+      '<thead><tr><th style="padding:10px 18px;text-align:left;font-size:11px;color:#aaa;text-transform:uppercase">Anahtar</th>' +
+      '<th style="padding:10px 18px;text-align:left;font-size:11px;color:#aaa;text-transform:uppercase">Trendyol</th>' +
+      '<th style="padding:10px 18px;text-align:left;font-size:11px;color:#aaa;text-transform:uppercase">Hepsiburada</th>' +
+      '<th style="padding:10px 18px;text-align:left;font-size:11px;color:#aaa;text-transform:uppercase">Güncelleme</th>' +
+      '<th style="padding:10px 18px"></th></tr></thead><tbody>' +
+      keys.map(k => {
+        const e = data[k];
+        return '<tr style="border-top:1px solid #f3f3f1">' +
+          '<td style="padding:12px 18px;font-size:13px;font-weight:600">' + k + '</td>' +
+          '<td style="padding:12px 18px;font-size:13px">' + (e.trendyol ? e.trendyol.toLocaleString('tr-TR') + ' ₺' : '—') + '</td>' +
+          '<td style="padding:12px 18px;font-size:13px">' + (e.hepsiburada ? e.hepsiburada.toLocaleString('tr-TR') + ' ₺' : '—') + '</td>' +
+          '<td style="padding:12px 18px;font-size:12px;color:#aaa">' + (e.last_updated || '') + '</td>' +
+          '<td style="padding:12px 18px"><button class="btn-danger" onclick="pcDelete(' + JSON.stringify(k) + ')" style="font-size:12px;padding:5px 10px">Kaldır</button></td>' +
+          '</tr>';
+      }).join('') +
+      '</tbody></table>';
+  } catch(e) {
+    el.innerHTML = '<div style="padding:20px;color:#aaa;font-size:13px">Yüklenemedi</div>';
+  }
 }
 
 checkAdminAuth();
