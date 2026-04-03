@@ -36,19 +36,34 @@ tr:last-child td{border-bottom:none}
 .btn-orange{background:#C49660;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:8px;padding:7px 14px;font-size:13px}
 .btn-blue{background:#3b82f6;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:8px;padding:7px 14px;font-size:13px}
 .btn-danger{background:#fef2f2;border:1px solid #fecaca;color:#ef4444;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border-radius:8px;padding:7px 14px;font-size:13px}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:stretch;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--bg);border-radius:20px;padding:30px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .3s}
-.modal-overlay.open .modal{transform:translateY(0)}
-.modal h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px}
+.modal{background:var(--bg);width:100%;max-width:680px;height:100vh;overflow-y:auto;transform:translateX(32px);transition:transform .28s cubic-bezier(.22,.68,0,1.2);display:flex;flex-direction:column;box-shadow:-8px 0 48px rgba(0,0,0,.12)}
+.modal-overlay.open .modal{transform:translateX(0)}
+/* Centered dialog for small modals (orders, prices) */
+.modal-overlay.dialog{align-items:center;justify-content:center;padding:20px}
+.modal-overlay.dialog .modal{max-width:540px;height:auto;max-height:90vh;border-radius:20px;transform:translateY(12px);box-shadow:0 20px 60px rgba(0,0,0,.2);padding:28px;display:block}
+.modal-overlay.dialog.open .modal{transform:translateY(0)}
+.modal-overlay.dialog .modal h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:18px}
+.modal-overlay.dialog .btn-submit,.modal-overlay.dialog .btn-cancel{width:100%;display:block;text-align:center}
+.modal-header{padding:22px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:10}
+.modal-header h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin:0}
+.modal-close{background:none;border:none;cursor:pointer;color:#888;font-size:22px;line-height:1;padding:4px 8px;border-radius:6px;transition:color .15s}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:24px 28px;flex:1}
+.modal-footer{padding:16px 28px;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--bg);display:flex;gap:10px}
+.modal-section{margin-bottom:24px}
+.modal-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#aaa;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.modal h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:20px}
 .form-group{margin-bottom:14px}
 .form-label{font-size:13px;color:#555;font-weight:500;margin-bottom:5px;display:block}
 .form-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;color:#1C1814;background:var(--bg)}
 .form-input:focus{border-color:#C49660}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.btn-submit{width:100%;background:#C49660;border:none;color:#fff;padding:13px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px}
-.btn-cancel{width:100%;background:var(--surface);border:none;color:#666;padding:11px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;margin-top:8px}
+.btn-submit{flex:1;background:#C49660;border:none;color:#fff;padding:12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer}
+.btn-submit:hover{background:#A67D48}
+.btn-cancel{background:var(--surface);border:1px solid var(--border);color:#666;padding:12px 20px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;white-space:nowrap}
 .upload-area{border:2px dashed var(--border);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafafa}
 .upload-area:hover{border-color:#C49660;background:#FDF5EB}
 .upload-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -238,7 +253,7 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <!-- SİPARİŞ DETAY MODAL -->
-<div class="modal-overlay" id="od-modal">
+<div class="modal-overlay dialog" id="od-modal">
   <div class="modal">
     <h2>📦 Sipariş Detayı — <span id="od-id"></span></h2>
     <div style="background:#FDFAF6;border-radius:10px;padding:14px;margin-bottom:18px;font-size:14px">
@@ -272,79 +287,156 @@ tr:last-child td{border-bottom:none}
 <!-- ÜRÜN EKLE MODAL -->
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
-    <h2>➕ Yeni Ürün Ekle</h2>
-    <div class="form-group">
-      <label class="form-label">Ürün Fotoğrafları <span style="color:#aaa;font-weight:400;font-size:11px">İlki kapak · Max 8 adet</span></label>
-      <div class="upload-area" style="cursor:pointer" onclick="document.getElementById('add-img-files').click()">
-        <input type="file" id="add-img-files" accept="image/*" multiple style="display:none" onchange="pickImages(this,'add')"/>
-        <div id="add-upload-ph"><div style="font-size:28px;margin-bottom:6px">📸</div><div style="font-size:13px;color:#888;font-weight:500">Fotoğraf seç — birden fazla seçebilirsin</div><div style="font-size:11px;color:#bbb;margin-top:3px">JPG, PNG, WEBP — Max 5MB her biri</div></div>
+    <div class="modal-header">
+      <h2>Yeni Ürün Ekle</h2>
+      <button class="modal-close" onclick="closeModal('add-modal')">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <div class="modal-section-title">Görseller</div>
+        <div class="upload-area" style="cursor:pointer" onclick="document.getElementById('add-img-files').click()">
+          <input type="file" id="add-img-files" accept="image/*" multiple style="display:none" onchange="pickImages(this,'add')"/>
+          <div id="add-upload-ph">
+            <div style="font-size:32px;margin-bottom:8px">📸</div>
+            <div style="font-size:14px;color:#555;font-weight:600">Fotoğraf yükle</div>
+            <div style="font-size:12px;color:#aaa;margin-top:4px">Birden fazla seçebilirsin · İlki kapak görseli olur · JPG, PNG, WEBP</div>
+          </div>
+        </div>
+        <div id="add-img-grid" class="img-grid"></div>
       </div>
-      <div id="add-img-grid" class="img-grid"></div>
-    </div>
-    <div class="form-group"><label class="form-label">Ürün Adı *</label><input class="form-input" id="new-name" placeholder="Örn: Sony WH-1000XM5 Kulaklık"/></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Marka</label><input class="form-input" id="new-brand" placeholder="Sony, Nike..."/></div>
-      <div class="form-group"><label class="form-label">SKU / Barkod</label><input class="form-input" id="new-sku" placeholder="SKU123"/></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Kategori</label>
-        <select class="form-input" id="new-category">
-          <option>Elektronik</option><option>Giyim</option><option>Ev</option>
-          <option>Spor</option><option>Kozmetik</option><option>Kitap</option><option>Genel</option>
-        </select>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Temel Bilgiler</div>
+        <div class="form-group">
+          <label class="form-label">Ürün Adı *</label>
+          <input class="form-input" id="new-name" placeholder="Örn: Sony WH-1000XM5 Kablosuz Kulaklık"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Marka</label><input class="form-input" id="new-brand" placeholder="Sony, Apple, Philips..."/></div>
+          <div class="form-group"><label class="form-label">SKU / Barkod</label><input class="form-input" id="new-sku" placeholder="SKU-001"/></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Açıklama</label>
+          <textarea class="form-input" id="new-desc" rows="7" placeholder="Ürün özelliklerini, teknik detayları ve kullanım alanlarını buraya yaz. Ne kadar detaylı olursa müşteri güveni o kadar artar." style="resize:vertical;line-height:1.6"></textarea>
+        </div>
       </div>
-      <div class="form-group"><label class="form-label">Stok</label><input class="form-input" id="new-stock" type="number" placeholder="99"/></div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Fiyatlandırma</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Satış Fiyatı (₺) *</label>
+            <input class="form-input" id="new-price" type="number" placeholder="0" style="font-size:18px;font-weight:700;color:var(--accent)"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">İndirimli Fiyat (₺) <span style="font-weight:400;color:#bbb">— üstü çizili gösterilir</span></label>
+            <input class="form-input" id="new-discount-price" type="number" placeholder="Boş bırak"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Stok & Kategori</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Kategori</label>
+            <select class="form-input" id="new-category">
+              <option>Elektronik</option><option>Giyim</option><option>Ev</option>
+              <option>Spor</option><option>Kozmetik</option><option>Kitap</option><option>Kişisel Bakım</option><option>Genel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stok Adedi</label>
+            <input class="form-input" id="new-stock" type="number" placeholder="99"/>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Normal Fiyat (₺) *</label><input class="form-input" id="new-price" type="number" placeholder="4299"/></div>
-      <div class="form-group"><label class="form-label">İndirimli Fiyat (₺)</label><input class="form-input" id="new-discount-price" type="number" placeholder="Boş bırak"/></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('add-modal')">İptal</button>
+      <button class="btn-submit" onclick="addProduct()">Ürünü Ekle</button>
     </div>
-    <div class="form-group"><label class="form-label">Açıklama</label><textarea class="form-input" id="new-desc" rows="2" placeholder="Kısa açıklama..." style="resize:vertical"></textarea></div>
-    <button class="btn-submit" onclick="addProduct()">✅ Ürünü Ekle</button>
-    <button class="btn-cancel" onclick="closeModal('add-modal')">İptal</button>
   </div>
 </div>
 
 <!-- ÜRÜN DÜZENLE MODAL -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
-    <h2>✏️ Ürünü Düzenle</h2>
-    <input type="hidden" id="edit-id"/>
-    <div class="form-group">
-      <label class="form-label">Ürün Fotoğrafları <span style="color:#aaa;font-weight:400;font-size:11px">İlki kapak · Yeni eklemek için tıkla</span></label>
-      <div class="upload-area" style="cursor:pointer" onclick="document.getElementById('edit-img-files').click()">
-        <input type="file" id="edit-img-files" accept="image/*" multiple style="display:none" onchange="pickImages(this,'edit')"/>
-        <div style="font-size:13px;color:#888;font-weight:500">+ Yeni fotoğraf ekle</div>
+    <div class="modal-header">
+      <h2>Ürünü Düzenle</h2>
+      <button class="modal-close" onclick="closeModal('edit-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id"/>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Görseller</div>
+        <div class="upload-area" style="cursor:pointer" onclick="document.getElementById('edit-img-files').click()">
+          <input type="file" id="edit-img-files" accept="image/*" multiple style="display:none" onchange="pickImages(this,'edit')"/>
+          <div style="font-size:13px;color:#888;font-weight:500;padding:4px 0">+ Yeni fotoğraf ekle</div>
+        </div>
+        <div id="edit-img-grid" class="img-grid"></div>
+        <input type="hidden" id="edit-image-url"/>
       </div>
-      <div id="edit-img-grid" class="img-grid"></div>
-      <input type="hidden" id="edit-image-url"/>
-    </div>
-    <div class="form-group"><label class="form-label">Ürün Adı *</label><input class="form-input" id="edit-name"/></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Marka</label><input class="form-input" id="edit-brand"/></div>
-      <div class="form-group"><label class="form-label">SKU</label><input class="form-input" id="edit-sku"/></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Kategori</label>
-        <select class="form-input" id="edit-category">
-          <option>Elektronik</option><option>Giyim</option><option>Ev</option>
-          <option>Spor</option><option>Kozmetik</option><option>Kitap</option><option>Genel</option>
-        </select>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Temel Bilgiler</div>
+        <div class="form-group">
+          <label class="form-label">Ürün Adı *</label>
+          <input class="form-input" id="edit-name"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Marka</label><input class="form-input" id="edit-brand"/></div>
+          <div class="form-group"><label class="form-label">SKU / Barkod</label><input class="form-input" id="edit-sku"/></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Açıklama</label>
+          <textarea class="form-input" id="edit-desc" rows="8" style="resize:vertical;line-height:1.6"></textarea>
+          <div style="font-size:11px;color:#bbb;margin-top:5px">Teknik özellikler, kullanım alanı, paket içeriği — ne kadar detaylı olursa o kadar iyi.</div>
+        </div>
       </div>
-      <div class="form-group"><label class="form-label">Stok</label><input class="form-input" id="edit-stock" type="number"/></div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Fiyatlandırma</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Satış Fiyatı (₺) *</label>
+            <input class="form-input" id="edit-price" type="number" style="font-size:18px;font-weight:700;color:var(--accent)"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">İndirimli Fiyat (₺) <span style="font-weight:400;color:#bbb">— üstü çizili gösterilir</span></label>
+            <input class="form-input" id="edit-discount-price" type="number" placeholder="Boş bırak"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Stok & Kategori</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Kategori</label>
+            <select class="form-input" id="edit-category">
+              <option>Elektronik</option><option>Giyim</option><option>Ev</option>
+              <option>Spor</option><option>Kozmetik</option><option>Kitap</option><option>Kişisel Bakım</option><option>Genel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stok Adedi</label>
+            <input class="form-input" id="edit-stock" type="number"/>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Normal Fiyat (₺) *</label><input class="form-input" id="edit-price" type="number"/></div>
-      <div class="form-group"><label class="form-label">İndirimli Fiyat (₺)</label><input class="form-input" id="edit-discount-price" type="number" placeholder="Boş bırak"/></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('edit-modal')">İptal</button>
+      <button class="btn-submit" onclick="saveEdit()">Kaydet</button>
     </div>
-    <div class="form-group"><label class="form-label">Açıklama</label><textarea class="form-input" id="edit-desc" rows="2" style="resize:vertical"></textarea></div>
-    <button class="btn-submit" onclick="saveEdit()">💾 Kaydet</button>
-    <button class="btn-cancel" onclick="closeModal('edit-modal')">İptal</button>
   </div>
 </div>
 
 <!-- FİYAT MODAL -->
-<div class="modal-overlay" id="price-modal">
+<div class="modal-overlay dialog" id="price-modal">
   <div class="modal">
     <h2>💰 Rakip Fiyat Gir</h2>
     <div id="price-modal-product" style="background:#FDF5EB;border:1px solid #fed7aa;border-radius:10px;padding:12px;margin-bottom:18px;font-weight:600;font-size:14px"></div>
@@ -717,6 +809,12 @@ function openAddModal(){
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('open');}
+// Close product drawers when clicking the dark backdrop
+['add-modal','edit-modal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){
+    if(e.target===this) closeModal(id);
+  });
+});
 
 function setTab(tab,btn){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
