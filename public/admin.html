@@ -88,6 +88,18 @@ tr:last-child td{border-bottom:none}
 .coupon-info{font-size:12px;color:#888;margin-top:2px}
 .stars-small{color:#C49660;font-size:11px}
 @media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row,.form-row-3{grid-template-columns:1fr}}
+.url-fill-bar{display:flex;gap:8px;margin-bottom:20px;padding:14px 16px;background:#f8f4ef;border:1px solid var(--border);border-radius:12px}
+.url-fill-bar input{flex:1;border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:#fff}
+.url-fill-bar input:focus{border-color:var(--accent)}
+.btn-fill{background:var(--accent);border:none;color:#fff;padding:9px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-fill:hover{background:var(--accent-h)}
+.btn-fill:disabled{opacity:.5;cursor:not-allowed}
+.img-pick-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.img-pick-item{position:relative;width:80px;height:80px;cursor:pointer;border-radius:8px;overflow:hidden;border:2px solid transparent;transition:border-color .15s;flex-shrink:0}
+.img-pick-item img{width:100%;height:100%;object-fit:cover;display:block}
+.img-pick-item.selected{border-color:var(--accent)}
+.img-pick-item.selected::after{content:'✓';position:absolute;top:3px;right:5px;color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.img-pick-label{font-size:11px;color:#888;margin-top:6px}
 .img-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:0}
 .img-thumb{position:relative;width:76px;height:76px;flex-shrink:0}
 .img-thumb img{width:100%;height:100%;object-fit:cover;border-radius:8px;border:2px solid transparent;display:block}
@@ -293,6 +305,11 @@ tr:last-child td{border-bottom:none}
     </div>
     <div class="modal-body">
 
+      <div class="url-fill-bar">
+        <input type="url" id="add-fill-url" placeholder="Amazon, MediaMarkt, Trendyol... URL yapıştır ve doldur"/>
+        <button class="btn-fill" id="add-fill-btn" onclick="fillFromUrl('add')">Doldur</button>
+      </div>
+
       <div class="modal-section">
         <div class="modal-section-title">Görseller</div>
         <div class="upload-area" style="cursor:pointer" onclick="document.getElementById('add-img-files').click()">
@@ -303,6 +320,8 @@ tr:last-child td{border-bottom:none}
             <div style="font-size:12px;color:#aaa;margin-top:4px">Birden fazla seçebilirsin · İlki kapak görseli olur · JPG, PNG, WEBP</div>
           </div>
         </div>
+        <div id="add-img-pick" class="img-pick-grid" style="display:none"></div>
+        <div id="add-img-pick-label" class="img-pick-label" style="display:none">Görsele tıklayarak seç — ilk seçilen kapak olur</div>
         <div id="add-img-grid" class="img-grid"></div>
       </div>
 
@@ -370,12 +389,19 @@ tr:last-child td{border-bottom:none}
     <div class="modal-body">
       <input type="hidden" id="edit-id"/>
 
+      <div class="url-fill-bar">
+        <input type="url" id="edit-fill-url" placeholder="Amazon, MediaMarkt, Trendyol... URL yapıştır ve doldur"/>
+        <button class="btn-fill" id="edit-fill-btn" onclick="fillFromUrl('edit')">Doldur</button>
+      </div>
+
       <div class="modal-section">
         <div class="modal-section-title">Görseller</div>
         <div class="upload-area" style="cursor:pointer" onclick="document.getElementById('edit-img-files').click()">
           <input type="file" id="edit-img-files" accept="image/*" multiple style="display:none" onchange="pickImages(this,'edit')"/>
           <div style="font-size:13px;color:#888;font-weight:500;padding:4px 0">+ Yeni fotoğraf ekle</div>
         </div>
+        <div id="edit-img-pick" class="img-pick-grid" style="display:none"></div>
+        <div id="edit-img-pick-label" class="img-pick-label" style="display:none">Görsele tıklayarak seç — ilk seçilen kapak olur</div>
         <div id="edit-img-grid" class="img-grid"></div>
         <input type="hidden" id="edit-image-url"/>
       </div>
@@ -682,8 +708,10 @@ async function addProduct(){
   const price=document.getElementById('new-price').value;
   if(!name||!price)return showToast('❌ Ad ve fiyat zorunlu!');
   showToast('📤 Yükleniyor...');
-  const imageUrls=await uploadAllImages('add');
-  if(!imageUrls.length)return showToast('❌ En az bir fotoğraf ekleyin!');
+  const uploaded=await uploadAllImages('add');
+  // Merge: uploaded files first, then URL-picked images
+  const imageUrls=[...uploaded, ...pickedFromUrl['add'].filter(u=>!uploaded.includes(u))];
+  if(!imageUrls.length)return showToast('❌ En az bir fotoğraf veya görsel seçin!');
   try{
     const res=await fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       name,image_url:imageUrls[0],images:JSON.stringify(imageUrls),
@@ -696,7 +724,7 @@ async function addProduct(){
       stock:document.getElementById('new-stock').value||99
     })});
     const d=await res.json();
-    if(d.id){showToast('✅ Ürün eklendi!');closeModal('add-modal');loadAll();addImgs=[];renderImgGrid('add');}
+    if(d.id){showToast('✅ Ürün eklendi!');closeModal('add-modal');loadAll();addImgs=[];pickedFromUrl['add']=[];renderImgGrid('add');}
     else showToast('❌ '+d.error);
   }catch(e){showToast('❌ Hata oluştu');}
 }
@@ -729,8 +757,9 @@ async function saveEdit(){
   const price=document.getElementById('edit-price').value;
   if(!name||!price)return showToast('❌ Ad ve fiyat zorunlu!');
   showToast('💾 Kaydediliyor...');
-  const imageUrls=await uploadAllImages('edit');
-  const imageUrl=imageUrls[0]||null;
+  const uploaded=await uploadAllImages('edit');
+  const imageUrls=[...uploaded, ...pickedFromUrl['edit'].filter(u=>!uploaded.includes(u))];
+  const imageUrl=imageUrls[0]||document.getElementById('edit-image-url').value||null;
   const imagesJson=imageUrls.length>0?JSON.stringify(imageUrls):null;
   try{
     const res=await fetch('/api/products/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({
@@ -809,12 +838,27 @@ function openAddModal(){
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-// Close product drawers when clicking the dark backdrop
+// Close product drawers when clicking the dark backdrop; reset pickers on close
 ['add-modal','edit-modal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){
     if(e.target===this) closeModal(id);
   });
 });
+// Reset fill URL + image picker when modal closes
+const _origClose = closeModal;
+function closeModal(id) {
+  _origClose(id);
+  if(id==='add-modal'||id==='edit-modal'){
+    const p=id==='add-modal'?'add':'edit';
+    const urlEl=document.getElementById(p+'-fill-url');
+    if(urlEl) urlEl.value='';
+    const grid=document.getElementById(p+'-img-pick');
+    if(grid){grid.innerHTML='';grid.style.display='none';}
+    const lbl=document.getElementById(p+'-img-pick-label');
+    if(lbl) lbl.style.display='none';
+    pickedFromUrl[p]=[];
+  }
+}
 
 function setTab(tab,btn){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
@@ -880,6 +924,74 @@ async function loadAnalytics(){
       ?(topProds||[]).map(function(p,i){return'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)"><span style="font-size:12px;font-weight:700;color:#aaa;min-width:16px">'+(i+1)+'</span><div style="flex:1"><div style="font-size:13px;font-weight:500">'+p.product_name+'</div><div style="font-size:11px;color:#aaa">'+p.sold+' adet satıldı</div></div><span style="font-size:13px;font-weight:700;color:var(--accent)">'+(+p.revenue||0).toLocaleString('tr-TR')+' ₺</span></div>';}).join('')
       :'<div style="color:#aaa;font-size:13px">Henüz sipariş yok</div>';
   }catch(e){console.error('Analytics hata:',e);}
+}
+
+// Track selected images from URL scrape (prefix → array of URLs)
+const pickedFromUrl = { add: [], edit: [] };
+
+async function fillFromUrl(prefix) {
+  const urlInput = document.getElementById(prefix + '-fill-url');
+  const btn = document.getElementById(prefix + '-fill-btn');
+  const url = (urlInput.value || '').trim();
+  if (!url) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Yükleniyor…';
+
+  try {
+    const r = await fetch('/api/scrape-url', {
+      method: 'POST',
+      body: JSON.stringify({ url })
+    });
+    const d = await r.json();
+    if (!r.ok) { showToast('Hata: ' + (d.error || 'Sayfa açılamadı')); return; }
+
+    // Fill text fields
+    if (d.name) document.getElementById(prefix === 'add' ? 'new-name' : 'edit-name').value = d.name;
+    if (d.desc) document.getElementById(prefix === 'add' ? 'new-desc' : 'edit-desc').value = d.desc;
+    if (d.brand) document.getElementById(prefix === 'add' ? 'new-brand' : 'edit-brand').value = d.brand;
+
+    // Show image picker
+    pickedFromUrl[prefix] = [];
+    const grid = document.getElementById(prefix + '-img-pick');
+    const label = document.getElementById(prefix + '-img-pick-label');
+
+    if (d.imgs && d.imgs.length > 0) {
+      grid.innerHTML = '';
+      d.imgs.forEach((src, i) => {
+        const item = document.createElement('div');
+        item.className = 'img-pick-item';
+        item.dataset.src = src;
+        const img = document.createElement('img');
+        img.src = src;
+        img.onerror = () => item.remove();
+        item.appendChild(img);
+        item.addEventListener('click', () => {
+          item.classList.toggle('selected');
+          if (item.classList.contains('selected')) {
+            pickedFromUrl[prefix].push(src);
+          } else {
+            pickedFromUrl[prefix] = pickedFromUrl[prefix].filter(u => u !== src);
+          }
+          // First selected = cover, update hidden field
+          if (prefix === 'edit' && pickedFromUrl[prefix].length > 0) {
+            document.getElementById('edit-image-url').value = pickedFromUrl[prefix][0];
+          }
+        });
+        grid.appendChild(item);
+      });
+      grid.style.display = 'flex';
+      label.style.display = 'block';
+      showToast('✓ ' + d.imgs.length + ' görsel bulundu — seçmek için tıkla');
+    } else {
+      showToast('Görsel bulunamadı — elle yükle');
+    }
+  } catch(e) {
+    showToast('Bağlantı hatası');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Doldur';
+  }
 }
 
 function showToast(msg){

@@ -157,6 +157,7 @@ const authRoutes = require('./routes/auth');
 const cartRoutes = require('./routes/cart');
 const wishlistRoutes = require('./routes/wishlist');
 const analyticsRoutes = require('./routes/analytics');
+const scrapeUrlRoutes = require('./routes/scrape-url');
 app.use('/api/products', productRoutes);
 app.use('/api/prices', priceRoutes);
 app.use('/api/orders', orderRoutes);
@@ -166,6 +167,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/scrape-url', scrapeUrlRoutes);
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/track', (req, res) => res.sendFile(path.join(__dirname, 'public', 'track.html')));
