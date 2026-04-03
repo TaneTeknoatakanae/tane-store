@@ -689,7 +689,7 @@ function updateCartUI() {
   const foot = document.getElementById('cart-foot');
   if (!cart.length) { el.innerHTML = '<div class="cart-empty">Sepetiniz boş</div>'; foot.style.display = 'none'; return; }
   foot.style.display = 'block';
-  const FREE = 500, FEE = 49.90, rem = FREE - total, pct = Math.min(100, (total / FREE) * 100);
+  const FREE = 4000, FEE = 49.90, rem = FREE - total, pct = Math.min(100, (total / FREE) * 100);
   const si = document.getElementById('ship-info');
   if (total >= FREE) { si.innerHTML = '<p class="ship-free" style="margin-bottom:12px">Kargo bedava!</p>'; }
   else { si.innerHTML = `<p class="ship-note">${rem.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ₺ daha ekle, kargo bedava</p><div class="ship-bar"><div class="ship-fill" style="width:${pct}%"></div></div><p class="ship-note" style="margin-bottom:12px">Kargo: ${FEE.toLocaleString('tr-TR')} ₺</p>`; }

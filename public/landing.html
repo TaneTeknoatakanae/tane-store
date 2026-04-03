@@ -308,7 +308,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <!-- PROMO BAR -->
 <div class="promo-bar" id="promo-bar">
-  <span>🚚 <strong>500 ₺</strong> ve üzeri alışverişlerde kargo <strong>ücretsiz</strong> · Güvenli ödeme · 14 gün iade hakkı</span>
+  <span>🚚 <strong>4.000 ₺</strong> ve üzeri alışverişlerde kargo <strong>ücretsiz</strong> · Güvenli ödeme · 14 gün iade hakkı</span>
   <button class="promo-x" onclick="document.getElementById('promo-bar').style.display='none'" title="Kapat" aria-label="Kapat">×</button>
 </div>
 
@@ -527,7 +527,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         Ücretsiz kargo için ne kadar harcamalıyım?
         <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="faq-a"><p><strong>500 ₺</strong> ve üzeri tüm siparişlerde kargo ücretsizdir. Bu tutarın altı için 49,90 ₺ sabit kargo ücreti uygulanır.</p></div>
+      <div class="faq-a"><p><strong>4.000 ₺</strong> ve üzeri tüm siparişlerde kargo ücretsizdir. Bu tutarın altı için 49,90 ₺ sabit kargo ücreti uygulanır.</p></div>
     </div>
   </div>
 </div>
@@ -761,8 +761,9 @@ async function loadProducts() {
     if (!Array.isArray(allProducts)) allProducts = [];
     renderProducts(allProducts.slice(0, 8));
     renderCategories();
-    // Hero product image
-    const heroP = allProducts.find(p => p.image_url && (p.rating >= 4 || !p.rating));
+    // Hero product image — random product with image on each load
+    const withImg = allProducts.filter(p => p.image_url);
+    const heroP = withImg.length ? withImg[Math.floor(Math.random() * withImg.length)] : null;
     if (heroP) {
       document.getElementById('hero-product-img').src = heroP.image_url;
       document.getElementById('hero-product-name').textContent = heroP.name;
@@ -893,7 +894,7 @@ function updateCartUI() {
     foot.style.display = 'none'; return;
   }
   foot.style.display = 'block';
-  const FREE = 500, FEE = 49.90, rem = FREE - total, pct = Math.min(100, (total / FREE) * 100);
+  const FREE = 4000, FEE = 49.90, rem = FREE - total, pct = Math.min(100, (total / FREE) * 100);
   const si = document.getElementById('ship-info');
   if (total >= FREE) {
     si.innerHTML = '<p class="c-ship-free" style="margin-bottom:12px">🎉 Ücretsiz kargo kazandınız!</p>';
