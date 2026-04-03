@@ -711,7 +711,6 @@ async function addProduct(){
   const uploaded=await uploadAllImages('add');
   // Merge: uploaded files first, then URL-picked images
   const imageUrls=[...uploaded, ...pickedFromUrl['add'].filter(u=>!uploaded.includes(u))];
-  if(!imageUrls.length)return showToast('❌ En az bir fotoğraf veya görsel seçin!');
   try{
     const res=await fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       name,image_url:imageUrls[0],images:JSON.stringify(imageUrls),
@@ -724,9 +723,9 @@ async function addProduct(){
       stock:document.getElementById('new-stock').value||99
     })});
     const d=await res.json();
-    if(d.id){showToast('✅ Ürün eklendi!');closeModal('add-modal');loadAll();addImgs=[];pickedFromUrl['add']=[];renderImgGrid('add');}
-    else showToast('❌ '+d.error);
-  }catch(e){showToast('❌ Hata oluştu');}
+    if(!res.ok) return showToast('❌ '+(d.error||'Sunucu hatası'));
+    showToast('✅ Ürün eklendi!');closeModal('add-modal');loadAll();addImgs=[];pickedFromUrl['add']=[];renderImgGrid('add');
+  }catch(e){console.error('addProduct hata:',e);showToast('❌ Hata: '+e.message);}
 }
 
 function openEditModal(id){
@@ -774,8 +773,9 @@ async function saveEdit(){
       stock:document.getElementById('edit-stock').value||99
     })});
     const d=await res.json();
+    if(!res.ok) return showToast('❌ '+(d.error||'Sunucu hatası'));
     showToast(d.message||'✅ Kaydedildi');closeModal('edit-modal');loadAll();
-  }catch(e){showToast('❌ Hata oluştu');}
+  }catch(e){console.error('saveEdit hata:',e);showToast('❌ Hata: '+e.message);}
 }
 
 async function deleteProduct(id){
@@ -837,17 +837,8 @@ function openAddModal(){
   document.getElementById('add-modal').classList.add('open');
 }
 
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-// Close product drawers when clicking the dark backdrop; reset pickers on close
-['add-modal','edit-modal'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',function(e){
-    if(e.target===this) closeModal(id);
-  });
-});
-// Reset fill URL + image picker when modal closes
-const _origClose = closeModal;
-function closeModal(id) {
-  _origClose(id);
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
   if(id==='add-modal'||id==='edit-modal'){
     const p=id==='add-modal'?'add':'edit';
     const urlEl=document.getElementById(p+'-fill-url');
@@ -859,6 +850,12 @@ function closeModal(id) {
     pickedFromUrl[p]=[];
   }
 }
+// Close drawers when clicking the dark backdrop
+['add-modal','edit-modal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){
+    if(e.target===this) closeModal(id);
+  });
+});
 
 function setTab(tab,btn){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
