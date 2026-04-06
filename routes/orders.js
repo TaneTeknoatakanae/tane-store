@@ -40,7 +40,7 @@ router.get('/mine', (req, res) => {
 
 // Sipariş takip (PUBLIC — /:id'den önce tanımlanmalı)
 router.get('/track/:id', (req, res) => {
-  db.get(`SELECT id, status, total_price, discount_amount, coupon_code,
+  db.get(`SELECT id, status, total_price,
     customer_name, customer_city, shipping_carrier, shipping_code, created_at FROM orders WHERE id = ?`,
     [req.params.id], (err, order) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -68,23 +68,21 @@ router.get('/:id', adminAuth, (req, res) => {
 // Yeni sipariş oluştur
 router.post('/', (req, res) => {
   const { customer_name, customer_phone, customer_email, customer_address, customer_city,
-    note, items, coupon_code, discount_amount } = req.body;
+    note, items } = req.body;
 
   if (!customer_name || !customer_phone || !customer_address || !customer_city || !items?.length) {
     return res.status(400).json({ error: 'Eksik bilgi var' });
   }
 
-  const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
-  const discount = parseFloat(discount_amount) || 0;
-  const total_price = Math.max(0, subtotal - discount);
-
+  const total_price = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const userId = req.session?.userId || null;
+
   db.run(`
     INSERT INTO orders (customer_name, customer_phone, customer_email, customer_address,
-      customer_city, total_price, coupon_code, discount_amount, note, user_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      customer_city, total_price, note, user_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `, [customer_name, customer_phone, customer_email || null, customer_address, customer_city,
-    total_price, coupon_code || null, discount, note || null, userId],
+    total_price, note || null, userId],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
       const orderId = this.lastID;
@@ -95,10 +93,6 @@ router.post('/', (req, res) => {
       `);
       items.forEach(item => stmt.run(orderId, item.product_id, item.product_name, item.price, item.quantity));
       stmt.finalize();
-
-      if (coupon_code) {
-        db.run('UPDATE coupons SET used_count = used_count + 1 WHERE code = ?', [coupon_code]);
-      }
 
       res.json({ id: orderId, message: '✅ Sipariş alındı!' });
     });

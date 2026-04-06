@@ -171,14 +171,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .order-row{display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px;gap:8px}
 .order-row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .order-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid var(--border);padding-top:10px;margin-top:8px}
-.coupon-row{display:flex;gap:8px;margin-bottom:16px}
-.coupon-in{flex:1;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:13px;outline:none;text-transform:uppercase;color:var(--text);background:var(--bg)}
-.coupon-in::placeholder{color:var(--text3)}
-.coupon-in:focus{border-color:#999}
-.btn-coupon{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:10px 16px;border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .15s}
-.btn-coupon:hover{background:var(--text);color:#fff;border-color:var(--text)}
-.coupon-ok{font-size:12px;color:var(--green);font-weight:600;margin-bottom:12px}
-.coupon-err{font-size:12px;color:var(--red);margin-bottom:12px}
 .fg{margin-bottom:12px}
 .fl{font-size:12px;color:var(--text2);font-weight:500;display:block;margin-bottom:5px}
 .fi{width:100%;border:1px solid var(--border);border-radius:8px;padding:11px 12px;font-family:inherit;font-size:14px;outline:none;color:var(--text);background:var(--bg);transition:border-color .2s}
@@ -377,11 +369,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
       </div>
       <div class="modal-body">
         <div class="order-sum" id="order-summary"></div>
-        <div class="coupon-row">
-          <input class="coupon-in" id="coupon-code" placeholder="KUPON KODU"/>
-          <button class="btn-coupon" onclick="applyCoupon()">Uygula</button>
-        </div>
-        <div id="coupon-result"></div>
         <div class="fr">
           <div class="fg"><label class="fl">Ad Soyad *</label><input class="fi" id="o-name" autocomplete="name" placeholder="Ahmet Yılmaz"/></div>
           <div class="fg"><label class="fl">Telefon *</label><input class="fi" id="o-phone" type="tel" autocomplete="tel" placeholder="05xx xxx xx xx"/></div>
@@ -470,7 +457,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 <script>
 let allProducts = [], currentCat = 'Tümü';
-let cart = [], appliedCoupon = null, currentUser = null;
+let cart = [], currentUser = null;
 
 async function initAuth() {
   try {
@@ -636,11 +623,8 @@ function closeModal() { document.getElementById('order-modal').classList.remove(
 
 function openOrderModal() {
   if (!cart.length) return showToast('Sepetiniz boş');
-  appliedCoupon = null;
   document.getElementById('chk-on-bilgi').checked = false;
   document.getElementById('chk-mesafeli').checked = false;
-  document.getElementById('coupon-code').value = '';
-  document.getElementById('coupon-result').innerHTML = '';
   if (currentUser) {
     document.getElementById('o-name').value = currentUser.name || '';
     document.getElementById('o-phone').value = currentUser.phone || '';
@@ -658,23 +642,10 @@ function openOrderModal() {
 
 function updateOrderSummary() {
   const sub = cart.reduce((s, i) => s + ep(i) * i.qty, 0);
-  const disc = appliedCoupon ? appliedCoupon.discount : 0;
   document.getElementById('order-summary').innerHTML = `
     <div class="order-sum-title">Sipariş Özeti</div>
     ${cart.map(i => `<div class="order-row"><span>${i.name} ×${i.qty}</span><span>${(ep(i) * i.qty).toLocaleString('tr-TR')} ₺</span></div>`).join('')}
-    ${disc > 0 ? `<div class="order-row" style="color:var(--green)"><span>İndirim (${appliedCoupon.code})</span><span>−${disc.toLocaleString('tr-TR')} ₺</span></div>` : ''}
-    <div class="order-total"><span>Toplam</span><span>${(sub - disc).toLocaleString('tr-TR')} ₺</span></div>`;
-}
-
-async function applyCoupon() {
-  const code = document.getElementById('coupon-code').value.trim();
-  if (!code) return;
-  const sub = cart.reduce((s, i) => s + ep(i) * i.qty, 0);
-  const res = await fetch('/api/coupons/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, total: sub }) });
-  const data = await res.json();
-  const el = document.getElementById('coupon-result');
-  if (data.valid) { appliedCoupon = data; el.innerHTML = `<p class="coupon-ok">${data.message}</p>`; updateOrderSummary(); }
-  else { el.innerHTML = `<p class="coupon-err">${data.error}</p>`; }
+    <div class="order-total"><span>Toplam</span><span>${sub.toLocaleString('tr-TR')} ₺</span></div>`;
 }
 
 async function submitOrder() {
@@ -691,7 +662,6 @@ async function submitOrder() {
     body: JSON.stringify({
       customer_name: name, customer_phone: phone, customer_email: document.getElementById('o-email').value,
       customer_address: address, customer_city: city, note: document.getElementById('o-note').value,
-      coupon_code: appliedCoupon ? appliedCoupon.code : null, discount_amount: appliedCoupon ? appliedCoupon.discount : 0,
       items: cart.map(i => ({ product_id: i.id, product_name: i.name, price: ep(i), quantity: i.qty }))
     })
   });

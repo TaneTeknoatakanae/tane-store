@@ -82,10 +82,6 @@ tr:last-child td{border-bottom:none}
 .product-img-ph{width:44px;height:44px;border-radius:9px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:20px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1C1814;color:#fff;padding:11px 22px;border-radius:11px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.15);white-space:nowrap}
 .hidden{display:none}
-.coupon-card{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--bg)}
-.coupon-card.inactive{opacity:.5}
-.coupon-code-text{font-weight:700;font-family:monospace;font-size:16px;color:#1C1814}
-.coupon-info{font-size:12px;color:#888;margin-top:2px}
 .stars-small{color:#C49660;font-size:11px}
 @media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row,.form-row-3{grid-template-columns:1fr}}
 .url-fill-bar{display:flex;gap:8px;margin-bottom:20px;padding:14px 16px;background:#f8f4ef;border:1px solid var(--border);border-radius:12px}
@@ -129,7 +125,6 @@ tr:last-child td{border-bottom:none}
     <button class="tab active" onclick="setTab('products',this)">🏷️ Ürünler</button>
     <button class="tab" onclick="setTab('orders',this)">📦 Siparişler</button>
     <button class="tab" onclick="setTab('prices',this)">💰 Fiyat Gir</button>
-    <button class="tab" onclick="setTab('coupons',this)">🎟 Kuponlar</button>
     <button class="tab" onclick="setTab('analytics',this)">📊 Analitik</button>
     <button class="tab" onclick="setTab('pricecompare',this)">🏷 Rakip Fiyat</button>
   </div>
@@ -147,7 +142,7 @@ tr:last-child td{border-bottom:none}
   <div id="tab-orders" class="hidden">
     <div class="table-wrap">
       <div class="table-head"><h3>Gelen Siparişler</h3></div>
-      <table><thead><tr><th>No</th><th>Müşteri</th><th>Telefon</th><th>Şehir</th><th>Tutar</th><th>İndirim</th><th>Ürünler</th><th>Kargo</th><th>Durum</th><th>Tarih</th><th></th></tr></thead>
+      <table><thead><tr><th>No</th><th>Müşteri</th><th>Telefon</th><th>Şehir</th><th>Tutar</th><th>Ürünler</th><th>Kargo</th><th>Durum</th><th>Tarih</th><th></th></tr></thead>
       <tbody id="orders-tbody"></tbody></table>
     </div>
   </div>
@@ -161,35 +156,6 @@ tr:last-child td{border-bottom:none}
   </div>
 
   <!-- KUPONLAR -->
-  <div id="tab-coupons" class="hidden">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <div class="table-wrap">
-        <div class="table-head"><h3>Mevcut Kuponlar</h3></div>
-        <div style="padding:16px" id="coupon-list"><div style="text-align:center;color:#aaa;padding:40px">Yükleniyor...</div></div>
-      </div>
-      <div class="table-wrap">
-        <div class="table-head"><h3>Yeni Kupon Oluştur</h3></div>
-        <div style="padding:20px">
-          <div class="form-group"><label class="form-label">Kupon Kodu *</label><input class="form-input" id="c-code" placeholder="TANE20" style="text-transform:uppercase"/></div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Tür *</label>
-              <select class="form-input" id="c-type">
-                <option value="percent">Yüzde (%)</option>
-                <option value="fixed">Sabit Tutar (₺)</option>
-              </select>
-            </div>
-            <div class="form-group"><label class="form-label">Değer *</label><input class="form-input" id="c-value" type="number" placeholder="20"/></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Min. Sepet (₺)</label><input class="form-input" id="c-min" type="number" placeholder="0"/></div>
-            <div class="form-group"><label class="form-label">Kullanım Limiti</label><input class="form-input" id="c-limit" type="number" placeholder="Sınırsız"/></div>
-          </div>
-          <button class="btn-submit" onclick="createCoupon()">✅ Kupon Oluştur</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ANALİTİK -->
   <div id="tab-analytics" class="hidden">
     <div style="margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
@@ -633,7 +599,6 @@ function renderOrders(){
     <td>${o.customer_phone}</td>
     <td>${o.customer_city}</td>
     <td style="font-weight:700">${o.total_price.toLocaleString('tr-TR')} ₺</td>
-    <td>${o.coupon_code?`<span class="badge badge-green">${o.coupon_code} -${(o.discount_amount||0).toLocaleString('tr-TR')}₺</span>`:'—'}</td>
     <td style="font-size:12px;color:#666;max-width:160px">${o.items||'—'}</td>
     <td>${kargoHTML}</td>
     <td><span style="background:${sc}20;color:${sc};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${o.status}</span></td>
@@ -658,53 +623,6 @@ function renderPriceList(){
   }).join('');
 }
 
-async function loadCoupons(){
-  try{
-    const coupons=await fetch('/api/coupons').then(r=>r.json());
-    const el=document.getElementById('coupon-list');
-    if(!coupons.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:40px">Henüz kupon yok</div>';return;}
-    el.innerHTML=coupons.map(c=>`
-      <div class="coupon-card ${c.active?'':'inactive'}">
-        <div>
-          <div class="coupon-code-text">${c.code}</div>
-          <div class="coupon-info">
-            ${c.type==='percent'?'%'+c.value+' indirim':c.value.toLocaleString('tr-TR')+' ₺ indirim'}
-            ${c.min_order>0?` • Min ${c.min_order.toLocaleString('tr-TR')} ₺`:''}
-            • ${c.used_count}/${c.usage_limit||'∞'} kullanım
-          </div>
-        </div>
-        <div style="display:flex;gap:6px">
-          <button class="${c.active?'btn-danger':'btn-orange'}" onclick="toggleCoupon(${c.id},${c.active?0:1})">${c.active?'Pasif Yap':'Aktif Yap'}</button>
-          <button class="btn-danger" onclick="deleteCoupon(${c.id})">🗑</button>
-        </div>
-      </div>`).join('');
-  }catch(e){showToast('❌ Kuponlar yüklenemedi');}
-}
-
-async function createCoupon(){
-  const code=document.getElementById('c-code').value.trim();
-  const type=document.getElementById('c-type').value;
-  const value=document.getElementById('c-value').value;
-  if(!code||!value)return showToast('❌ Kod ve değer zorunlu');
-  try{
-    const res=await fetch('/api/coupons',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({code,type,value,min_order:document.getElementById('c-min').value||0,usage_limit:document.getElementById('c-limit').value||null})});
-    const d=await res.json();
-    if(d.id){showToast('✅ Kupon oluşturuldu!');['c-code','c-value','c-min','c-limit'].forEach(id=>document.getElementById(id).value='');loadCoupons();}
-    else showToast('❌ '+d.error);
-  }catch(e){showToast('❌ Hata oluştu');}
-}
-
-async function toggleCoupon(id,active){
-  await fetch('/api/coupons/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({active})});
-  loadCoupons();
-}
-
-async function deleteCoupon(id){
-  if(!confirm('Kuponu silmek istediğine emin misin?'))return;
-  await fetch('/api/coupons/'+id,{method:'DELETE'});
-  showToast('✅ Kupon silindi');loadCoupons();
-}
 
 let addImgs=[], editImgs=[];
 
@@ -866,7 +784,7 @@ function openOrderDetail(id){
   document.getElementById('od-customer').textContent=o.customer_name+' — '+o.customer_phone;
   document.getElementById('od-address').textContent=(o.customer_address||'')+(o.customer_city?' / '+o.customer_city:'');
   document.getElementById('od-items').textContent=o.items||'—';
-  document.getElementById('od-total').textContent=o.total_price.toLocaleString('tr-TR')+' ₺'+(o.coupon_code?' ('+o.coupon_code+' -'+o.discount_amount+'₺)':'');
+  document.getElementById('od-total').textContent=o.total_price.toLocaleString('tr-TR')+' ₺';
   document.getElementById('od-note').textContent=o.note||'—';
   document.getElementById('od-status').value=o.status;
   document.getElementById('od-carrier').value=o.shipping_carrier||'';
@@ -917,7 +835,6 @@ function setTab(tab,btn){
   btn.classList.add('active');
   document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.add('hidden'));
   document.getElementById('tab-'+tab).classList.remove('hidden');
-  if(tab==='coupons')loadCoupons();
   if(tab==='analytics')loadAnalytics();
   if(tab==='pricecompare')pcLoadList();
 }

@@ -79,7 +79,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .total-row{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:4px;border-top:1px solid var(--border)}
 .total-label{font-size:14px;color:var(--text2)}
 .total-amount{font-size:20px;font-weight:700;color:var(--accent)}
-.discount-info{font-size:13px;color:var(--green);font-weight:500;margin-top:4px;text-align:right}
 
 .btn-home{display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text);border:1px solid var(--border);padding:11px 20px;border-radius:var(--r);font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;text-decoration:none;margin-top:20px;transition:all .15s}
 .btn-home:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -198,7 +197,6 @@ function renderOrder(order) {
         <span class="total-label">Toplam Tutar</span>
         <span class="total-amount">${order.total_price.toLocaleString('tr-TR')} ₺</span>
       </div>
-      ${order.discount_amount > 0 ? `<div class="discount-info">${order.coupon_code} kuponu ile ${order.discount_amount.toLocaleString('tr-TR')} ₺ tasarruf ettiniz</div>` : ''}
 
       <a href="/" class="btn-home">← Alışverişe Devam Et</a>
     </div>`;
