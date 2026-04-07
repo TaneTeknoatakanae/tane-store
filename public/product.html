@@ -414,7 +414,7 @@ function loadPaytrTaksit(price) {
     body{margin:0;padding:4px;font-family:-apple-system,'Segoe UI',sans-serif;font-size:12px;color:#1C1814;background:#fff}
     img{max-width:80px;max-height:24px;object-fit:contain;display:block;margin-bottom:8px}
     /* PayTR scripti #paytr_taksit_tablosu içine düz bloklar koyuyor (img + text + table). Grid'le 2 kolona yaslayalım */
-    #paytr_taksit_tablosu{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    #paytr_taksit_tablosu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
     /* Her doğrudan child = bir banka kartı */
     #paytr_taksit_tablosu>*{border:1px solid #f0ebe2;border-radius:10px;padding:12px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.03);min-width:0}
     table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
@@ -424,7 +424,7 @@ function loadPaytrTaksit(price) {
     tr:last-child td{border-bottom:none}
     h2,h3,h4{font-size:12px;font-weight:700;color:#1C1814;margin:0 0 6px}
     a{color:#C49660;text-decoration:none}
-    @media(max-width:480px){#paytr_taksit_tablosu{grid-template-columns:1fr}}
+    @media(max-width:340px){#paytr_taksit_tablosu{grid-template-columns:1fr}}
   </style></head><body><div id="paytr_taksit_tablosu"></div>
   <script src="${scriptUrl}"><\/script></body></html>`;
   target.innerHTML = '<iframe class="paytr-taksit-iframe" id="paytr-taksit-iframe"></iframe>';
