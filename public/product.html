@@ -416,11 +416,12 @@ function loadPaytrTaksit(price) {
     /* PayTR scripti #paytr_taksit_tablosu içine düz bloklar koyuyor (img + text + table). Grid'le 2 kolona yaslayalım */
     #paytr_taksit_tablosu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
     /* Her doğrudan child = bir banka kartı */
-    #paytr_taksit_tablosu>*{border:1px solid #f0ebe2;border-radius:10px;padding:12px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.03);min-width:0}
-    table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
-    th,td{padding:5px 6px;border-bottom:1px solid #f5f1e8;text-align:right}
-    th:first-child,td:first-child{text-align:left;color:#C49660;font-weight:700}
-    th{background:#FDFAF6;color:#888;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #e8e0d0}
+    #paytr_taksit_tablosu>*{border:1px solid #f0ebe2;border-radius:10px;padding:10px 12px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.03);min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+    table{width:auto;border-collapse:collapse;font-size:12px;margin-top:4px}
+    th,td{padding:4px 10px 4px 0;border-bottom:1px solid #f5f1e8;text-align:left;white-space:nowrap}
+    td:last-child,th:last-child{padding-right:0;text-align:right}
+    th:first-child,td:first-child{color:#C49660;font-weight:700}
+    th{background:transparent;color:#999;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #e8e0d0;padding-top:0}
     tr:last-child td{border-bottom:none}
     h2,h3,h4{font-size:12px;font-weight:700;color:#1C1814;margin:0 0 6px}
     a{color:#C49660;text-decoration:none}
