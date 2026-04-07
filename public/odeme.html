@@ -170,7 +170,7 @@ function loadPayment() {
   }
   document.getElementById('loading').style.display = 'none';
   const iframe = document.getElementById('paytr-iframe');
-  iframe.src = `https://www.paytr.com/odeme/guvenli/${paytrToken}`;
+  iframe.src = `https://www.paytr.com/odeme/api/${paytrToken}`;
   document.getElementById('iframe-wrapper').style.display = 'block';
 }
 
@@ -185,15 +185,21 @@ function retryPayment() {
 }
 
 // --- Listen for PayTR postMessage (iFrame notifies parent) ---
+// PayTR sends postMessage ONLY after user completes or cancels payment — not on load errors
 window.addEventListener('message', function(ev) {
   if (ev.origin !== 'https://www.paytr.com') return;
   const msg = ev.data;
+  // Ignore non-payment messages (resize events etc.)
+  const isResult = msg === 'success' || msg === 'fail' ||
+    (typeof msg === 'object' && (msg.status === 'success' || msg.status === 'fail'));
+  if (!isResult) return;
 
   document.getElementById('iframe-wrapper').style.display = 'none';
   const screen = document.getElementById('result-screen');
   screen.style.display = 'block';
 
-  if (msg === 'success' || (typeof msg === 'object' && msg.status === 'success')) {
+  const status = (msg === 'success' || (typeof msg === 'object' && msg.status === 'success'));
+  if (status) {
     document.getElementById('result-icon').textContent  = '✅';
     document.getElementById('result-title').textContent = 'Ödeme Başarılı!';
     document.getElementById('result-desc').textContent  = `Siparişiniz #${orderId} alındı. Teşekkür ederiz!`;
