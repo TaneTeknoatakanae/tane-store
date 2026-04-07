@@ -401,16 +401,16 @@ tr:last-child td{border-bottom:none}
       <div class="modal-section">
         <div class="modal-section-title">Stok & Kategori</div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Kategori</label>
-            <select class="form-input" id="new-category">
-              <option>Elektronik</option><option>Giyim</option><option>Ev</option>
-              <option>Spor</option><option>Kozmetik</option><option>Kitap</option><option>Kişisel Bakım</option><option>Genel</option>
-            </select>
+          <div class="form-group"><label class="form-label">Üst Kategori</label>
+            <select class="form-input" id="new-parent-cat" onchange="loadChildCats('new')"></select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Stok Adedi</label>
-            <input class="form-input" id="new-stock" type="number" placeholder="99"/>
+          <div class="form-group"><label class="form-label">Alt Kategori</label>
+            <select class="form-input" id="new-category-id"></select>
           </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stok Adedi</label>
+          <input class="form-input" id="new-stock" type="number" placeholder="99"/>
         </div>
       </div>
 
@@ -483,16 +483,16 @@ tr:last-child td{border-bottom:none}
       <div class="modal-section">
         <div class="modal-section-title">Stok & Kategori</div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Kategori</label>
-            <select class="form-input" id="edit-category">
-              <option>Elektronik</option><option>Giyim</option><option>Ev</option>
-              <option>Spor</option><option>Kozmetik</option><option>Kitap</option><option>Kişisel Bakım</option><option>Genel</option>
-            </select>
+          <div class="form-group"><label class="form-label">Üst Kategori</label>
+            <select class="form-input" id="edit-parent-cat" onchange="loadChildCats('edit')"></select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Stok Adedi</label>
-            <input class="form-input" id="edit-stock" type="number"/>
+          <div class="form-group"><label class="form-label">Alt Kategori</label>
+            <select class="form-input" id="edit-category-id"></select>
           </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stok Adedi</label>
+          <input class="form-input" id="edit-stock" type="number"/>
         </div>
       </div>
 
@@ -563,12 +563,37 @@ async function adminLogout() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-let products=[],orders=[],selectedProductId=null,editImageUrl=null;
+let products=[],orders=[],selectedProductId=null,editImageUrl=null,categoryTree=[];
+
+async function loadCategoryTree(){
+  try{
+    categoryTree = await fetch('/api/categories').then(r=>r.json());
+    populateParentCatSelect('new');
+    populateParentCatSelect('edit');
+  }catch(e){console.error('Kategori ağacı yüklenemedi:',e);}
+}
+function populateParentCatSelect(prefix){
+  const sel = document.getElementById(prefix+'-parent-cat');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">Üst kategori seç...</option>' +
+    categoryTree.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  document.getElementById(prefix+'-category-id').innerHTML = '<option value="">Önce üst kategori seçin</option>';
+}
+function loadChildCats(prefix, selectedChildId){
+  const parentId = parseInt(document.getElementById(prefix+'-parent-cat').value);
+  const sel = document.getElementById(prefix+'-category-id');
+  if(!parentId){ sel.innerHTML = '<option value="">Önce üst kategori seçin</option>'; return; }
+  const parent = categoryTree.find(p=>p.id===parentId);
+  if(!parent){ sel.innerHTML = ''; return; }
+  sel.innerHTML = '<option value="">Alt kategori seç...</option>' +
+    parent.children.map(c=>`<option value="${c.id}" ${selectedChildId==c.id?'selected':''}>${c.name}</option>`).join('');
+}
 
 async function loadAll(){
   try{
     const[pr,or]=await Promise.all([fetch('/api/products').then(r=>r.json()),fetch('/api/orders').then(r=>r.json())]);
     products=pr;orders=or;
+    if(!categoryTree.length) loadCategoryTree();
     document.getElementById('s-products').textContent=products.length;
     document.getElementById('s-orders').textContent=orders.length;
     const revenue=orders.reduce((s,o)=>s+(o.total_price||0),0);
@@ -711,7 +736,8 @@ async function addProduct(){
     const res=await fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       name,image_url:imageUrls[0],images:JSON.stringify(imageUrls),
       description:document.getElementById('new-desc').value,
-      category:document.getElementById('new-category').value,
+      category_id:document.getElementById('new-category-id').value||null,
+      category:(document.getElementById('new-category-id').selectedOptions[0]?.text)||'Genel',
       brand:document.getElementById('new-brand').value,
       sku:document.getElementById('new-sku').value,
       tane_price:parseFloat(price),
@@ -735,8 +761,11 @@ function openEditModal(id){
   document.getElementById('edit-discount-price').value=p.discount_price||'';
   document.getElementById('edit-stock').value=p.stock||99;
   document.getElementById('edit-image-url').value=p.image_url||'';
-  const sel=document.getElementById('edit-category');
-  for(let i=0;i<sel.options.length;i++)if(sel.options[i].value===p.category){sel.selectedIndex=i;break;}
+  // Hiyerarşik kategori seç: parent_cat_id varsa onu ata, sonra child seç
+  if (p.parent_cat_id) {
+    document.getElementById('edit-parent-cat').value = p.parent_cat_id;
+    loadChildCats('edit', p.category_id);
+  } else { document.getElementById('edit-parent-cat').value = ''; loadChildCats('edit'); }
   editImgs=[];
   try{const imgs=p.images?JSON.parse(p.images):[];
     if(imgs.length)editImgs=imgs.map(u=>({url:u,file:null}));
@@ -761,7 +790,8 @@ async function saveEdit(){
       name,image_url:imageUrl||null,
       images:imagesJson,
       description:document.getElementById('edit-desc').value,
-      category:document.getElementById('edit-category').value,
+      category_id:document.getElementById('edit-category-id').value||null,
+      category:(document.getElementById('edit-category-id').selectedOptions[0]?.text)||'Genel',
       brand:document.getElementById('edit-brand').value,
       sku:document.getElementById('edit-sku').value,
       tane_price:parseFloat(price),

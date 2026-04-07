@@ -129,8 +129,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-add:disabled{opacity:.45;cursor:not-allowed}
 
 /* CATEGORIES */
-.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 @media(max-width:480px){.cat-grid{grid-template-columns:repeat(2,1fr)}}
+.cat-card-wrap{display:flex;flex-direction:column;gap:8px}
+.cat-subs{display:flex;flex-wrap:wrap;gap:4px;padding:0 2px}
+.cat-sub-link{font-size:11px;color:var(--text2);text-decoration:none;background:var(--surface);padding:3px 9px;border-radius:12px;border:1px solid var(--border-light);transition:all .15s;line-height:1.6}
+.cat-sub-link:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cat-sub-cnt{opacity:.6;font-size:10px}
 .cat-card{display:flex;flex-direction:column;border-radius:var(--r-lg);overflow:hidden;text-decoration:none;color:var(--text);background:var(--bg);border:1px solid var(--border-light);transition:border-color .2s,box-shadow .2s,transform .2s;cursor:pointer}
 .cat-card:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:translateY(-3px)}
 .cat-img-wrap{aspect-ratio:1;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px}
@@ -609,7 +614,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="footer-grid">
       <div>
         <a href="/" class="footer-logo"><img src="/AmblemTane.png" alt="Tane Store" style="height:38px;display:block;mix-blend-mode:multiply"></a>
-        <p class="footer-desc">Tane Store, elektronik, ev, giyim ve daha fazlasını güvenle satın alabileceğiniz Türkiye'nin online mağazasıdır.</p>
+        <p class="footer-desc">Tane Store teknolojiyi güvenle satın alabileceğiniz Türkiye'nin online mağazası.</p>
         <p class="footer-email">Destek: <a href="mailto:info@tanetekno.com">info@tanetekno.com</a></p>
         <p style="margin-top:8px;font-size:13px;color:#98989d">Hafta içi 09:00 – 18:00</p>
         <p style="margin-top:12px"><a href="/iletisim" style="color:var(--accent);font-size:13px;text-decoration:none">Tüm iletişim bilgileri →</a></p>
@@ -762,10 +767,21 @@ async function checkAuth() {
 // ── PRODUCTS ──
 async function loadProducts() {
   try {
-    allProducts = await fetch('/api/products').then(r => r.json());
+    // /kategori/parent[/child] yolundan filtre çek
+    const slugMatch = location.pathname.match(/^\/kategori\/([^\/]+)(?:\/([^\/]+))?/);
+    let url = '/api/products';
+    if (slugMatch) {
+      const params = new URLSearchParams();
+      params.set('parent_slug', slugMatch[1]);
+      if (slugMatch[2]) params.set('child_slug', slugMatch[2]);
+      url += '?' + params.toString();
+    }
+    allProducts = await fetch(url).then(r => r.json());
     if (!Array.isArray(allProducts)) allProducts = [];
-    renderProducts(allProducts.slice(0, 8));
-    renderCategories();
+    // Slug yoldaysa tümünü göster (zaten filtreli geldi), değilse 8'i
+    renderProducts(slugMatch ? allProducts : allProducts.slice(0, 8));
+    if (!categoryTree.length) loadCategoryTree();
+    else renderCategories();
     // Hero product image — random product with image on each load
     const withImg = allProducts.filter(p => p.image_url);
     const heroP = withImg.length ? withImg[Math.floor(Math.random() * withImg.length)] : null;
@@ -820,32 +836,42 @@ function renderProducts(products) {
   }).join('');
 }
 
+// Hiyerarşik kategoriler — DB'den canlı çekilir
+let categoryTree = [];
+const CAT_ICONS = { 'bilgisayar':'💻', 'tv-ses':'📺', 'ev-yasam':'🏠', 'oyun-konsol':'🎮' };
+
+async function loadCategoryTree() {
+  try {
+    categoryTree = await fetch('/api/categories').then(r => r.json());
+    renderCategories();
+  } catch(e) {}
+}
+
 function renderCategories() {
-  const CATS = [
-    {key:'Elektronik',label:'Elektronik',fb:'💻'},
-    {key:'Giyim',label:'Giyim & Aksesuar',fb:'👕'},
-    {key:'Ev',label:'Ev & Yaşam',fb:'🏠'},
-    {key:'Spor',label:'Spor & Outdoor',fb:'⚽'},
-    {key:'Kozmetik',label:'Kozmetik',fb:'✨'},
-    {key:'Kitap',label:'Kitap & Kırtasiye',fb:'📚'},
-  ];
   const grid = document.getElementById('cat-grid');
-  if (!grid) return;
-  const rows = CATS.map(cat => {
-    const prods = allProducts.filter(p => p.category === cat.key);
-    if (!prods.length) return '';
+  if (!grid || !categoryTree.length) return;
+  grid.innerHTML = categoryTree.map(parent => {
+    const fb = CAT_ICONS[parent.slug] || '🛍️';
+    const childIds = parent.children.map(c => c.id);
+    const prods = allProducts.filter(p => childIds.includes(p.category_id));
     const img = prods.find(p => p.image_url)?.image_url;
-    return `<a href="/?cat=${encodeURIComponent(cat.key)}" class="cat-card">
-      <div class="cat-img-wrap">
-        ${img ? `<img class="cat-img" src="${img}" alt="${cat.label}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=cat-icon-fb>${cat.fb}</span>'">` : `<span class="cat-icon-fb">${cat.fb}</span>`}
-      </div>
-      <div class="cat-foot">
-        <div class="cat-name">${cat.label}</div>
-        <div class="cat-count">${prods.length} ürün</div>
-      </div>
-    </a>`;
+    const childLinks = parent.children.map(c => {
+      const cnt = allProducts.filter(p => p.category_id === c.id).length;
+      return `<a href="/kategori/${parent.slug}/${c.slug}" class="cat-sub-link">${c.name}${cnt?` <span class="cat-sub-cnt">(${cnt})</span>`:''}</a>`;
+    }).join('');
+    return `<div class="cat-card-wrap">
+      <a href="/kategori/${parent.slug}" class="cat-card">
+        <div class="cat-img-wrap">
+          ${img ? `<img class="cat-img" src="${img}" alt="${parent.name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=cat-icon-fb>${fb}</span>'">` : `<span class="cat-icon-fb">${fb}</span>`}
+        </div>
+        <div class="cat-foot">
+          <div class="cat-name">${parent.name}</div>
+          <div class="cat-count">${prods.length} ürün</div>
+        </div>
+      </a>
+      <div class="cat-subs">${childLinks}</div>
+    </div>`;
   }).join('');
-  grid.innerHTML = rows || CATS.map(c => `<a href="/?cat=${encodeURIComponent(c.key)}" class="cat-card"><div class="cat-img-wrap"><span class="cat-icon-fb">${c.fb}</span></div><div class="cat-foot"><div class="cat-name">${c.label}</div></div></a>`).join('');
 }
 
 // ── CART ──

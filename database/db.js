@@ -187,6 +187,63 @@ async function initDB() {
     // unique index on merchant_oid — safe to run repeatedly
     await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS orders_merchant_oid_idx ON orders(merchant_oid) WHERE merchant_oid IS NOT NULL`);
 
+    // ── Hiyerarşik kategori sistemi ─────────────────────────
+    await pool.query(`CREATE TABLE IF NOT EXISTS categories (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      slug TEXT NOT NULL UNIQUE,
+      parent_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+      sort_order INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS categories_parent_idx ON categories(parent_id)`);
+    await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL`);
+
+    // İlk kez seed et — sadece tablo boşsa
+    const seedCheck = await pool.query('SELECT COUNT(*)::int AS c FROM categories');
+    if (seedCheck.rows[0].c === 0) {
+      const tree = [
+        { name: 'Bilgisayar',   slug: 'bilgisayar',   children: [
+          { name: 'Laptop',                slug: 'laptop' },
+          { name: 'Oyuncu Bilgisayarı',    slug: 'oyuncu-bilgisayari' },
+          { name: 'Tablet',                slug: 'tablet' },
+          { name: 'Masaüstü PC',           slug: 'masaustu-pc' }
+        ]},
+        { name: 'TV & Ses',     slug: 'tv-ses',       children: [
+          { name: 'Televizyonlar',         slug: 'televizyonlar' },
+          { name: 'Soundbar',              slug: 'soundbar' },
+          { name: 'Kulaklıklar',           slug: 'kulakliklar' },
+          { name: 'Projeksiyon',           slug: 'projeksiyon' }
+        ]},
+        { name: 'Ev & Yaşam',   slug: 'ev-yasam',     children: [
+          { name: 'Robot Süpürgeler',      slug: 'robot-supurgeler' },
+          { name: 'Dikey Süpürgeler',      slug: 'dikey-supurgeler' },
+          { name: 'Kahve Makineleri',      slug: 'kahve-makineleri' }
+        ]},
+        { name: 'Oyun & Konsol', slug: 'oyun-konsol', children: [
+          { name: 'PlayStation',           slug: 'playstation' },
+          { name: 'VR Başlıklar',          slug: 'vr-basliklar' },
+          { name: 'Konsol Aksesuarları',   slug: 'konsol-aksesuarlari' }
+        ]}
+      ];
+      for (let i = 0; i < tree.length; i++) {
+        const p = tree[i];
+        const r = await pool.query(
+          'INSERT INTO categories (name, slug, parent_id, sort_order) VALUES ($1,$2,NULL,$3) RETURNING id',
+          [p.name, p.slug, i]
+        );
+        const parentId = r.rows[0].id;
+        for (let j = 0; j < p.children.length; j++) {
+          const c = p.children[j];
+          await pool.query(
+            'INSERT INTO categories (name, slug, parent_id, sort_order) VALUES ($1,$2,$3,$4)',
+            [c.name, c.slug, parentId, j]
+          );
+        }
+      }
+      console.log('Hiyerarşik kategoriler seed edildi');
+    }
+
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
     console.error('DB hatasi:', e.message);

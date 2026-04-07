@@ -169,6 +169,12 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/scrape-url', scrapeUrlRoutes);
 app.use('/api/price-compare', require('./routes/price-compare'));
 app.use('/api/paytr', require('./routes/paytr'));
+app.use('/api/categories', require('./routes/categories'));
+
+// SEO-friendly category URL: /kategori/bilgisayar/laptop → landing.html (server tarafı slug → query)
+app.get('/kategori/:parent/:child?', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+});
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/track', (req, res) => res.sendFile(path.join(__dirname, 'public', 'track.html')));
@@ -208,11 +214,19 @@ app.get('/sitemap.xml', (req, res) => {
     staticPages.forEach(p => items.push(
       `<url><loc>${SITE}${p.url}</loc><lastmod>${today}</lastmod><changefreq>${p.freq}</changefreq><priority>${p.pri}</priority></url>`
     ));
-    // Categories (unique)
-    const cats = Array.from(new Set((rows || []).map(r => r.category).filter(Boolean)));
-    cats.forEach(c => items.push(
-      `<url><loc>${SITE}/landing?cat=${encodeURIComponent(c)}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`
-    ));
+    // Hiyerarşik kategoriler — DB'den çekilen ağaç
+    db.all('SELECT id, slug, parent_id FROM categories', [], (errC, cats) => {
+      const catRows = cats || [];
+      const parents = catRows.filter(c => !c.parent_id);
+      parents.forEach(p => {
+        items.push(`<url><loc>${SITE}/kategori/${p.slug}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`);
+        catRows.filter(c => c.parent_id === p.id).forEach(c => {
+          items.push(`<url><loc>${SITE}/kategori/${p.slug}/${c.slug}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`);
+        });
+      });
+      sendXml();
+    });
+    function sendXml() {
     // Products
     (rows || []).forEach(r => {
       const lastmod = r.created_at ? new Date(r.created_at).toISOString().split('T')[0] : today;
@@ -221,6 +235,7 @@ app.get('/sitemap.xml', (req, res) => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items.join('\n')}\n</urlset>`;
     res.set('Content-Type', 'application/xml; charset=utf-8');
     res.send(xml);
+    } // end sendXml
   });
 });
 app.get('/siparis-alindi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'siparis-alindi.html')));

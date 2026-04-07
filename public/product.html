@@ -286,6 +286,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 <div class="breadcrumb">
   <a href="/">Ana Sayfa</a>
+  <span class="bc-sep" id="bc-parent-sep" style="display:none">›</span>
+  <a href="#" id="bc-parent" style="display:none"></a>
+  <span class="bc-sep" id="bc-child-sep" style="display:none">›</span>
+  <a href="#" id="bc-child" style="display:none"></a>
   <span class="bc-sep">›</span>
   <span id="breadcrumb-name" style="color:var(--text2)">Ürün</span>
 </div>
@@ -456,6 +460,19 @@ async function loadProduct() {
     if (product.error) { window.location.href = '/'; return; }
     document.title = `${product.name} — Tane Store`;
     document.getElementById('breadcrumb-name').textContent = product.name;
+    // Hiyerarşik breadcrumb
+    if (product.parent_cat_slug) {
+      const pa = document.getElementById('bc-parent');
+      pa.href = '/kategori/' + product.parent_cat_slug;
+      pa.textContent = product.parent_cat_name;
+      pa.style.display = ''; document.getElementById('bc-parent-sep').style.display = '';
+    }
+    if (product.category_slug) {
+      const ch = document.getElementById('bc-child');
+      ch.href = '/kategori/' + (product.parent_cat_slug || '') + '/' + product.category_slug;
+      ch.textContent = product.category_name;
+      ch.style.display = ''; document.getElementById('bc-child-sep').style.display = '';
+    }
     renderProduct();
     loadPaytrTaksit(effectivePrice(product));
     loadReviews();
