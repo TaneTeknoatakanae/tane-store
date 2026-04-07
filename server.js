@@ -50,6 +50,7 @@ const upload = multer({
 app.set('trust proxy', 1); // Railway reverse proxy
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'tane-store-secret-2026',
   resave: false,
