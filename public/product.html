@@ -82,15 +82,27 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 /* BUY BOX */
 .buy-box{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:24px;margin-bottom:16px}
-.paytr-taksit-wrap{border:1px solid var(--border-light);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:16px;background:#fff}
-.paytr-taksit-title{font-size:13px;font-weight:700;color:#555;margin-bottom:10px}
-#paytr_taksit_tablosu{min-height:40px;font-size:13px}
-#paytr_taksit_tablosu table{width:100%;border-collapse:collapse;font-size:12px}
-#paytr_taksit_tablosu th,#paytr_taksit_tablosu td{padding:7px 8px;border-bottom:1px solid #f0f0f0;text-align:right}
-#paytr_taksit_tablosu th{font-weight:600;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
-#paytr_taksit_tablosu th:first-child,#paytr_taksit_tablosu td:first-child{text-align:left}
-#paytr_taksit_tablosu .paytr-loading{color:#aaa;font-size:12px;text-align:center;padding:8px}
-@media(max-width:600px){#paytr_taksit_tablosu table{font-size:11px}#paytr_taksit_tablosu th,#paytr_taksit_tablosu td{padding:5px 4px}}
+.paytr-taksit-wrap{border:1px solid var(--border-light);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:16px;background:#fff;overflow:hidden}
+.paytr-taksit-title{font-size:13px;font-weight:700;color:#1C1814;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+#paytr_taksit_tablosu{min-height:40px;font-family:'DM Sans',-apple-system,sans-serif}
+#paytr_taksit_tablosu .paytr-loading{color:#aaa;font-size:12px;text-align:center;padding:12px}
+/* PayTR'ın inject ettiği tüm elemanları sıfırla & yeniden stille */
+#paytr_taksit_tablosu *{font-family:'DM Sans',-apple-system,sans-serif!important;color:#1C1814!important;border-color:#f0ebe2!important;box-sizing:border-box}
+#paytr_taksit_tablosu table{width:100%!important;border-collapse:collapse!important;background:transparent!important;font-size:12px!important;border:none!important;margin:0!important}
+#paytr_taksit_tablosu thead,#paytr_taksit_tablosu thead tr,#paytr_taksit_tablosu thead th{background:#FDFAF6!important;border:none!important}
+#paytr_taksit_tablosu th{padding:9px 10px!important;text-align:center!important;font-size:10px!important;font-weight:700!important;color:#888!important;text-transform:uppercase!important;letter-spacing:.5px!important;border-bottom:1px solid #f0ebe2!important;background:#FDFAF6!important}
+#paytr_taksit_tablosu th:first-child{text-align:left!important}
+#paytr_taksit_tablosu td{padding:10px!important;text-align:center!important;font-size:13px!important;border-bottom:1px solid #f5f1e8!important;background:#fff!important;font-weight:500!important}
+#paytr_taksit_tablosu td:first-child{text-align:left!important;font-weight:700!important;color:#C49660!important}
+#paytr_taksit_tablosu tr:last-child td{border-bottom:none!important}
+#paytr_taksit_tablosu tr:hover td{background:#FDFAF6!important}
+/* PayTR'ın eklediği logo / başlık / footer gibi gereksiz öğeleri gizle */
+#paytr_taksit_tablosu img,#paytr_taksit_tablosu .paytr_logo,#paytr_taksit_tablosu .paytr-logo,#paytr_taksit_tablosu a{display:none!important}
+#paytr_taksit_tablosu>div:first-child:not(:has(table)),#paytr_taksit_tablosu>p,#paytr_taksit_tablosu>span:not(:has(table)){display:none!important}
+@media(max-width:600px){
+  #paytr_taksit_tablosu th,#paytr_taksit_tablosu td{padding:7px 5px!important;font-size:11px!important}
+  #paytr_taksit_tablosu th{font-size:9px!important}
+}
 .price-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
 .price-original{font-size:13px;color:var(--text3);text-decoration:line-through;margin-bottom:4px}
 .price-main{font-size:32px;font-weight:700;color:var(--text);letter-spacing:-.5px;line-height:1}
