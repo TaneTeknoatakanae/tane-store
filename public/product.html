@@ -85,27 +85,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 /* BUY BOX */
 .buy-box{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:24px;margin-bottom:16px}
-.paytr-taksit-wrap{border:1px solid var(--border-light);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:16px;background:#fff;overflow:hidden}
+.paytr-taksit-wrap{border:1px solid var(--border-light);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:16px;background:#fff}
 .paytr-taksit-title{font-size:13px;font-weight:700;color:#1C1814;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-#paytr_taksit_tablosu{min-height:40px;font-family:'DM Sans',-apple-system,sans-serif}
-#paytr_taksit_tablosu .paytr-loading{color:#aaa;font-size:12px;text-align:center;padding:12px}
-/* PayTR'ın inject ettiği tüm elemanları sıfırla & yeniden stille */
-#paytr_taksit_tablosu *{font-family:'DM Sans',-apple-system,sans-serif!important;color:#1C1814!important;border-color:#f0ebe2!important;box-sizing:border-box}
-#paytr_taksit_tablosu table{width:100%!important;border-collapse:collapse!important;background:transparent!important;font-size:12px!important;border:none!important;margin:0!important}
-#paytr_taksit_tablosu thead,#paytr_taksit_tablosu thead tr,#paytr_taksit_tablosu thead th{background:#FDFAF6!important;border:none!important}
-#paytr_taksit_tablosu th{padding:9px 10px!important;text-align:center!important;font-size:10px!important;font-weight:700!important;color:#888!important;text-transform:uppercase!important;letter-spacing:.5px!important;border-bottom:1px solid #f0ebe2!important;background:#FDFAF6!important}
-#paytr_taksit_tablosu th:first-child{text-align:left!important}
-#paytr_taksit_tablosu td{padding:10px!important;text-align:center!important;font-size:13px!important;border-bottom:1px solid #f5f1e8!important;background:#fff!important;font-weight:500!important}
-#paytr_taksit_tablosu td:first-child{text-align:left!important;font-weight:700!important;color:#C49660!important}
-#paytr_taksit_tablosu tr:last-child td{border-bottom:none!important}
-#paytr_taksit_tablosu tr:hover td{background:#FDFAF6!important}
-/* PayTR'ın eklediği logo / başlık / footer gibi gereksiz öğeleri gizle */
-#paytr_taksit_tablosu img,#paytr_taksit_tablosu .paytr_logo,#paytr_taksit_tablosu .paytr-logo,#paytr_taksit_tablosu a{display:none!important}
-#paytr_taksit_tablosu>div:first-child:not(:has(table)),#paytr_taksit_tablosu>p,#paytr_taksit_tablosu>span:not(:has(table)){display:none!important}
-@media(max-width:600px){
-  #paytr_taksit_tablosu th,#paytr_taksit_tablosu td{padding:7px 5px!important;font-size:11px!important}
-  #paytr_taksit_tablosu th{font-size:9px!important}
-}
+.paytr-taksit-iframe{width:100%;border:none;display:block;min-height:300px;background:#fff}
+.paytr-loading{color:#aaa;font-size:12px;text-align:center;padding:20px}
 .price-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
 .price-original{font-size:13px;color:var(--text3);text-decoration:line-through;margin-bottom:4px}
 .price-main{font-size:32px;font-weight:700;color:var(--text);letter-spacing:-.5px;line-height:1}
@@ -417,24 +400,45 @@ async function initAuth() {
 
 function effectivePrice(p) { return p.discount_price || p.tane_price; }
 
-// PayTR Taksit Tablosu — dinamik yükleme (vade farkı müşteriden)
+// PayTR Taksit Tablosu — izole iframe içinde, vade farkı müşteriden
 function loadPaytrTaksit(price) {
   const wrap = document.getElementById('paytr-taksit-wrap');
   const target = document.getElementById('paytr_taksit_tablosu');
   if (!wrap || !target || !price || price <= 0) { if (wrap) wrap.style.display = 'none'; return; }
   wrap.style.display = 'block';
-  target.innerHTML = '<div class="paytr-loading">Taksit seçenekleri yükleniyor…</div>';
-  // Eski script varsa kaldır
-  const oldScript = document.getElementById('paytr-taksit-script');
-  if (oldScript) oldScript.remove();
-  // PayTR formatı: 1250.50 (nokta ile, integer/2 desimal)
   const amount = Number(price).toFixed(2);
-  const s = document.createElement('script');
-  s.id = 'paytr-taksit-script';
-  s.async = true;
-  s.src = `https://www.paytr.com/odeme/taksit-tablosu/v2?token=69064c82903a337dc43f88a9ce32b5771d53eb272f6ccef5d3d7b4eb5d3c7d88&merchant_id=688968&amount=${amount}&taksit=0&tumu=0`;
-  s.onerror = () => { target.innerHTML = '<div class="paytr-loading">Taksit bilgisi şu anda yüklenemiyor.</div>'; };
-  document.body.appendChild(s);
+  const scriptUrl = `https://www.paytr.com/odeme/taksit-tablosu/v2?token=69064c82903a337dc43f88a9ce32b5771d53eb272f6ccef5d3d7b4eb5d3c7d88&merchant_id=688968&amount=${amount}&taksit=0&tumu=0`;
+  // Iframe içinde çalışsın — bizim CSS'lerimiz PayTR'ın tablo yapısını bozmasın
+  const html = `<!doctype html><html><head><meta charset="utf-8"><base target="_blank"><style>
+    body{margin:0;padding:0;font-family:-apple-system,'Segoe UI',sans-serif;font-size:13px;color:#1C1814;background:#fff}
+    table{width:100%;border-collapse:collapse;margin-bottom:14px}
+    th,td{padding:8px 10px;border-bottom:1px solid #f0ebe2;text-align:right;font-size:12px}
+    th:first-child,td:first-child{text-align:left}
+    th{background:#FDFAF6;color:#888;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e8e0d0}
+    tr:last-child td{border-bottom:none}
+    /* Banka logoları ve blok ayraçları */
+    img{max-width:90px;max-height:28px;object-fit:contain;display:block;margin-bottom:6px}
+    .bank,div[id^="bank"],.installment-table{margin-bottom:18px;padding:14px;border:1px solid #f0ebe2;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+    h2,h3,h4{font-size:13px;font-weight:700;color:#C49660;margin:0 0 8px}
+    a{color:#C49660;text-decoration:none}
+  </style></head><body><div id="paytr_taksit_tablosu"></div>
+  <script src="${scriptUrl}"><\/script></body></html>`;
+  target.innerHTML = '<iframe class="paytr-taksit-iframe" id="paytr-taksit-iframe"></iframe>';
+  const iframe = document.getElementById('paytr-taksit-iframe');
+  iframe.srcdoc = html;
+  // İçerik yüklendikten sonra yüksekliği otomatik ayarla
+  iframe.onload = () => {
+    try {
+      const h = iframe.contentDocument.body.scrollHeight;
+      iframe.style.height = (h + 20) + 'px';
+      // PayTR script async, ekstra observer ile sonradan yüklenenleri de yakala
+      const obs = new (iframe.contentWindow.MutationObserver || MutationObserver)(() => {
+        iframe.style.height = (iframe.contentDocument.body.scrollHeight + 20) + 'px';
+      });
+      obs.observe(iframe.contentDocument.body, { childList: true, subtree: true });
+      setTimeout(() => { iframe.style.height = (iframe.contentDocument.body.scrollHeight + 20) + 'px'; }, 1500);
+    } catch(e) {}
+  };
 }
 
 async function loadProduct() {
