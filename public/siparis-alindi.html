@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Siparişiniz Alındı — Tane Store</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #222; min-height: 100vh; display: flex; flex-direction: column; }
+  header { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+  header img { height: 36px; }
+  header span { font-size: 18px; font-weight: 700; }
+
+  .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+  .card { background: #fff; border-radius: 16px; border: 1px solid #e5e5e5; padding: 48px 40px; max-width: 520px; width: 100%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,.06); }
+
+  .checkmark { width: 72px; height: 72px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+  .checkmark svg { width: 36px; height: 36px; }
+
+  h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; color: #1a1a1a; }
+  .subtitle { font-size: 15px; color: #666; margin-bottom: 32px; line-height: 1.5; }
+
+  .order-box { background: #f8f8f8; border-radius: 10px; padding: 20px; margin-bottom: 28px; text-align: left; }
+  .order-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+  .order-row .label { color: #888; }
+  .order-row .value { font-weight: 600; }
+
+  .steps { display: flex; gap: 0; margin-bottom: 32px; }
+  .step { flex: 1; text-align: center; position: relative; }
+  .step:not(:last-child)::after { content: ''; position: absolute; top: 14px; left: 50%; width: 100%; height: 2px; background: #4caf50; z-index: 0; }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; background: #4caf50; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; position: relative; z-index: 1; }
+  .step-label { font-size: 11px; color: #666; }
+
+  .actions { display: flex; flex-direction: column; gap: 10px; }
+  .btn-primary { display: block; background: #222; color: #fff; text-decoration: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 600; }
+  .btn-secondary { display: block; background: #f0f0f0; color: #333; text-decoration: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 500; }
+  .btn-primary:hover { background: #000; }
+  .btn-secondary:hover { background: #e5e5e5; }
+
+  .note { font-size: 12px; color: #aaa; margin-top: 24px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="/AmblemTane.png" alt="Tane Store" onerror="this.style.display='none'">
+  <span>Tane Store</span>
+</header>
+
+<div class="page">
+  <div class="card">
+    <div class="checkmark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+
+    <h1>Siparişiniz Alındı!</h1>
+    <p class="subtitle">Ödemeniz başarıyla işlendi. Siparişiniz en kısa sürede hazırlanıp kargoya verilecektir.</p>
+
+    <div class="order-box">
+      <div class="order-row">
+        <span class="label">Sipariş No</span>
+        <span class="value" id="order-id">#—</span>
+      </div>
+      <div class="order-row">
+        <span class="label">Durum</span>
+        <span class="value" style="color:#4caf50;">Ödeme Alındı ✓</span>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">✓</div>
+        <div class="step-label">Sipariş<br>Alındı</div>
+      </div>
+      <div class="step">
+        <div class="step-dot" style="background:#ddd;color:#999;">2</div>
+        <div class="step-label">Hazır-<br>lanıyor</div>
+      </div>
+      <div class="step">
+        <div class="step-dot" style="background:#ddd;color:#999;">3</div>
+        <div class="step-label">Kargoya<br>Verildi</div>
+      </div>
+      <div class="step">
+        <div class="step-dot" style="background:#ddd;color:#999;">4</div>
+        <div class="step-label">Teslim<br>Edildi</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a href="#" class="btn-primary" id="track-btn">Siparişimi Takip Et</a>
+      <a href="/" class="btn-secondary">Alışverişe Devam Et</a>
+    </div>
+
+    <p class="note">Sipariş durumunuz hakkında e-posta ile bilgilendirileceksiniz.<br>Sorularınız için <a href="/iletisim" style="color:#666;">iletişim</a> sayfamızı ziyaret edebilirsiniz.</p>
+  </div>
+</div>
+
+<script>
+const params  = new URLSearchParams(location.search);
+const orderId = params.get('order_id');
+if (orderId) {
+  document.getElementById('order-id').textContent = '#' + orderId;
+  document.getElementById('track-btn').href = '/track?id=' + orderId;
+}
+// Temizle
+sessionStorage.removeItem('tane_last_order');
+</script>
+</body>
+</html>

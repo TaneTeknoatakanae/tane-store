@@ -119,7 +119,7 @@ router.post('/create-payment', async (req, res) => {
           user_name:         customer_name,
           user_address:      customer_address,
           user_phone:        customer_phone,
-          merchant_ok_url:   `https://tanetekno.com/track?id=${orderId}`,
+          merchant_ok_url:   `https://tanetekno.com/siparis-alindi?order_id=${orderId}`,
           merchant_fail_url: `https://tanetekno.com/odeme?order_id=${orderId}&failed=1`,
           currency,
           test_mode:         String(test_mode),

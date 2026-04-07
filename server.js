@@ -185,5 +185,6 @@ app.get('/kvkk', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kvkk
 app.get('/cerez-politikasi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cerez-politikasi.html')));
 app.get('/on-bilgilendirme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'on-bilgilendirme.html')));
 app.get('/odeme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'odeme.html')));
+app.get('/siparis-alindi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'siparis-alindi.html')));
 
 
