@@ -185,6 +185,44 @@ app.get('/kvkk', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kvkk
 app.get('/cerez-politikasi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cerez-politikasi.html')));
 app.get('/on-bilgilendirme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'on-bilgilendirme.html')));
 app.get('/odeme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'odeme.html')));
+
+// ─── Dinamik sitemap.xml ───
+app.get('/sitemap.xml', (req, res) => {
+  const SITE = 'https://www.tanetekno.com';
+  const today = new Date().toISOString().split('T')[0];
+  const staticPages = [
+    { url: '/',                  pri: '1.0', freq: 'daily'   },
+    { url: '/landing',           pri: '0.9', freq: 'daily'   },
+    { url: '/hakkimizda',        pri: '0.5', freq: 'monthly' },
+    { url: '/iletisim',          pri: '0.5', freq: 'monthly' },
+    { url: '/teslimat-iade',     pri: '0.4', freq: 'monthly' },
+    { url: '/gizlilik',          pri: '0.3', freq: 'yearly'  },
+    { url: '/kvkk',              pri: '0.3', freq: 'yearly'  },
+    { url: '/cerez-politikasi',  pri: '0.3', freq: 'yearly'  },
+    { url: '/mesafeli-satis',    pri: '0.3', freq: 'yearly'  },
+    { url: '/on-bilgilendirme',  pri: '0.3', freq: 'yearly'  }
+  ];
+  db.all('SELECT id, name, COALESCE(category, \'\') AS category, created_at FROM products', [], (err, rows) => {
+    const escape = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+    const items = [];
+    staticPages.forEach(p => items.push(
+      `<url><loc>${SITE}${p.url}</loc><lastmod>${today}</lastmod><changefreq>${p.freq}</changefreq><priority>${p.pri}</priority></url>`
+    ));
+    // Categories (unique)
+    const cats = Array.from(new Set((rows || []).map(r => r.category).filter(Boolean)));
+    cats.forEach(c => items.push(
+      `<url><loc>${SITE}/landing?cat=${encodeURIComponent(c)}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`
+    ));
+    // Products
+    (rows || []).forEach(r => {
+      const lastmod = r.created_at ? new Date(r.created_at).toISOString().split('T')[0] : today;
+      items.push(`<url><loc>${SITE}/product.html?id=${r.id}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+    });
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items.join('\n')}\n</urlset>`;
+    res.set('Content-Type', 'application/xml; charset=utf-8');
+    res.send(xml);
+  });
+});
 app.get('/siparis-alindi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'siparis-alindi.html')));
 
 
