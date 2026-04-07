@@ -717,21 +717,23 @@ function updateOrderSummary() {
 async function submitOrder() {
   const name = document.getElementById('o-name').value.trim(), phone = document.getElementById('o-phone').value.trim(), address = document.getElementById('o-address').value.trim(), city = document.getElementById('o-city').value.trim();
   if (!name || !phone || !address || !city) return showToast('Zorunlu alanları doldurun');
-  const btn = document.getElementById('btn-order'); btn.textContent = 'Gönderiliyor…'; btn.disabled = true;
-  const res = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ customer_name: name, customer_phone: phone, customer_email: document.getElementById('o-email').value, customer_address: address, customer_city: city, note: document.getElementById('o-note').value, items: cart.map(i => ({ product_id: i.id, product_name: i.name, price: effectivePrice(i), quantity: i.qty })) }) });
+  const btn = document.getElementById('btn-order'); btn.textContent = 'İşleniyor…'; btn.disabled = true;
+  const orderItems = cart.map(i => ({ product_id: i.id, product_name: i.name, price: effectivePrice(i), quantity: i.qty }));
+  const res = await fetch('/api/paytr/create-payment', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+    body: JSON.stringify({ customer_name: name, customer_phone: phone, customer_email: document.getElementById('o-email').value,
+      customer_address: address, customer_city: city, note: document.getElementById('o-note').value, items: orderItems })
+  });
   btn.textContent = 'Siparişi Onayla'; btn.disabled = false;
   const data = await res.json();
-  if (data.id) {
-    // Save order data for payment page summary
+  if (data.token) {
     sessionStorage.setItem('tane_last_order', JSON.stringify({
-      customer_name: name, customer_phone: phone,
-      customer_address: address, customer_city: city,
-      items: cart.map(i => ({ product_id: i.id, product_name: i.name, price: effectivePrice(i), quantity: i.qty }))
+      customer_name: name, customer_phone: phone, customer_address: address, customer_city: city, items: orderItems
     }));
     cart = [];
     if (currentUser) fetch('/api/cart', { method: 'DELETE', credentials: 'include' }); else saveCart();
     updateCartUI();
-    window.location.href = '/odeme?order_id=' + data.id;
+    window.location.href = '/odeme?token=' + encodeURIComponent(data.token) + '&order_id=' + data.order_id;
   }
   else { showToast(data.error || 'Bir hata oluştu'); }
 }

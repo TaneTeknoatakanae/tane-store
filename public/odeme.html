@@ -120,8 +120,9 @@
 </div>
 
 <script>
-const params = new URLSearchParams(location.search);
-const orderId   = params.get('order_id');
+const params        = new URLSearchParams(location.search);
+const orderId       = params.get('order_id');
+const paytrToken    = params.get('token');
 const FREE_SHIPPING = 4000;
 
 // --- Render order summary from sessionStorage ---
@@ -161,37 +162,16 @@ function renderSummary() {
 function fmt(n) { return new Intl.NumberFormat('tr-TR', { style:'currency', currency:'TRY', minimumFractionDigits:2 }).format(n); }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// --- Load PayTR iFrame ---
-async function loadPayment() {
-  if (!orderId) {
-    showError('Sipariş ID bulunamadı. Lütfen sepete geri dönün.');
+// --- Load PayTR iFrame — token comes from URL param, no extra API call needed ---
+function loadPayment() {
+  if (!paytrToken) {
+    showError('Ödeme token\'ı bulunamadı. Lütfen sepete dönüp tekrar deneyin.');
     return;
   }
-
-  try {
-    const res = await fetch('/api/paytr/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ order_id: orderId })
-    });
-    const data = await res.json();
-
-    if (!res.ok || !data.token) {
-      showError(data.error || 'Token alınamadı. Lütfen tekrar deneyin.');
-      return;
-    }
-
-    // Show iframe
-    document.getElementById('loading').style.display = 'none';
-    const wrapper = document.getElementById('iframe-wrapper');
-    const iframe  = document.getElementById('paytr-iframe');
-    iframe.src = `https://www.paytr.com/odeme/api/${data.token}`;
-    wrapper.style.display = 'block';
-
-  } catch(err) {
-    showError('Sunucu bağlantı hatası: ' + err.message);
-  }
+  document.getElementById('loading').style.display = 'none';
+  const iframe = document.getElementById('paytr-iframe');
+  iframe.src = `https://www.paytr.com/odeme/api/${paytrToken}`;
+  document.getElementById('iframe-wrapper').style.display = 'block';
 }
 
 function showError(msg) {
@@ -201,9 +181,7 @@ function showError(msg) {
 }
 
 function retryPayment() {
-  document.getElementById('error-box').style.display = 'none';
-  document.getElementById('loading').style.display = 'block';
-  loadPayment();
+  window.location.href = '/';
 }
 
 // --- Listen for PayTR postMessage (iFrame notifies parent) ---

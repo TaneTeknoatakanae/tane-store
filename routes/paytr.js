@@ -1,141 +1,198 @@
 const express = require('express');
-const router = express.Router();
-const crypto = require('crypto');
-const axios = require('axios');
-const db = require('../database/db');
+const router  = express.Router();
+const crypto  = require('crypto');
+const axios   = require('axios');
+const db      = require('../database/db');
 
 const MERCHANT_ID   = process.env.PAYTR_MERCHANT_ID;
 const MERCHANT_KEY  = process.env.PAYTR_MERCHANT_KEY;
 const MERCHANT_SALT = process.env.PAYTR_MERCHANT_SALT;
-const SITE_URL      = 'https://tanetekno.com';
-const CALLBACK_URL  = `${SITE_URL}/api/paytr/callback`;
+const CALLBACK_URL  = 'https://tanetekno.com/api/paytr/callback';
 
-// POST /api/paytr/token  — frontend calls this after order is created
-// Body: { order_id }
-router.post('/token', async (req, res) => {
-  const { order_id } = req.body;
-  if (!order_id) return res.status(400).json({ error: 'order_id eksik' });
+// ─────────────────────────────────────────────────────────────
+// POST /api/paytr/create-payment
+//
+// Steps:
+//   1. Create order row + order_items in DB (status = 'Beklemede', payment_status = 'pending')
+//   2. Generate unique merchant_oid, save to order
+//   3. Build PayTR token via HMAC-SHA256
+//   4. Call PayTR API → get iframe token
+//   5. Return { token, order_id } to frontend
+// ─────────────────────────────────────────────────────────────
+router.post('/create-payment', async (req, res) => {
+  const {
+    customer_name, customer_phone, customer_email,
+    customer_address, customer_city, note, items
+  } = req.body;
 
+  // ── 1. Validate input ──────────────────────────────────────
+  if (!customer_name || !customer_phone || !customer_address || !customer_city) {
+    return res.status(400).json({ error: 'Eksik bilgi: ad, telefon, adres ve şehir zorunlu' });
+  }
+  if (!Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'Sepet boş' });
+  }
   if (!MERCHANT_ID || !MERCHANT_KEY || !MERCHANT_SALT) {
-    return res.status(500).json({ error: 'PayTR yapılandırması eksik (env vars)' });
+    console.error('[PayTR] Env vars eksik: PAYTR_MERCHANT_ID / KEY / SALT');
+    return res.status(500).json({ error: 'Ödeme sistemi yapılandırılmamış' });
   }
 
-  // Fetch order + items
-  db.get('SELECT * FROM orders WHERE id = ?', [order_id], (err, order) => {
-    if (err || !order) return res.status(404).json({ error: 'Sipariş bulunamadı' });
+  const total_price = items.reduce((s, i) => s + (Number(i.price) || 0) * (Number(i.quantity) || 1), 0);
+  const userId      = req.session?.userId || null;
 
-    db.all('SELECT * FROM order_items WHERE order_id = ?', [order_id], async (err2, items) => {
-      if (err2 || !items?.length) return res.status(400).json({ error: 'Sipariş kalemleri bulunamadı' });
+  console.log(`[PayTR] Sipariş oluşturuluyor — müşteri: ${customer_name}, toplam: ${total_price} ₺`);
 
-      // Generate unique merchant_oid and save it
-      const merchant_oid = 'TN' + order_id + '_' + Date.now();
-      const user_ip = (req.headers['x-forwarded-for'] || req.ip || '127.0.0.1').split(',')[0].trim();
-      const email = order.customer_email || 'musteri@tanetekno.com';
-      const payment_amount = Math.round(order.total_price * 100); // kuruş
+  // ── 2. Create order in DB ──────────────────────────────────
+  db.run(`
+    INSERT INTO orders
+      (customer_name, customer_phone, customer_email, customer_address,
+       customer_city, total_price, note, user_id, status, payment_status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Beklemede', 'pending')
+  `,
+  [customer_name, customer_phone, customer_email || null,
+   customer_address, customer_city, total_price, note || null, userId],
+  function (err) {
+    if (err) {
+      console.error('[PayTR] Sipariş DB hatası:', err.message);
+      return res.status(500).json({ error: 'Sipariş kaydedilemedi: ' + err.message });
+    }
+    const orderId = this.lastID;
+    console.log(`[PayTR] Sipariş oluşturuldu — id: ${orderId}`);
 
-      // Save merchant_oid on order
-      db.run('UPDATE orders SET merchant_oid = ?, payment_status = ? WHERE id = ?',
-        [merchant_oid, 'pending', order_id], async function(err3) {
-          if (err3) return res.status(500).json({ error: err3.message });
+    // ── 3. Insert order_items ──────────────────────────────
+    const stmt = db.prepare(`
+      INSERT INTO order_items (order_id, product_id, product_name, price, quantity)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+    items.forEach(i => stmt.run(orderId, i.product_id, i.product_name, i.price, i.quantity));
+    stmt.finalize();
 
-          // Build basket: [[name, unit_price_kuruş_str, qty_str], ...]
-          const basket = items.map(i => [
-            String(i.product_name).substring(0, 60),
-            String(Math.round(i.price * 100)),
-            String(i.quantity)
-          ]);
-          const user_basket = Buffer.from(JSON.stringify(basket)).toString('base64');
+    // ── 4. Generate merchant_oid and get PayTR token ───────
+    const merchant_oid = `TN${orderId}_${Date.now()}`;
+    const user_ip      = (req.headers['x-forwarded-for'] || req.ip || '127.0.0.1')
+                          .split(',')[0].trim();
+    const email         = customer_email || 'musteri@tanetekno.com';
+    const payment_amount = Math.round(total_price * 100); // kuruş (integer)
 
-          const no_installment = 0;
-          const max_installment = 0;
-          const currency = 'TL';
-          const test_mode = process.env.PAYTR_TEST_MODE === '1' ? 1 : 0;
+    // Save merchant_oid to order
+    db.run('UPDATE orders SET merchant_oid = ? WHERE id = ?', [merchant_oid, orderId],
+      async function (err2) {
+        if (err2) {
+          console.error('[PayTR] merchant_oid kaydedilemedi:', err2.message);
+          return res.status(500).json({ error: 'merchant_oid kaydedilemedi' });
+        }
 
-          // PayTR HMAC-SHA256 token
-          const hashStr = [
-            MERCHANT_ID, user_ip, merchant_oid, email,
-            payment_amount, user_basket, no_installment, max_installment,
-            currency, test_mode, MERCHANT_SALT
-          ].join('');
-          const paytr_token = crypto.createHmac('sha256', MERCHANT_KEY)
-            .update(hashStr).digest('base64');
+        // Build basket: [[name, unit_price_kuruş, qty], ...]  — PayTR expects strings
+        const basket = items.map(i => [
+          String(i.product_name).substring(0, 60),
+          String(Math.round(Number(i.price) * 100)),
+          String(Number(i.quantity))
+        ]);
+        const user_basket    = Buffer.from(JSON.stringify(basket)).toString('base64');
+        const no_installment = 0;
+        const max_installment = 0;
+        const currency       = 'TL';
+        const test_mode      = process.env.PAYTR_TEST_MODE === '1' ? 1 : 0;
 
-          const params = new URLSearchParams({
-            merchant_id:       MERCHANT_ID,
-            user_ip,
-            merchant_oid,
-            email,
-            payment_amount:    String(payment_amount),
-            paytr_token,
-            user_basket,
-            debug_on:          process.env.NODE_ENV !== 'production' ? '1' : '0',
-            no_installment:    String(no_installment),
-            max_installment:   String(max_installment),
-            user_name:         order.customer_name,
-            user_address:      order.customer_address,
-            user_phone:        order.customer_phone,
-            merchant_ok_url:   CALLBACK_URL,
-            merchant_fail_url: CALLBACK_URL,
-            currency,
-            test_mode:         String(test_mode),
-            lang:              'tr'
-          });
+        // HMAC-SHA256 token string (order matters — must match PayTR spec exactly)
+        const hashStr = [
+          MERCHANT_ID, user_ip, merchant_oid, email,
+          payment_amount, user_basket,
+          no_installment, max_installment,
+          currency, test_mode,
+          MERCHANT_SALT
+        ].join('');
+        const paytr_token = crypto.createHmac('sha256', MERCHANT_KEY)
+          .update(hashStr).digest('base64');
 
-          try {
-            const resp = await axios.post(
-              'https://www.paytr.com/odeme/api/get-token',
-              params.toString(),
-              { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, timeout: 15000 }
-            );
-
-            if (resp.data.status === 'success') {
-              res.json({ token: resp.data.token, order_id });
-            } else {
-              // Rollback merchant_oid so user can retry
-              db.run('UPDATE orders SET merchant_oid = NULL, payment_status = NULL WHERE id = ?', [order_id]);
-              res.status(400).json({ error: resp.data.reason || 'PayTR token alınamadı' });
-            }
-          } catch (axiosErr) {
-            db.run('UPDATE orders SET merchant_oid = NULL, payment_status = NULL WHERE id = ?', [order_id]);
-            res.status(500).json({ error: 'PayTR bağlantı hatası: ' + axiosErr.message });
-          }
+        const params = new URLSearchParams({
+          merchant_id:       MERCHANT_ID,
+          user_ip,
+          merchant_oid,
+          email,
+          payment_amount:    String(payment_amount),
+          paytr_token,
+          user_basket,
+          debug_on:          test_mode === 1 ? '1' : '0',
+          no_installment:    String(no_installment),
+          max_installment:   String(max_installment),
+          user_name:         customer_name,
+          user_address:      customer_address,
+          user_phone:        customer_phone,
+          merchant_ok_url:   CALLBACK_URL,
+          merchant_fail_url: CALLBACK_URL,
+          currency,
+          test_mode:         String(test_mode),
+          lang:              'tr'
         });
-    });
+
+        console.log('[PayTR] Token isteği gönderiliyor — merchant_oid:', merchant_oid,
+          '| amount:', payment_amount, 'kuruş | test_mode:', test_mode);
+
+        try {
+          const resp = await axios.post(
+            'https://www.paytr.com/odeme/api/get-token',
+            params.toString(),
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, timeout: 15000 }
+          );
+
+          console.log('[PayTR] API yanıtı:', resp.data);
+
+          if (resp.data.status === 'success') {
+            return res.json({ token: resp.data.token, order_id: orderId });
+          }
+
+          // Token failed — mark order as failed so admin can see it
+          db.run("UPDATE orders SET payment_status = 'token_failed' WHERE id = ?", [orderId]);
+          console.error('[PayTR] Token alınamadı:', resp.data.reason);
+          return res.status(400).json({ error: resp.data.reason || 'PayTR token alınamadı' });
+
+        } catch (axiosErr) {
+          db.run("UPDATE orders SET payment_status = 'token_failed' WHERE id = ?", [orderId]);
+          console.error('[PayTR] Bağlantı hatası:', axiosErr.message);
+          return res.status(500).json({ error: 'PayTR bağlantı hatası: ' + axiosErr.message });
+        }
+      });
   });
 });
 
-// POST /api/paytr/callback — PayTR sunucu tarafından çağrılır (sunucudan sunucuya)
-// Respond EXACTLY "OK" on success, anything else = PayTR retries
+// ─────────────────────────────────────────────────────────────
+// POST /api/paytr/callback
+//
+// Called server-to-server by PayTR after payment.
+// MUST respond exactly "OK" — anything else causes PayTR to retry.
+// ─────────────────────────────────────────────────────────────
 router.post('/callback', express.urlencoded({ extended: false }), (req, res) => {
   const { merchant_oid, status, total_amount, hash } = req.body;
 
+  console.log('[PayTR] Callback alındı:', { merchant_oid, status, total_amount });
+
   if (!merchant_oid || !status || !total_amount || !hash) {
-    console.error('[PayTR] Callback eksik alanlar:', req.body);
+    console.error('[PayTR] Callback eksik alan:', req.body);
     return res.send('FAILED');
   }
-
   if (!MERCHANT_KEY || !MERCHANT_SALT) {
-    console.error('[PayTR] MERCHANT_KEY/SALT eksik');
+    console.error('[PayTR] MERCHANT_KEY veya SALT eksik');
     return res.send('FAILED');
   }
 
-  // Validate hash: base64(HMAC-SHA256(merchant_oid + salt + status + total_amount, key))
+  // Validate: base64(HMAC-SHA256(merchant_oid + salt + status + total_amount, key))
   const expectedHash = crypto.createHmac('sha256', MERCHANT_KEY)
     .update(merchant_oid + MERCHANT_SALT + status + total_amount)
     .digest('base64');
 
   if (hash !== expectedHash) {
-    console.error('[PayTR] Hash doğrulama başarısız! merchant_oid:', merchant_oid);
+    console.error('[PayTR] Hash eşleşmedi — olası sahte callback! merchant_oid:', merchant_oid);
     return res.send('FAILED');
   }
 
-  const newStatus     = status === 'success' ? 'Ödendi' : 'Ödeme Başarısız';
+  const newStatus      = status === 'success' ? 'Ödendi' : 'Ödeme Başarısız';
   const payment_status = status === 'success' ? 'paid' : 'failed';
 
   db.run(
     'UPDATE orders SET status = ?, payment_status = ? WHERE merchant_oid = ?',
     [newStatus, payment_status, merchant_oid],
-    function(err) {
+    function (err) {
       if (err) {
         console.error('[PayTR] Order güncelleme hatası:', err.message);
         return res.send('FAILED');
@@ -143,9 +200,9 @@ router.post('/callback', express.urlencoded({ extended: false }), (req, res) => 
       if (this.changes === 0) {
         console.error('[PayTR] merchant_oid bulunamadı:', merchant_oid);
       } else {
-        console.log(`[PayTR] Ödeme ${status}: ${merchant_oid}`);
+        console.log(`[PayTR] Ödeme sonucu kaydedildi — ${merchant_oid}: ${status} → ${newStatus}`);
       }
-      res.send('OK');
+      res.send('OK'); // PayTR bu yanıtı bekliyor
     }
   );
 });

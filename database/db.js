@@ -177,8 +177,15 @@ async function initDB() {
       created_at TIMESTAMP DEFAULT NOW()
     )`);
     await pool.query(`ALTER TABLE pageviews ADD COLUMN IF NOT EXISTS product_id INTEGER`);
+    // orders — add every column that might be missing on existing DBs
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id)`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS note TEXT`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_carrier TEXT`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_code TEXT`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS merchant_oid TEXT`);
     await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'pending'`);
+    // unique index on merchant_oid — safe to run repeatedly
+    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS orders_merchant_oid_idx ON orders(merchant_oid) WHERE merchant_oid IS NOT NULL`);
 
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
