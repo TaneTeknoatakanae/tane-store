@@ -68,7 +68,7 @@ router.post('/create-payment', async (req, res) => {
     stmt.finalize();
 
     // ── 4. Generate merchant_oid and get PayTR token ───────
-    const merchant_oid = `TN${orderId}_${Date.now()}`;
+    const merchant_oid = `TN${orderId}T${Date.now()}`;
     const user_ip      = (req.headers['x-forwarded-for'] || req.ip || '127.0.0.1')
                           .split(',')[0].trim();
     const email         = customer_email || 'musteri@tanetekno.com';
