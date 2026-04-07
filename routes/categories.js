@@ -28,13 +28,19 @@ router.get('/flat', (req, res) => {
   });
 });
 
-// GET /api/categories/by-slug/:parent/:child? — slug'tan kategori bul
-router.get('/by-slug/:parent/:child?', (req, res) => {
-  const { parent, child } = req.params;
-  db.get('SELECT * FROM categories WHERE slug = ? AND parent_id IS NULL', [parent], (err, p) => {
+// GET /api/categories/by-slug/:parent — sadece üst kategori
+router.get('/by-slug/:parent', (req, res) => {
+  db.get('SELECT * FROM categories WHERE slug = ? AND parent_id IS NULL', [req.params.parent], (err, p) => {
     if (err || !p) return res.status(404).json({ error: 'Kategori bulunamadı' });
-    if (!child) return res.json({ parent: p, child: null });
-    db.get('SELECT * FROM categories WHERE slug = ? AND parent_id = ?', [child, p.id], (err2, c) => {
+    res.json({ parent: p, child: null });
+  });
+});
+
+// GET /api/categories/by-slug/:parent/:child — üst + alt
+router.get('/by-slug/:parent/:child', (req, res) => {
+  db.get('SELECT * FROM categories WHERE slug = ? AND parent_id IS NULL', [req.params.parent], (err, p) => {
+    if (err || !p) return res.status(404).json({ error: 'Kategori bulunamadı' });
+    db.get('SELECT * FROM categories WHERE slug = ? AND parent_id = ?', [req.params.child, p.id], (err2, c) => {
       if (err2 || !c) return res.status(404).json({ error: 'Alt kategori bulunamadı' });
       res.json({ parent: p, child: c });
     });

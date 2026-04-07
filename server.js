@@ -171,10 +171,9 @@ app.use('/api/price-compare', require('./routes/price-compare'));
 app.use('/api/paytr', require('./routes/paytr'));
 app.use('/api/categories', require('./routes/categories'));
 
-// SEO-friendly category URL: /kategori/bilgisayar/laptop → landing.html (server tarafı slug → query)
-app.get('/kategori/:parent/:child?', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
-});
+// SEO-friendly category URL: /kategori/bilgisayar veya /kategori/bilgisayar/laptop → landing.html
+app.get('/kategori/:parent', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
+app.get('/kategori/:parent/:child', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/track', (req, res) => res.sendFile(path.join(__dirname, 'public', 'track.html')));
