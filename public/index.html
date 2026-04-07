@@ -668,14 +668,17 @@ async function submitOrder() {
   btn.textContent = 'Siparişi Onayla'; btn.disabled = false;
   const data = await res.json();
   if (data.id) {
+    // Save order data for payment page summary
+    sessionStorage.setItem('tane_last_order', JSON.stringify({
+      customer_name: name, customer_phone: phone,
+      customer_address: address, customer_city: city,
+      items: cart.map(i => ({ product_id: i.id, product_name: i.name, price: ep(i), quantity: i.qty }))
+    }));
     cart = [];
     if (currentUser) fetch('/api/cart', { method: 'DELETE', credentials: 'include' });
     else localStorage.setItem('tane-cart', JSON.stringify(cart));
     updateCart();
-    document.getElementById('success-order-id').textContent = '#' + data.id;
-    document.getElementById('track-link').href = '/track?id=' + data.id;
-    document.getElementById('order-form-screen').classList.add('hidden');
-    document.getElementById('order-success-screen').classList.remove('hidden');
+    window.location.href = '/odeme?order_id=' + data.id;
   } else { showToast(data.error || 'Bir hata oluştu'); }
 }
 

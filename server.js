@@ -167,6 +167,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/scrape-url', scrapeUrlRoutes);
 app.use('/api/price-compare', require('./routes/price-compare'));
+app.use('/api/paytr', require('./routes/paytr'));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/track', (req, res) => res.sendFile(path.join(__dirname, 'public', 'track.html')));
@@ -182,5 +183,6 @@ app.get('/iletisim', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 app.get('/kvkk', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kvkk.html')));
 app.get('/cerez-politikasi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cerez-politikasi.html')));
 app.get('/on-bilgilendirme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'on-bilgilendirme.html')));
+app.get('/odeme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'odeme.html')));
 
 

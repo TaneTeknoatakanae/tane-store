@@ -177,6 +177,8 @@ async function initDB() {
       created_at TIMESTAMP DEFAULT NOW()
     )`);
     await pool.query(`ALTER TABLE pageviews ADD COLUMN IF NOT EXISTS product_id INTEGER`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS merchant_oid TEXT`);
+    await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'pending'`);
 
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
