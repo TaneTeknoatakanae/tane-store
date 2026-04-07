@@ -170,7 +170,7 @@ function loadPayment() {
   }
   document.getElementById('loading').style.display = 'none';
   const iframe = document.getElementById('paytr-iframe');
-  iframe.src = `https://www.paytr.com/odeme/api/${paytrToken}`;
+  iframe.src = `https://www.paytr.com/odeme/guvenli/${paytrToken}`;
   document.getElementById('iframe-wrapper').style.display = 'block';
 }
 
