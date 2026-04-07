@@ -112,6 +112,33 @@ router.put('/:id/status', adminAuth, (req, res) => {
   );
 });
 
+// Toplu işlem — admin only
+// Body: { ids: [1,2,3], action: 'delete' | 'status', status?: 'Kargoda' }
+router.post('/bulk-action', adminAuth, (req, res) => {
+  const { ids, action, status } = req.body;
+  if (!Array.isArray(ids) || !ids.length) return res.status(400).json({ error: 'ID listesi boş' });
+  const safeIds = ids.map(n => parseInt(n)).filter(Boolean);
+  if (!safeIds.length) return res.status(400).json({ error: 'Geçersiz ID listesi' });
+
+  // PostgreSQL: ANY($1::int[]) ile array binding
+  if (action === 'delete') {
+    db.run('DELETE FROM orders WHERE id = ANY($1::int[])', [safeIds], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      audit(req, 'order.bulk_delete', { ids: safeIds });
+      res.json({ message: `✅ ${this.changes} sipariş silindi`, changes: this.changes });
+    });
+  } else if (action === 'status') {
+    if (!status) return res.status(400).json({ error: 'status alanı gerekli' });
+    db.run('UPDATE orders SET status = $1 WHERE id = ANY($2::int[])', [status, safeIds], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      audit(req, 'order.bulk_status', { ids: safeIds, status });
+      res.json({ message: `✅ ${this.changes} sipariş güncellendi`, changes: this.changes });
+    });
+  } else {
+    return res.status(400).json({ error: 'Geçersiz action' });
+  }
+});
+
 // Sipariş iptali (Kullanıcı — sadece Beklemede)
 router.put('/:id/cancel', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Giriş yapılmamış' });

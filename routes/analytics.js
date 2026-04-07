@@ -141,6 +141,52 @@ router.get('/top-products', (req, res) => {
   });
 });
 
+// Yıllık ve genel toplam (yearly + all-time)
+router.get('/yearly', (req, res) => {
+  db.get(`
+    SELECT
+      COUNT(*)                                              AS year_views,
+      COUNT(DISTINCT ip_hash)                               AS year_unique
+    FROM pageviews
+    WHERE created_at >= NOW() - INTERVAL '365 days'
+  `, [], (e1, pv) => {
+    db.get(`
+      SELECT
+        COALESCE(SUM(total_price), 0) AS year_rev,
+        COUNT(*)                       AS year_orders
+      FROM orders
+      WHERE created_at >= NOW() - INTERVAL '365 days'
+    `, [], (e2, ord) => {
+      res.json({
+        year_views:  pv?.year_views  || 0,
+        year_unique: pv?.year_unique || 0,
+        year_rev:    ord?.year_rev   || 0,
+        year_orders: ord?.year_orders|| 0
+      });
+    });
+  });
+});
+
+// En çok satan kategoriler — order_items'i products'a join ederek
+router.get('/top-categories', (req, res) => {
+  db.all(`
+    SELECT
+      COALESCE(NULLIF(p.category, ''), 'Diğer') AS category,
+      SUM(oi.quantity)                          AS sold,
+      SUM(oi.price * oi.quantity)               AS revenue
+    FROM order_items oi
+    JOIN products p ON p.id = oi.product_id
+    JOIN orders   o ON o.id = oi.order_id
+    WHERE o.created_at >= NOW() - INTERVAL '90 days'
+    GROUP BY category
+    ORDER BY revenue DESC
+    LIMIT 8
+  `, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows || []);
+  });
+});
+
 // Device breakdown
 router.get('/devices', (req, res) => {
   db.all(`

@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Tane Store — Admin Paneli</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#FDFAF6;--surface:#F5EFE4;--border:#DDD0BC;--text:#1C1814;--accent:#C49660;--accent-h:#A67D48}
@@ -141,8 +142,20 @@ tr:last-child td{border-bottom:none}
   <!-- SİPARİŞLER -->
   <div id="tab-orders" class="hidden">
     <div class="table-wrap">
-      <div class="table-head"><h3>Gelen Siparişler</h3></div>
-      <table><thead><tr><th>No</th><th>Müşteri</th><th>Telefon</th><th>Şehir</th><th>Tutar</th><th>Ürünler</th><th>Kargo</th><th>Durum</th><th>Tarih</th><th></th></tr></thead>
+      <div class="table-head" style="flex-wrap:wrap;gap:10px">
+        <h3>Gelen Siparişler</h3>
+        <div id="bulk-bar" style="display:none;align-items:center;gap:8px;flex-wrap:wrap">
+          <span id="bulk-count" style="font-size:13px;color:#666;font-weight:600"></span>
+          <button class="btn-orange" onclick="bulkAction('status','Onaylandı')">Onayla</button>
+          <button class="btn-blue" onclick="bulkAction('status','Kargoda')">Kargoya Ver</button>
+          <button class="btn-orange" style="background:#16a34a" onclick="bulkAction('status','Teslim Edildi')">Tamamla</button>
+          <button class="btn-danger" onclick="bulkAction('delete')">Sil</button>
+        </div>
+      </div>
+      <table><thead><tr>
+        <th style="width:34px"><input type="checkbox" id="orders-check-all" onchange="toggleAllOrders(this.checked)"></th>
+        <th>No</th><th>Müşteri</th><th>Telefon</th><th>Şehir</th><th>Tutar</th><th>Ürünler</th><th>Kargo</th><th>Durum</th><th>Tarih</th><th></th>
+      </tr></thead>
       <tbody id="orders-tbody"></tbody></table>
     </div>
   </div>
@@ -184,10 +197,15 @@ tr:last-child td{border-bottom:none}
         <div style="font-size:12px;color:#aaa;margin-top:4px"><span id="an-month-unique">—</span> tekil ziyaretçi</div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
       <div class="stat-card"><div class="stat-label">Bugün Ciro</div><div class="stat-num" id="an-today-rev" style="font-size:22px;color:var(--accent)">—</div></div>
       <div class="stat-card"><div class="stat-label">Bu Hafta Ciro</div><div class="stat-num" id="an-week-rev" style="font-size:22px;color:var(--accent)">—</div></div>
       <div class="stat-card"><div class="stat-label">Bu Ay Ciro</div><div class="stat-num" id="an-month-rev" style="font-size:22px;color:var(--accent)">—</div></div>
+      <div class="stat-card" style="background:linear-gradient(135deg,#1C1814,#3a2f25);color:#fff;border:none">
+        <div class="stat-label" style="color:#C49660">Yıllık Ciro</div>
+        <div class="stat-num" id="an-year-rev" style="font-size:22px;color:#fff">—</div>
+        <div style="font-size:11px;color:#bbb;margin-top:4px"><span id="an-year-orders">—</span> sipariş · <span id="an-year-unique">—</span> tekil ziyaretçi</div>
+      </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
       <div class="stat-card"><div class="stat-label">Bekleyen Sipariş</div><div class="stat-num" id="an-pending">—</div></div>
@@ -196,15 +214,17 @@ tr:last-child td{border-bottom:none}
       <div class="stat-card"><div class="stat-label">Müşteri</div><div class="stat-num" id="an-customers">—</div></div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-      <div class="table-wrap" style="padding:20px 22px">
-        <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:#555">Son 30 Gün — Ziyaretçi</div>
-        <div id="an-views-chart" style="display:flex;align-items:flex-end;gap:2px;height:72px;background:var(--surface);border-radius:8px;padding:6px 8px"></div>
-      </div>
-      <div class="table-wrap" style="padding:20px 22px">
-        <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:#555">Son 30 Gün — Sipariş Sayısı</div>
-        <div id="an-orders-chart" style="display:flex;align-items:flex-end;gap:2px;height:72px;background:var(--surface);border-radius:8px;padding:6px 8px"></div>
-      </div>
+    <div class="table-wrap" style="padding:20px 22px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:#555">Son 30 Gün — Ziyaretçi & Tekil Kullanıcı Trendi</div>
+      <div style="height:240px;position:relative"><canvas id="an-visit-chart"></canvas></div>
+    </div>
+    <div class="table-wrap" style="padding:20px 22px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:#555">Son 30 Gün — Ciro & Sipariş Trendi</div>
+      <div style="height:240px;position:relative"><canvas id="an-sales-chart"></canvas></div>
+    </div>
+    <div class="table-wrap" style="padding:20px 22px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:16px">En Çok Satan Kategoriler (Son 90 Gün)</div>
+      <div id="an-top-categories"><div style="color:#aaa;font-size:13px">Yükleniyor...</div></div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
@@ -586,7 +606,7 @@ function renderProducts(){
 
 function renderOrders(){
   const tbody=document.getElementById('orders-tbody');
-  if(!orders.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:#aaa;padding:40px">Henüz sipariş yok</td></tr>';return;}
+  if(!orders.length){tbody.innerHTML='<tr><td colspan="12" style="text-align:center;color:#aaa;padding:40px">Henüz sipariş yok</td></tr>';updateBulkBar();return;}
   const statusColors={'Beklemede':'#C49660','Onaylandı':'#3b82f6','Kargoda':'#16a34a','Teslim Edildi':'#16a34a','İptal':'#ef4444'};
   tbody.innerHTML=orders.map(o=>{
     const sc=statusColors[o.status]||'#888';
@@ -594,6 +614,7 @@ function renderOrders(){
       ?`<div style="font-size:11px"><div style="font-weight:600;color:#555">${o.shipping_carrier||'Kargo'}</div><div style="color:#3b82f6;font-family:monospace">${o.shipping_code}</div></div>`
       :'<span style="color:#ccc;font-size:12px">—</span>';
     return`<tr>
+    <td><input type="checkbox" class="order-check" data-id="${o.id}" onchange="updateBulkBar()"></td>
     <td style="font-family:monospace;color:#C49660">#${o.id}</td>
     <td style="font-weight:600">${o.customer_name}</td>
     <td>${o.customer_phone}</td>
@@ -830,6 +851,38 @@ function closeModal(id){
   });
 });
 
+// ── Sipariş toplu işlemleri ──
+function getSelectedOrderIds(){
+  return Array.from(document.querySelectorAll('.order-check:checked')).map(c=>parseInt(c.dataset.id));
+}
+function updateBulkBar(){
+  const ids=getSelectedOrderIds();
+  const bar=document.getElementById('bulk-bar');
+  if(!bar)return;
+  if(ids.length){bar.style.display='flex';document.getElementById('bulk-count').textContent=ids.length+' seçildi';}
+  else{bar.style.display='none';}
+  const all=document.getElementById('orders-check-all');
+  const total=document.querySelectorAll('.order-check').length;
+  if(all)all.checked=ids.length>0&&ids.length===total;
+}
+function toggleAllOrders(checked){
+  document.querySelectorAll('.order-check').forEach(c=>c.checked=checked);
+  updateBulkBar();
+}
+async function bulkAction(action,status){
+  const ids=getSelectedOrderIds();
+  if(!ids.length)return;
+  const msg=action==='delete'?ids.length+' sipariş silinecek. Emin misin?':ids.length+' sipariş "'+status+'" olarak güncellenecek. Devam?';
+  if(!confirm(msg))return;
+  try{
+    const r=await fetch('/api/orders/bulk-action',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({ids,action,status})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Hata');
+    showToast(d.message||'Tamamlandı');
+    await loadAll();
+  }catch(e){showToast('Hata: '+e.message);}
+}
+
 function setTab(tab,btn){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
@@ -839,16 +892,22 @@ function setTab(tab,btn){
   if(tab==='pricecompare')pcLoadList();
 }
 
+let visitChart=null, salesChart=null;
 async function loadAnalytics(){
   try{
-    const [summary,daily,pages,topProds,traffic,topViewed]=await Promise.all([
+    const [summary,daily,pages,topProds,traffic,topViewed,yearly,topCats]=await Promise.all([
       fetch('/api/analytics/summary').then(r=>r.json()),
       fetch('/api/analytics/daily').then(r=>r.json()),
       fetch('/api/analytics/pages').then(r=>r.json()),
       fetch('/api/analytics/top-products').then(r=>r.json()),
       fetch('/api/analytics/traffic-sources').then(r=>r.json()),
-      fetch('/api/analytics/top-viewed-products').then(r=>r.json())
+      fetch('/api/analytics/top-viewed-products').then(r=>r.json()),
+      fetch('/api/analytics/yearly').then(r=>r.json()),
+      fetch('/api/analytics/top-categories').then(r=>r.json())
     ]);
+    document.getElementById('an-year-rev').textContent=(+yearly.year_rev||0).toLocaleString('tr-TR')+' ₺';
+    document.getElementById('an-year-orders').textContent=yearly.year_orders||0;
+    document.getElementById('an-year-unique').textContent=yearly.year_unique||0;
 
     document.getElementById('an-today-views').textContent=summary.today_views||0;
     document.getElementById('an-week-views').textContent=summary.week_views||0;
@@ -864,15 +923,37 @@ async function loadAnalytics(){
     document.getElementById('an-total-products').textContent=summary.total_products||0;
     document.getElementById('an-customers').textContent=summary.total_customers||0;
 
-    const vd=daily.views||[];const mv=Math.max(...vd.map(d=>+d.views),1);
-    document.getElementById('an-views-chart').innerHTML=vd.length
-      ?vd.map(d=>'<div title="'+d.date+': '+d.views+' görüntüleme / '+d.unique_visitors+' tekil" style="flex:1;background:var(--accent);border-radius:2px 2px 0 0;height:'+Math.round((+d.views/mv)*100)+'%;min-height:2px"></div>').join('')
-      :'<div style="color:#aaa;font-size:12px;margin:auto">Veri yok</div>';
+    // Chart.js — Ziyaretçi & tekil
+    const vd=daily.views||[];
+    const vLabels=vd.map(d=>new Date(d.date).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'}));
+    if(visitChart)visitChart.destroy();
+    visitChart=new Chart(document.getElementById('an-visit-chart'),{
+      type:'line',
+      data:{labels:vLabels,datasets:[
+        {label:'Görüntüleme',data:vd.map(d=>+d.views),borderColor:'#C49660',backgroundColor:'rgba(196,150,96,.15)',tension:.35,fill:true,borderWidth:2,pointRadius:2},
+        {label:'Tekil Ziyaretçi',data:vd.map(d=>+d.unique_visitors),borderColor:'#1C1814',backgroundColor:'rgba(28,24,20,.05)',tension:.35,fill:false,borderWidth:2,pointRadius:2,borderDash:[5,4]}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0f0'}},x:{grid:{display:false}}}}
+    });
 
-    const od=daily.revenue||[];const mo=Math.max(...od.map(d=>+d.orders),1);
-    document.getElementById('an-orders-chart').innerHTML=od.length
-      ?od.map(d=>'<div title="'+d.date+': '+d.orders+' sipariş" style="flex:1;background:#3b82f6;border-radius:2px 2px 0 0;height:'+Math.round((+d.orders/mo)*100)+'%;min-height:2px"></div>').join('')
-      :'<div style="color:#aaa;font-size:12px;margin:auto">Veri yok</div>';
+    // Chart.js — Ciro & Sipariş
+    const rd=daily.revenue||[];
+    const rLabels=rd.map(d=>new Date(d.date).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'}));
+    if(salesChart)salesChart.destroy();
+    salesChart=new Chart(document.getElementById('an-sales-chart'),{
+      type:'line',
+      data:{labels:rLabels,datasets:[
+        {label:'Ciro (₺)',data:rd.map(d=>+d.revenue||0),borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.15)',tension:.35,fill:true,borderWidth:2,pointRadius:2,yAxisID:'y'},
+        {label:'Sipariş',data:rd.map(d=>+d.orders||0),borderColor:'#3b82f6',tension:.35,borderWidth:2,pointRadius:2,yAxisID:'y1'}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{beginAtZero:true,position:'left',grid:{color:'#f0f0f0'},title:{display:true,text:'₺',font:{size:10}}},y1:{beginAtZero:true,position:'right',grid:{display:false},title:{display:true,text:'adet',font:{size:10}}},x:{grid:{display:false}}}}
+    });
+
+    // Top kategoriler
+    const tcMax=(topCats[0]&&+topCats[0].revenue)||1;
+    document.getElementById('an-top-categories').innerHTML=(topCats||[]).length
+      ?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;font-size:11px;color:#aaa;padding-bottom:8px">KATEGORİ</th><th style="text-align:right;font-size:11px;color:#aaa">SATILAN</th><th style="text-align:right;font-size:11px;color:#aaa">CİRO</th><th style="width:30%"></th></tr></thead><tbody>'+(topCats||[]).map(function(c){var pct=Math.round((+c.revenue/tcMax)*100);return'<tr><td style="padding:8px 0;font-weight:600;font-size:13px">'+c.category+'</td><td style="text-align:right;color:#666;font-size:13px">'+c.sold+' adet</td><td style="text-align:right;font-weight:700;color:var(--accent);font-size:13px">'+(+c.revenue||0).toLocaleString('tr-TR')+' ₺</td><td style="padding-left:14px"><div style="background:var(--surface);border-radius:3px;height:6px"><div style="background:var(--accent);height:6px;border-radius:3px;width:'+pct+'%"></div></div></td></tr>';}).join('')+'</tbody></table>'
+      :'<div style="color:#aaa;font-size:13px">Henüz satış yok</div>';
 
     const pageLabels={'/':'Ana Sayfa','/landing':'Landing','/product.html':'Ürün Sayfası','/track':'Sipariş Takip','/hesabim':'Hesabım','/login':'Giriş'};
     const maxPg=(pages[0]&&pages[0].views)||1;
