@@ -270,15 +270,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 </nav>
 
 <!-- CATEGORY FILTER -->
-<div class="filter-bar">
-  <button class="cat-pill active" onclick="setCat('Tümü',this)">Tümü</button>
-  <button class="cat-pill" onclick="setCat('Elektronik',this)">Elektronik</button>
-  <button class="cat-pill" onclick="setCat('Giyim',this)">Giyim</button>
-  <button class="cat-pill" onclick="setCat('Ev',this)">Ev</button>
-  <button class="cat-pill" onclick="setCat('Spor',this)">Spor</button>
-  <button class="cat-pill" onclick="setCat('Kozmetik',this)">Kozmetik</button>
-  <button class="cat-pill" onclick="setCat('Kitap',this)">Kitap</button>
-  <button class="cat-pill" onclick="setCat('Genel',this)">Genel</button>
+<div class="filter-bar" id="filter-bar">
+  <button class="cat-pill active" onclick="setCat(null,null,this)">Tümü</button>
   <div class="filter-sep"></div>
   <select class="sort-sel" id="sort" onchange="applyFilters()" aria-label="Sıralama">
     <option value="default">Sırala</option>
@@ -460,7 +453,46 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 </div>
 
 <script>
-let allProducts = [], currentCat = 'Tümü';
+let allProducts = [], currentParentId = null, currentChildId = null, categoryTree = [];
+
+async function loadCategoryTree() {
+  try {
+    categoryTree = await fetch('/api/categories').then(r => r.json());
+    renderCatPills();
+  } catch(e) {}
+}
+function renderCatPills() {
+  const bar = document.getElementById('filter-bar');
+  if (!bar) return;
+  // Mevcut "Tümü" + sep dışında pill'leri temizle
+  const sep = bar.querySelector('.filter-sep');
+  Array.from(bar.querySelectorAll('.cat-pill')).forEach((b,i)=>{ if(i>0) b.remove(); });
+  Array.from(bar.querySelectorAll('.subcat-pill')).forEach(b=>b.remove());
+  categoryTree.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-pill';
+    btn.textContent = p.name;
+    btn.onclick = (e) => setCat(p.id, null, e.currentTarget);
+    bar.insertBefore(btn, sep);
+  });
+}
+function renderSubCatPills() {
+  const bar = document.getElementById('filter-bar');
+  if (!bar) return;
+  Array.from(bar.querySelectorAll('.subcat-pill')).forEach(b=>b.remove());
+  if (!currentParentId) return;
+  const parent = categoryTree.find(p => p.id === currentParentId);
+  if (!parent) return;
+  const sep = bar.querySelector('.filter-sep');
+  parent.children.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-pill subcat-pill' + (currentChildId===c.id?' active':'');
+    btn.textContent = '↳ ' + c.name;
+    btn.style.fontSize = '12px';
+    btn.onclick = (e) => setCat(currentParentId, c.id, e.currentTarget);
+    bar.insertBefore(btn, sep);
+  });
+}
 let cart = [], currentUser = null;
 
 async function initAuth() {
@@ -498,7 +530,9 @@ function applyFilters() {
   const q = document.getElementById('search').value.toLowerCase().trim();
   const sort = document.getElementById('sort').value;
   let list = allProducts.filter(p => {
-    const matchCat = currentCat === 'Tümü' || p.category === currentCat;
+    let matchCat = true;
+    if (currentChildId)       matchCat = p.category_id === currentChildId;
+    else if (currentParentId) matchCat = p.parent_cat_id === currentParentId;
     const matchQ = !q || p.name.toLowerCase().includes(q) || (p.brand || '').toLowerCase().includes(q);
     return matchCat && matchQ;
   });
@@ -508,11 +542,22 @@ function applyFilters() {
   renderProducts(list);
 }
 
-function setCat(cat, btn) {
-  currentCat = cat;
+function setCat(parentId, childId, btn) {
+  currentParentId = parentId;
+  currentChildId  = childId;
   document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('section-title').textContent = cat === 'Tümü' ? 'Tüm Ürünler' : cat;
+  if (btn) btn.classList.add('active');
+  let title = 'Tüm Ürünler';
+  if (parentId) {
+    const p = categoryTree.find(x => x.id === parentId);
+    title = p ? p.name : title;
+    if (childId) {
+      const c = p?.children.find(x => x.id === childId);
+      if (c) title = p.name + ' › ' + c.name;
+    }
+  }
+  document.getElementById('section-title').textContent = title;
+  renderSubCatPills();
   applyFilters();
 }
 
@@ -711,14 +756,25 @@ function initCookies() {
 
 function initUrlParams() {
   const params = new URLSearchParams(location.search);
-  const cat = params.get('cat');
   const checkout = params.get('checkout');
-  if (cat) {
-    const btn = Array.from(document.querySelectorAll('.cat-pill')).find(b => b.textContent.trim() === cat);
-    if (btn) setCat(cat, btn);
+  // /kategori/parent/child URL'i destekle
+  const slugMatch = location.pathname.match(/^\/kategori\/([^\/]+)(?:\/([^\/]+))?/);
+  if (slugMatch) {
+    // Kategori ağacı yüklenince eşle
+    const trySet = () => {
+      if (!categoryTree.length) { setTimeout(trySet, 100); return; }
+      const parent = categoryTree.find(p => p.slug === slugMatch[1]);
+      if (!parent) return;
+      const child = slugMatch[2] ? parent.children.find(c => c.slug === slugMatch[2]) : null;
+      const btn = Array.from(document.querySelectorAll('.cat-pill')).find(b => b.textContent.trim() === parent.name);
+      setCat(parent.id, child ? child.id : null, btn || null);
+    };
+    trySet();
   }
   if (checkout === 'open') setTimeout(openOrderModal, 500);
 }
+
+loadCategoryTree();
 
 initCookies();
 initAuth().then(() => { loadProducts(); initUrlParams(); });
