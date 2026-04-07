@@ -82,6 +82,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 /* BUY BOX */
 .buy-box{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:24px;margin-bottom:16px}
+.paytr-taksit-wrap{border:1px solid var(--border-light);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:16px;background:#fff}
+.paytr-taksit-title{font-size:13px;font-weight:700;color:#555;margin-bottom:10px}
+#paytr_taksit_tablosu{min-height:40px;font-size:13px}
+#paytr_taksit_tablosu table{width:100%;border-collapse:collapse;font-size:12px}
+#paytr_taksit_tablosu th,#paytr_taksit_tablosu td{padding:7px 8px;border-bottom:1px solid #f0f0f0;text-align:right}
+#paytr_taksit_tablosu th{font-weight:600;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+#paytr_taksit_tablosu th:first-child,#paytr_taksit_tablosu td:first-child{text-align:left}
+#paytr_taksit_tablosu .paytr-loading{color:#aaa;font-size:12px;text-align:center;padding:8px}
+@media(max-width:600px){#paytr_taksit_tablosu table{font-size:11px}#paytr_taksit_tablosu th,#paytr_taksit_tablosu td{padding:5px 4px}}
 .price-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
 .price-original{font-size:13px;color:var(--text3);text-decoration:line-through;margin-bottom:4px}
 .price-main{font-size:32px;font-weight:700;color:var(--text);letter-spacing:-.5px;line-height:1}
@@ -393,6 +402,26 @@ async function initAuth() {
 
 function effectivePrice(p) { return p.discount_price || p.tane_price; }
 
+// PayTR Taksit Tablosu — dinamik yükleme (vade farkı müşteriden)
+function loadPaytrTaksit(price) {
+  const wrap = document.getElementById('paytr-taksit-wrap');
+  const target = document.getElementById('paytr_taksit_tablosu');
+  if (!wrap || !target || !price || price <= 0) { if (wrap) wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  target.innerHTML = '<div class="paytr-loading">Taksit seçenekleri yükleniyor…</div>';
+  // Eski script varsa kaldır
+  const oldScript = document.getElementById('paytr-taksit-script');
+  if (oldScript) oldScript.remove();
+  // PayTR formatı: 1250.50 (nokta ile, integer/2 desimal)
+  const amount = Number(price).toFixed(2);
+  const s = document.createElement('script');
+  s.id = 'paytr-taksit-script';
+  s.async = true;
+  s.src = `https://www.paytr.com/odeme/taksit-tablosu/v2?token=69064c82903a337dc43f88a9ce32b5771d53eb272f6ccef5d3d7b4eb5d3c7d88&merchant_id=688968&amount=${amount}&taksit=0&tumu=0`;
+  s.onerror = () => { target.innerHTML = '<div class="paytr-loading">Taksit bilgisi şu anda yüklenemiyor.</div>'; };
+  document.body.appendChild(s);
+}
+
 async function loadProduct() {
   if (!productId) { window.location.href = '/'; return; }
   try {
@@ -402,6 +431,7 @@ async function loadProduct() {
     document.title = `${product.name} — Tane Store`;
     document.getElementById('breadcrumb-name').textContent = product.name;
     renderProduct();
+    loadPaytrTaksit(effectivePrice(product));
     loadReviews();
     loadSimilar();
     updateWishlistBtn();
@@ -508,6 +538,12 @@ function renderProduct() {
           <div class="price-label">Fiyat</div>
           ${priceHTML}
           ${stockHTML}
+        </div>
+
+        <!-- PayTR Taksit Tablosu (vade farkı müşteriden) -->
+        <div id="paytr-taksit-wrap" class="paytr-taksit-wrap">
+          <div class="paytr-taksit-title">💳 Taksit Seçenekleri</div>
+          <div id="paytr_taksit_tablosu"></div>
         </div>
 
         ${compareHTML}
