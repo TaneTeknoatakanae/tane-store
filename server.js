@@ -108,12 +108,13 @@ app.get('/product.html', (req, res, next) => {
     if (err || !p) return next();
     const fs = require('fs');
     let html = fs.readFileSync(path.join(__dirname, 'public', 'product.html'), 'utf8');
+    const SITE = 'https://www.tanetekno.com';
     const title = `${p.name} — Tane Store`;
     const desc = (p.description || `${p.name} - Tane Store'da satın al`).substring(0, 160).replace(/"/g, '&quot;');
-    const img = p.image_url ? `https://tanetekno.com${p.image_url}` : 'https://tanetekno.com/AmblemTane.png';
-    const SITE = 'https://www.tanetekno.com';
+    const imgAbs = p.image_url
+      ? (p.image_url.startsWith('http') ? p.image_url : `${SITE}${p.image_url}`)
+      : `${SITE}/AmblemTane.png`;
     const price = p.discount_price || p.tane_price || 0;
-    const imgAbs = p.image_url ? `${SITE}${p.image_url}` : `${SITE}/AmblemTane.png`;
     const cleanDesc = (str) => String(str||'').replace(/"/g, '\\"').replace(/\n/g,' ').replace(/<[^>]+>/g,'').substring(0,500);
     const availability = (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
     const jsonLd = {
