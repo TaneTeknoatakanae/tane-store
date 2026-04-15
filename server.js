@@ -111,13 +111,42 @@ app.get('/product.html', (req, res, next) => {
     const title = `${p.name} — Tane Store`;
     const desc = (p.description || `${p.name} - Tane Store'da satın al`).substring(0, 160).replace(/"/g, '&quot;');
     const img = p.image_url ? `https://tanetekno.com${p.image_url}` : 'https://tanetekno.com/AmblemTane.png';
+    const SITE = 'https://www.tanetekno.com';
+    const price = p.discount_price || p.tane_price || 0;
+    const imgAbs = p.image_url ? `${SITE}${p.image_url}` : `${SITE}/AmblemTane.png`;
+    const cleanDesc = (str) => String(str||'').replace(/"/g, '\\"').replace(/\n/g,' ').replace(/<[^>]+>/g,'').substring(0,500);
+    const availability = (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": p.name,
+      "description": cleanDesc(p.description || p.name),
+      "image": imgAbs,
+      "sku": p.sku || `TANE-${p.id}`,
+      "brand": { "@type": "Brand", "name": p.brand || "Tane Store" },
+      "url": `${SITE}/product.html?id=${id}`,
+      "offers": {
+        "@type": "Offer",
+        "url": `${SITE}/product.html?id=${id}`,
+        "priceCurrency": "TRY",
+        "price": price.toFixed(2),
+        "availability": availability,
+        "seller": { "@type": "Organization", "name": "Tane Store" },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "TR" },
+          "deliveryTime": { "@type": "ShippingDeliveryTime", "businessDays": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 3 } }
+        }
+      }
+    };
     const meta = `<meta name="description" content="${desc}">
     <meta property="og:title" content="${title.replace(/"/g,'&quot;')}">
     <meta property="og:description" content="${desc}">
-    <meta property="og:image" content="${img}">
-    <meta property="og:url" content="https://tanetekno.com/product.html?id=${id}">
+    <meta property="og:image" content="${imgAbs}">
+    <meta property="og:url" content="${SITE}/product.html?id=${id}">
     <meta property="og:type" content="product">
-    <meta name="twitter:card" content="summary_large_image">`;
+    <meta name="twitter:card" content="summary_large_image">
+    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`;
     html = html.replace('<!-- OG_META -->', meta);
     html = html.replace('<title>Tane Store — Ürün</title>', `<title>${title}</title>`);
     res.send(html);
