@@ -131,11 +131,24 @@ app.get('/product.html', (req, res, next) => {
         "priceCurrency": "TRY",
         "price": price.toFixed(2),
         "availability": availability,
-        "seller": { "@type": "Organization", "name": "Tane Store" },
+        "itemCondition": "https://schema.org/NewCondition",
         "shippingDetails": {
           "@type": "OfferShippingDetails",
+          "shippingRate": { "@type": "MonetaryAmount", "value": price >= 4000 ? "0" : "49.90", "currency": "TRY" },
           "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "TR" },
-          "deliveryTime": { "@type": "ShippingDeliveryTime", "businessDays": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 3 } }
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 1, "unitCode": "DAY" },
+            "transitTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 3, "unitCode": "DAY" }
+          }
+        },
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": "TR",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+          "merchantReturnDays": 14,
+          "returnMethod": "https://schema.org/ReturnByMail",
+          "returnFees": "https://schema.org/FreeReturn"
         }
       }
     };
