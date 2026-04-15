@@ -5,71 +5,213 @@
 <link rel="icon" href="/AmblemTane.png" type="image/png">
 <link rel="apple-touch-icon" href="/AmblemTane.png">
 <link rel="canonical" href="https://www.tanetekno.com/hakkimizda">
-<meta name="description" content="Tane Store hakkında — Türkiye'nin güvenilir teknoloji ve yaşam ürünleri mağazası. Misyonumuz, vizyonumuz ve değerlerimiz.">
+<meta name="description" content="Tane Store hakkında — İstanbul merkezli teknoloji ticaret platformu. E-ticaret, toptan, B2B kurumsal satış ve distribütörlük.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Hakkımızda — Tane Store</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#FDFAF6;--surface:#F5EFE4;--border-light:#EDE4D4;--border:#DDD0BC;--text:#1C1814;--text2:#6B5E50;--text3:#A89480;--accent:#C49660;--r:10px;--r-lg:16px}
+:root{--bg:#FDFAF6;--surface:#F5EFE4;--border-light:#EDE4D4;--border:#DDD0BC;--text:#1C1814;--text2:#6B5E50;--text3:#A89480;--accent:#C49660;--accent-h:#A67D48;--r:10px;--r-lg:16px}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
-nav{background:rgba(253,250,246,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-light);padding:0 24px;display:flex;align-items:center;height:60px}
-.logo{font-weight:700;font-size:18px;color:var(--text);text-decoration:none;letter-spacing:-0.5px}
-.logo span{color:var(--accent)}
-.page{max-width:720px;margin:0 auto;padding:56px 24px}
-h1{font-size:30px;font-weight:700;margin-bottom:8px;letter-spacing:-0.5px;color:var(--text)}
-.subtitle{color:var(--text3);font-size:13px;margin-bottom:40px;padding-bottom:20px;border-bottom:1px solid var(--border-light)}
-h2{font-size:15px;font-weight:600;margin:32px 0 12px;color:var(--text)}
-p{color:var(--text2);line-height:1.8;font-size:14px;margin-bottom:12px}
-.values{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:20px 0}
-.value-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:20px;text-align:center;transition:border-color .2s}
-.value-card:hover{border-color:var(--border)}
-.value-icon{font-size:26px;margin-bottom:10px}
-.value-title{font-weight:600;font-size:13px;margin-bottom:6px;color:var(--text)}
-.value-desc{font-size:12px;color:var(--text2);line-height:1.5}
-.contact-box{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:18px;margin-top:20px}
-.contact-box p{margin:0;font-size:14px;color:var(--text2)}
-.contact-box a{color:var(--accent);text-decoration:none;font-weight:500}
-.contact-box a:hover{color:#A67D48}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* ── NAV ── */
+nav{background:rgba(253,250,246,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-light);padding:0 24px;display:flex;align-items:center;height:60px;position:sticky;top:0;z-index:100}
+
+/* ── HERO ── */
+.hero{position:relative;text-align:center;padding:80px 24px 64px;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:500px;height:350px;background:radial-gradient(ellipse,rgba(196,150,96,.1) 0%,transparent 70%);pointer-events:none}
+.hero-label{display:inline-block;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.hero h1{font-size:clamp(1.8rem,4.5vw,2.8rem);font-weight:800;line-height:1.2;margin-bottom:16px;letter-spacing:-.5px}
+.hero p{max-width:580px;margin:0 auto;color:var(--text2);font-size:.95rem;line-height:1.7}
+
+/* ── CONTAINER ── */
+.container{max-width:900px;margin:0 auto;padding:0 24px}
+.section{padding:52px 0}
+.section+.section{border-top:1px solid var(--border-light)}
+.section-label{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.section h2{font-size:1.4rem;font-weight:700;margin-bottom:14px;letter-spacing:-.3px}
+.section p{color:var(--text2);font-size:.9rem;line-height:1.8;max-width:680px}
+.section p+p{margin-top:12px}
+
+/* ── SERVICES ── */
+.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:28px}
+.service-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:24px 20px;transition:border-color .2s,transform .2s}
+.service-card:hover{border-color:var(--border);transform:translateY(-2px)}
+.service-icon{width:40px;height:40px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;color:#fff}
+.service-card h3{font-size:.85rem;font-weight:700;margin-bottom:6px}
+.service-card p{font-size:.78rem;color:var(--text3);line-height:1.55;margin:0}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:28px}
+.stat-item{text-align:center;padding:24px 14px;background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg)}
+.stat-number{font-size:1.8rem;font-weight:800;color:var(--accent)}
+.stat-label{font-size:.72rem;color:var(--text3);margin-top:4px;font-weight:500}
+
+/* ── WHY US ── */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.why-card{display:flex;gap:14px;align-items:flex-start;padding:22px;background:var(--surface);border:1px solid var(--border-light);border-radius:var(--r-lg);transition:border-color .2s}
+.why-card:hover{border-color:var(--border)}
+.why-icon{flex-shrink:0;width:34px;height:34px;border-radius:8px;background:rgba(196,150,96,.12);display:flex;align-items:center;justify-content:center;font-size:15px}
+.why-card h3{font-size:.85rem;font-weight:700;margin-bottom:3px}
+.why-card p{font-size:.78rem;color:var(--text3);line-height:1.55;margin:0}
+
+/* ── VISION ── */
+.vision-box{margin-top:20px;padding:30px;border-radius:var(--r-lg);background:linear-gradient(135deg,rgba(196,150,96,.08) 0%,rgba(166,125,72,.04) 100%);border:1px solid rgba(196,150,96,.15)}
+.vision-box p{color:var(--text2);font-size:.9rem;margin:0}
+
+/* ── CTA ── */
+.cta-section{text-align:center;padding:64px 24px;border-top:1px solid var(--border-light)}
+.cta-section h2{font-size:1.3rem;font-weight:700;margin-bottom:10px}
+.cta-section p{color:var(--text2);margin-bottom:24px;font-size:.9rem}
+.cta-btn{display:inline-block;padding:13px 32px;background:var(--text);color:#fff;font-weight:700;font-size:.85rem;border-radius:var(--r);text-decoration:none;transition:opacity .2s,transform .2s}
+.cta-btn:hover{opacity:.85;transform:translateY(-2px)}
+
+/* ── FOOTER ── */
+.footer{text-align:center;padding:28px 24px;border-top:1px solid var(--border-light);color:var(--text3);font-size:.75rem}
+.footer a{color:var(--accent);text-decoration:none}
+
+@media(max-width:700px){
+  .services-grid{grid-template-columns:1fr 1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .why-grid{grid-template-columns:1fr}
+  .hero{padding:60px 20px 44px}
+  .section{padding:36px 0}
+}
+@media(max-width:400px){
+  .services-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
-<nav><a class="logo" href="/landing"><img src="/AmblemTane.png" alt="Tane Store" style="height:38px;display:block;mix-blend-mode:multiply"></a></nav>
-<div class="page">
-  <h1>Hakkımızda</h1>
-  <p class="subtitle">Kaliteli ürünleri en uygun fiyatla sunan güvenilir alışveriş noktanız</p>
 
-  <p>Tane Store, Türkiye genelinde müşterilerine geniş ürün yelpazesi sunan bir e-ticaret platformudur. Teknolojiden elektroniğe, ev yaşamından kişisel bakıma kadar pek çok kategoride ürünü tek bir çatı altında topluyoruz.</p>
-  <p>Amacımız, müşterilerimize en rekabetçi fiyatlar ve en hızlı teslimat seçenekleriyle alışveriş deneyimi sunmaktır. Her ürünü titizlikle seçiyor, kalite ve güvenilirliği ön planda tutuyoruz.</p>
+<nav>
+  <a href="/landing"><img src="/AmblemTane.png" alt="Tane Store" style="height:38px;display:block;mix-blend-mode:multiply"></a>
+</nav>
 
-  <h2>Neden Tane Store?</h2>
-  <div class="values">
-    <div class="value-card">
-      <div class="value-icon">⚡</div>
-      <div class="value-title">En Uygun Fiyat</div>
-      <div class="value-desc">Fiyat karşılaştırma sistemiyle her zaman en uygun seçenek</div>
-    </div>
-    <div class="value-card">
-      <div class="value-icon">🚚</div>
-      <div class="value-title">Hızlı Teslimat</div>
-      <div class="value-desc">Siparişleriniz 24 saat içinde kargolanır</div>
-    </div>
-    <div class="value-card">
-      <div class="value-icon">🔒</div>
-      <div class="value-title">Güvenli Ödeme</div>
-      <div class="value-desc">SSL korumalı altyapı ve güvenilir ödeme sistemleri</div>
-    </div>
-    <div class="value-card">
-      <div class="value-icon">💬</div>
-      <div class="value-title">Müşteri Desteği</div>
-      <div class="value-desc">7/24 destek hattı ile yanınızdayız</div>
-    </div>
-  </div>
+<header class="hero">
+  <div class="hero-label">Hakkımızda</div>
+  <h1>Tek Ürünle Başladık,<br>Uçtan Uca Ticaret Yapıyoruz.</h1>
+  <p>Tane Store, İstanbul merkezli bir teknoloji ticaret platformudur. Bireysel tüketicilerden kurumlara, küçük işletmelerden holdinglere kadar geniş bir müşteri ağına hizmet veriyoruz.</p>
+</header>
 
-  <h2>İletişim</h2>
-  <div class="contact-box">
-    <p>Sorularınız için: <a href="mailto:info@tanetekno.com">info@tanetekno.com</a> — 7 Gün, 24 Saat</p>
-  </div>
+<div class="container">
+  <!-- Biz Kimiz -->
+  <section class="section">
+    <div class="section-label">Biz Kimiz</div>
+    <h2>Ticareti Basitleştiriyoruz</h2>
+    <p>Tane Store olarak e-ticaret, toptan ticaret, B2B kurumsal satış ve distribütörlük alanlarında faaliyet gösteriyoruz. Teknolojiden elektroniğe, ofis ekipmanlarından aksesuara kadar geniş bir ürün yelpazesini müşterilerimize sunuyoruz.</p>
+    <p>Bireysel müşterilere online perakende satış yaparken, aynı zamanda şirketlere ve kurumlara özel fiyatlandırma, fatura düzeni ve teslimat planlamasıyla kurumsal çözümler üretiyoruz. Üreticiler ile perakendeciler arasında köprü görevi üstlenerek toptan tedarikte güvenilir bir partner olarak konumlanıyoruz.</p>
+  </section>
+
+  <!-- Faaliyet Alanları -->
+  <section class="section">
+    <div class="section-label">Faaliyet Alanları</div>
+    <h2>Neler Yapıyoruz?</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🛒</div>
+        <h3>E-Ticaret</h3>
+        <p>Bireysel müşterilere fiyat karşılaştırmalı online satış. Her zaman en uygun fiyat garantisi.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📦</div>
+        <h3>Toptan Ticaret</h3>
+        <p>Büyük hacimli ürün tedariği. Perakendecilere ve bayilere toplu satış çözümleri.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🏢</div>
+        <h3>B2B Kurumsal</h3>
+        <p>Şirket ve kurumlara özel fiyatlandırma, fatura düzeni ve teslimat planlaması.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🔗</div>
+        <h3>Distribütörlük</h3>
+        <p>Marka ve üreticilerin Türkiye genelinde yetkili dağıtım ve tedarik ağı.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rakamlar -->
+  <section class="section">
+    <div class="section-label">Rakamlarla Biz</div>
+    <h2>Güvenin Adı</h2>
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-number">4+</div>
+        <div class="stat-label">Faaliyet Alanı</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Ürün Çeşidi</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">B2B</div>
+        <div class="stat-label">Kurumsal Çözümler</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">7/24</div>
+        <div class="stat-label">Destek Hattı</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Neden Tane -->
+  <section class="section">
+    <div class="section-label">Avantajlar</div>
+    <h2>Neden Tane Store?</h2>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">⚡</div>
+        <div>
+          <h3>Rekabetçi Fiyat</h3>
+          <p>Fiyat karşılaştırma altyapımızla her zaman piyasanın en uygun seçeneğini sunuyoruz.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🚚</div>
+        <div>
+          <h3>Hızlı Teslimat</h3>
+          <p>Siparişler 24 saat içinde kargolanır. Kurumsal siparişlerde özel teslimat planlaması.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🔒</div>
+        <div>
+          <h3>Güvenli Alışveriş</h3>
+          <p>SSL korumalı altyapı, güvenilir ödeme sistemleri ve kurumsal fatura desteği.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🤝</div>
+        <div>
+          <h3>Kurumsal Güven</h3>
+          <p>Holdinglerden üniversitelere kadar geniş bir kurumsal referans ağı.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vizyon -->
+  <section class="section">
+    <div class="section-label">Vizyon</div>
+    <h2>Nereye Gidiyoruz?</h2>
+    <div class="vision-box">
+      <p>Tane Store olarak sadece ürün satan değil, güven satan bir marka olmayı hedefliyoruz. Kısa vadede Türkiye'nin en güvenilir teknoloji ticaret platformlarından biri olmak, uzun vadede ise üretimden dağıtıma kadar uçtan uca bir ticaret ekosistemi kurmak en büyük hedefimiz.</p>
+    </div>
+  </section>
 </div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Birlikte Çalışalım</h2>
+  <p>Kurumsal teklif, toptan sipariş veya distribütörlük için bizimle iletişime geçin.</p>
+  <a href="mailto:info@tanetekno.com" class="cta-btn">İletişime Geç →</a>
+</section>
+
+<footer class="footer">
+  © 2025 Tane Store — <a href="mailto:info@tanetekno.com">info@tanetekno.com</a>
+</footer>
+
 </body>
 </html>
