@@ -17,8 +17,13 @@ const PORT = process.env.PORT || 3000;
 // Railway healthcheck endpoint — deploy phase'inde container'ın yaşadığını doğrular
 app.get('/_health', (req, res) => res.status(200).send('OK'));
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`✅ Tane Store çalışıyor → Port: ${PORT}`);
+// app.listen() en sona alındı — tüm middleware/route'lar mount edildikten sonra başlar
+// Startup hatalarını yakalamak için global handler'lar
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] uncaughtException:', err.message, err.stack);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[FATAL] unhandledRejection:', reason);
 });
 
 // ── Akakçe otomatik sync — her gün saat 03:00'da ──────────
@@ -284,5 +289,13 @@ app.get('/sitemap.xml', (req, res) => {
   });
 });
 app.get('/siparis-alindi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'siparis-alindi.html')));
+
+// ── Sunucuyu en sonda başlat — tüm route/middleware'ler hazır olduktan sonra ──
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Tane Store çalışıyor → Port: ${PORT}`);
+}).on('error', (err) => {
+  console.error('[FATAL] Sunucu başlatılamadı:', err.message);
+  process.exit(1);
+});
 
 
