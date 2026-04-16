@@ -709,19 +709,33 @@ function removeImg(btn){
 
 async function uploadOneImage(file){
   const fd=new FormData();fd.append('image',file);
-  try{const r=await fetch('/api/upload',{method:'POST',body:fd});const d=await r.json();return d.url||null;}
-  catch(e){return null;}
+  try{
+    const r=await fetch('/api/upload',{method:'POST',body:fd,credentials:'include'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok){
+      console.error('[upload] hata:',r.status,d);
+      showToast('❌ Resim yüklenemedi: '+(d.error||r.status));
+      return null;
+    }
+    return d.url||null;
+  }catch(e){
+    console.error('[upload] exception:',e);
+    showToast('❌ Resim yükleme bağlantı hatası');
+    return null;
+  }
 }
 
 async function uploadAllImages(prefix){
   const arr=prefix==='add'?addImgs:editImgs;
   const urls=[];
+  let failed=0;
   for(const img of arr){
     if(!img.file){urls.push(img.url);continue;}
     const url=await uploadOneImage(img.file);
     if(url)urls.push(url);
+    else failed++;
   }
-  return urls;
+  return {urls,failed};
 }
 
 async function addProduct(){
@@ -729,7 +743,8 @@ async function addProduct(){
   const price=document.getElementById('new-price').value;
   if(!name||!price)return showToast('❌ Ad ve fiyat zorunlu!');
   showToast('📤 Yükleniyor...');
-  const uploaded=await uploadAllImages('add');
+  const {urls:uploaded,failed}=await uploadAllImages('add');
+  if(failed>0){return showToast('❌ '+failed+' resim yüklenemedi — kaydetme iptal edildi');}
   // Merge: uploaded files first, then URL-picked images
   const imageUrls=[...uploaded, ...pickedFromUrl['add'].filter(u=>!uploaded.includes(u))];
   try{
@@ -781,7 +796,8 @@ async function saveEdit(){
   const price=document.getElementById('edit-price').value;
   if(!name||!price)return showToast('❌ Ad ve fiyat zorunlu!');
   showToast('💾 Kaydediliyor...');
-  const uploaded=await uploadAllImages('edit');
+  const {urls:uploaded,failed}=await uploadAllImages('edit');
+  if(failed>0){return showToast('❌ '+failed+' resim yüklenemedi — kaydetme iptal edildi');}
   const imageUrls=[...uploaded, ...pickedFromUrl['edit'].filter(u=>!uploaded.includes(u))];
   const imageUrl=imageUrls[0]||document.getElementById('edit-image-url').value||null;
   const imagesJson=imageUrls.length>0?JSON.stringify(imageUrls):null;
