@@ -244,6 +244,27 @@ async function initDB() {
       console.log('Hiyerarşik kategoriler seed edildi');
     }
 
+    // ── Sonradan eklenen alt kategoriler (idempotent) ──────
+    const extraSubcats = [
+      { parent: 'bilgisayar',  name: 'Monitör',                 slug: 'monitor' },
+      { parent: 'bilgisayar',  name: 'Bilgisayar Bileşenleri',  slug: 'bilgisayar-bilesenleri' },
+      { parent: 'bilgisayar',  name: 'RAM',                     slug: 'ram' },
+      { parent: 'bilgisayar',  name: 'SSD',                     slug: 'ssd' },
+      { parent: 'oyun-konsol', name: 'Oyuncu Klavyesi',         slug: 'oyuncu-klavyesi' },
+      { parent: 'oyun-konsol', name: 'Oyuncu Mouse',            slug: 'oyuncu-mouse' },
+      { parent: 'oyun-konsol', name: 'Oyuncu Kulaklığı',        slug: 'oyuncu-kulakligi' }
+    ];
+    for (const sc of extraSubcats) {
+      const parentRes = await pool.query('SELECT id FROM categories WHERE slug = $1 AND parent_id IS NULL', [sc.parent]);
+      if (!parentRes.rows.length) continue;
+      await pool.query(
+        `INSERT INTO categories (name, slug, parent_id, sort_order)
+         VALUES ($1, $2, $3, (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM categories WHERE parent_id = $3))
+         ON CONFLICT (slug) DO NOTHING`,
+        [sc.name, sc.slug, parentRes.rows[0].id]
+      );
+    }
+
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
     console.error('DB hatasi:', e.message);
