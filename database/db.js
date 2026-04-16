@@ -252,6 +252,7 @@ async function initDB() {
       { parent: 'bilgisayar',  name: 'Bilgisayar Bileşenleri',  slug: 'bilgisayar-bilesenleri' },
       { parent: 'bilgisayar',  name: 'RAM',                     slug: 'ram' },
       { parent: 'bilgisayar',  name: 'SSD',                     slug: 'ssd' },
+      { parent: 'bilgisayar',  name: 'GPU',                     slug: 'gpu' },
       { parent: 'oyun-konsol', name: 'Oyuncu Klavyesi',         slug: 'oyuncu-klavyesi' },
       { parent: 'oyun-konsol', name: 'Oyuncu Mouse',            slug: 'oyuncu-mouse' },
       { parent: 'oyun-konsol', name: 'Oyuncu Kulaklığı',        slug: 'oyuncu-kulakligi' }
