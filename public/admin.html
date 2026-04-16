@@ -645,6 +645,7 @@ async function adminLogout() {
 
 // ─────────────────────────────────────────────────────────────────────────
 let products=[],orders=[],selectedProductId=null,editImageUrl=null,categoryTree=[];
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 async function loadCategoryTree(){
   try{
@@ -770,9 +771,9 @@ function renderProducts(){
     const isInactive=p.is_active===false;
     return`<tr class="${isInactive?'row-inactive':''}">
       <td><input type="checkbox" class="prod-check" data-id="${p.id}" onchange="updateProdBulkBar()"></td>
-      <td><div style="display:flex;align-items:center;gap:10px">${imgEl}<div><div style="font-weight:600">${p.name}</div><div style="font-size:11px;color:#aaa">${p.description?p.description.substring(0,40)+'…':''}</div></div></div></td>
-      <td><span class="badge badge-orange">${p.category||'Genel'}</span>${p.brand?`<div style="font-size:11px;color:#888;margin-top:3px">${p.brand}</div>`:''}</td>
-      <td><div style="font-size:12px;font-family:monospace;color:#555">${p.sku||'—'}</div>${stockBadge}</td>
+      <td><div style="display:flex;align-items:center;gap:10px">${imgEl}<div><div style="font-weight:600">${escHtml(p.name)}</div><div style="font-size:11px;color:#aaa">${p.description?escHtml(String(p.description).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().substring(0,40))+'…':''}</div></div></div></td>
+      <td><span class="badge badge-orange">${escHtml(p.category||'Genel')}</span>${p.brand?`<div style="font-size:11px;color:#888;margin-top:3px">${escHtml(p.brand)}</div>`:''}</td>
+      <td><div style="font-size:12px;font-family:monospace;color:#555">${escHtml(p.sku||'—')}</div>${stockBadge}</td>
       <td>${priceText}</td>
       <td><span class="badge ${priceCount>0?'badge-green':'badge-gray'}">${priceCount>0?priceCount+' platform':'Girilmedi'}</span></td>
       <td><span class="stars-small">${stars}</span><div style="font-size:11px;color:#aaa">${p.review_count||0} yorum</div></td>
