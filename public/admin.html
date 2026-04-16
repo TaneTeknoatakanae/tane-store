@@ -135,8 +135,21 @@ tr:last-child td{border-bottom:none}
   <!-- ÜRÜNLER -->
   <div id="tab-products">
     <div class="table-wrap">
-      <div class="table-head" style="gap:8px;flex-wrap:wrap"><h3>Tüm Ürünler</h3><div style="display:flex;gap:8px"><button class="btn-orange" onclick="openBulkModal()">⚡ Toplu Ekle</button><button class="btn-primary" onclick="openAddModal()">➕ Yeni Ürün Ekle</button></div></div>
-      <table><thead><tr><th>Ürün</th><th>Kategori / Marka</th><th>SKU / Stok</th><th>Fiyat</th><th>Karşılaştırma</th><th>Puan</th><th>İşlem</th></tr></thead>
+      <div class="table-head" style="gap:8px;flex-wrap:wrap">
+        <h3>Tüm Ürünler</h3>
+        <div id="prod-bulk-bar" style="display:none;align-items:center;gap:8px;flex-wrap:wrap">
+          <span id="prod-bulk-count" style="font-size:13px;color:#666;font-weight:600"></span>
+          <button class="btn-danger" onclick="bulkDeleteProducts()">🗑 Seçilenleri Sil</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-left:auto">
+          <button class="btn-orange" onclick="openBulkModal()">⚡ Toplu Ekle</button>
+          <button class="btn-primary" onclick="openAddModal()">➕ Yeni Ürün Ekle</button>
+        </div>
+      </div>
+      <table><thead><tr>
+        <th style="width:34px"><input type="checkbox" id="prod-check-all" onchange="toggleAllProducts(this.checked)"></th>
+        <th>Ürün</th><th>Kategori / Marka</th><th>SKU / Stok</th><th>Fiyat</th><th>Karşılaştırma</th><th>Puan</th><th>İşlem</th>
+      </tr></thead>
       <tbody id="products-tbody"></tbody></table>
     </div>
   </div>
@@ -645,7 +658,7 @@ async function loadAll(){
 
 function renderProducts(){
   const tbody=document.getElementById('products-tbody');
-  if(!products.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:40px">Henüz ürün yok</td></tr>';return;}
+  if(!products.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:40px">Henüz ürün yok</td></tr>';updateProdBulkBar();return;}
   tbody.innerHTML=products.map(p=>{
     const priceCount=p.platforms?p.platforms.split(',').length:0;
     const imgEl=p.image_url?`<img src="${p.image_url}" class="product-img-thumb" onerror="this.outerHTML='<div class=product-img-ph>📦</div>'">`:`<div class="product-img-ph">📦</div>`;
@@ -654,6 +667,7 @@ function renderProducts(){
     const stars=p.rating?'★'.repeat(Math.round(p.rating))+'☆'.repeat(5-Math.round(p.rating)):'—';
     const stockBadge=p.stock===0?'<span class="badge badge-red">Stok Yok</span>':p.stock<=10?`<span class="badge badge-orange">Son ${p.stock}</span>`:`<span style="font-size:12px;color:#888">${p.stock||99}</span>`;
     return`<tr>
+      <td><input type="checkbox" class="prod-check" data-id="${p.id}" onchange="updateProdBulkBar()"></td>
       <td><div style="display:flex;align-items:center;gap:10px">${imgEl}<div><div style="font-weight:600">${p.name}</div><div style="font-size:11px;color:#aaa">${p.description?p.description.substring(0,40)+'…':''}</div></div></div></td>
       <td><span class="badge badge-orange">${p.category||'Genel'}</span>${p.brand?`<div style="font-size:11px;color:#888;margin-top:3px">${p.brand}</div>`:''}</td>
       <td><div style="font-size:12px;font-family:monospace;color:#555">${p.sku||'—'}</div>${stockBadge}</td>
@@ -999,6 +1013,37 @@ function closeModal(id){
     if(e.target===this) closeModal(id);
   });
 });
+
+// ── Ürün toplu işlemleri ──
+function getSelectedProductIds(){
+  return Array.from(document.querySelectorAll('.prod-check:checked')).map(c=>parseInt(c.dataset.id));
+}
+function updateProdBulkBar(){
+  const ids=getSelectedProductIds();
+  const bar=document.getElementById('prod-bulk-bar');
+  if(!bar)return;
+  if(ids.length){bar.style.display='flex';document.getElementById('prod-bulk-count').textContent=ids.length+' seçildi';}
+  else{bar.style.display='none';}
+  const all=document.getElementById('prod-check-all');
+  const total=document.querySelectorAll('.prod-check').length;
+  if(all)all.checked=ids.length>0&&ids.length===total;
+}
+function toggleAllProducts(checked){
+  document.querySelectorAll('.prod-check').forEach(c=>c.checked=checked);
+  updateProdBulkBar();
+}
+async function bulkDeleteProducts(){
+  const ids=getSelectedProductIds();
+  if(!ids.length)return;
+  if(!confirm(ids.length+' ürün silinecek. Bu işlem geri alınamaz. Emin misin?'))return;
+  try{
+    const r=await fetch('/api/products/bulk-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({ids})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Hata');
+    showToast(d.message||'Tamamlandı');
+    await loadAll();
+  }catch(e){showToast('Hata: '+e.message);}
+}
 
 // ── Sipariş toplu işlemleri ──
 function getSelectedOrderIds(){

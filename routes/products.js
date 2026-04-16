@@ -92,6 +92,22 @@ router.put('/:id', adminAuth, (req, res) => {
     });
 });
 
+// Toplu ürün silme — admin only
+// Body: { ids: [1,2,3] }
+router.post('/bulk-delete', adminAuth, (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || !ids.length) return res.status(400).json({ error: 'ID listesi boş' });
+  const safeIds = ids.map(n => parseInt(n)).filter(Boolean);
+  if (!safeIds.length) return res.status(400).json({ error: 'Geçersiz ID listesi' });
+
+  // ON DELETE CASCADE prices ve reviews'u otomatik temizler (FK)
+  db.run('DELETE FROM products WHERE id = ANY($1::int[])', [safeIds], function(err) {
+    if (err) return res.status(500).json({ error: err.message });
+    audit(req, 'product.bulk_delete', { ids: safeIds });
+    res.json({ message: `✅ ${this.changes} ürün silindi`, changes: this.changes });
+  });
+});
+
 // Ürün sil — admin only
 router.delete('/:id', adminAuth, (req, res) => {
   db.run('DELETE FROM prices WHERE product_id = ?', [req.params.id]);
