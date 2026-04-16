@@ -29,10 +29,23 @@ nav{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;t
 .tab.active{background:#1C1814;color:#fff}
 .tab:not(.active){background:var(--bg);border:1px solid var(--border);color:#666}
 .table-wrap{background:var(--bg);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.table-wrap table{min-width:100%;display:table}
+.table-scroll{overflow-x:auto}
+td,th{white-space:nowrap}
+td:first-child,th:first-child{white-space:normal}
+td:nth-child(2){white-space:normal;min-width:220px}
 .table-head{padding:18px 22px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
 .table-head h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
 table{width:100%;border-collapse:collapse}
 th{padding:11px 18px;text-align:left;font-size:11px;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #f3f3f1}
+.prod-filter-btn{background:transparent;border:none;padding:6px 14px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;color:#666;transition:all .15s}
+.prod-filter-btn.active{background:#1C1814;color:#fff}
+.prod-filter-btn.active span{color:rgba(255,255,255,.6)!important}
+.row-inactive{opacity:.55}
+.row-inactive td:nth-child(2)::before{content:'⏸ ';color:#888}
+.toggle-btn{background:none;border:1px solid var(--border);border-radius:7px;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:600;color:#666}
+.toggle-btn.active{background:#dcfce7;border-color:#86efac;color:#16a34a}
+.toggle-btn.inactive{background:#fef3c7;border-color:#fde68a;color:#b45309}
 .sort-th{cursor:pointer;user-select:none;transition:color .15s}
 .sort-th:hover{color:#C49660}
 .sort-ind{display:inline-block;width:10px;font-size:10px;color:#C49660;margin-left:2px}
@@ -139,16 +152,24 @@ tr:last-child td{border-bottom:none}
   <div id="tab-products">
     <div class="table-wrap">
       <div class="table-head" style="gap:8px;flex-wrap:wrap">
-        <h3>Tüm Ürünler</h3>
+        <h3>Ürünler</h3>
+        <div style="display:flex;gap:4px;background:var(--surface);padding:3px;border-radius:10px">
+          <button class="prod-filter-btn active" data-filter="active" onclick="setProductFilter('active',this)">Aktif <span id="cnt-active" style="color:#888;font-weight:500">(0)</span></button>
+          <button class="prod-filter-btn" data-filter="inactive" onclick="setProductFilter('inactive',this)">Pasif <span id="cnt-inactive" style="color:#888;font-weight:500">(0)</span></button>
+          <button class="prod-filter-btn" data-filter="all" onclick="setProductFilter('all',this)">Tümü <span id="cnt-all" style="color:#888;font-weight:500">(0)</span></button>
+        </div>
         <div id="prod-bulk-bar" style="display:none;align-items:center;gap:8px;flex-wrap:wrap">
           <span id="prod-bulk-count" style="font-size:13px;color:#666;font-weight:600"></span>
-          <button class="btn-danger" onclick="bulkDeleteProducts()">🗑 Seçilenleri Sil</button>
+          <button class="btn-orange" onclick="bulkToggleActive(true)">✓ Aktif Yap</button>
+          <button class="btn-orange" style="background:#888" onclick="bulkToggleActive(false)">⏸ Pasife Al</button>
+          <button class="btn-danger" onclick="bulkDeleteProducts()">🗑 Sil</button>
         </div>
         <div style="display:flex;gap:8px;margin-left:auto">
           <button class="btn-orange" onclick="openBulkModal()">⚡ Toplu Ekle</button>
           <button class="btn-primary" onclick="openAddModal()">➕ Yeni Ürün Ekle</button>
         </div>
       </div>
+      <div class="table-scroll">
       <table><thead><tr>
         <th style="width:34px"><input type="checkbox" id="prod-check-all" onchange="toggleAllProducts(this.checked)"></th>
         <th class="sort-th" onclick="sortProducts('name')">Ürün <span class="sort-ind" data-key="name"></span></th>
@@ -160,6 +181,7 @@ tr:last-child td{border-bottom:none}
         <th>İşlem</th>
       </tr></thead>
       <tbody id="products-tbody"></tbody></table>
+      </div>
     </div>
   </div>
 
@@ -651,7 +673,7 @@ function loadChildCats(prefix, selectedChildId){
 
 async function loadAll(){
   try{
-    const[pr,or]=await Promise.all([fetch('/api/products').then(r=>r.json()),fetch('/api/orders').then(r=>r.json())]);
+    const[pr,or]=await Promise.all([fetch('/api/products?admin=1',{credentials:'include'}).then(r=>r.json()),fetch('/api/orders').then(r=>r.json())]);
     products=pr;orders=or;
     if(!categoryTree.length) loadCategoryTree();
     document.getElementById('s-products').textContent=products.length;
@@ -665,7 +687,34 @@ async function loadAll(){
   }catch(e){showToast('❌ Veri yüklenemedi');}
 }
 
-let prodSortKey='', prodSortDir='asc';
+let prodSortKey='', prodSortDir='asc', productFilter='active';
+function setProductFilter(f,btn){
+  productFilter=f;
+  document.querySelectorAll('.prod-filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderProducts();
+}
+async function toggleProductActive(id,makeActive){
+  try{
+    const r=await fetch('/api/products/'+id+'/toggle-active',{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({is_active:makeActive})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Hata');
+    showToast(d.message);
+    await loadAll();
+  }catch(e){showToast('Hata: '+e.message);}
+}
+async function bulkToggleActive(makeActive){
+  const ids=getSelectedProductIds();
+  if(!ids.length)return;
+  try{
+    const r=await fetch('/api/products/bulk-active',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({ids,is_active:makeActive})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Hata');
+    showToast(d.message);
+    await loadAll();
+  }catch(e){showToast('Hata: '+e.message);}
+}
+
 function sortProducts(key){
   if(prodSortKey===key){prodSortDir=prodSortDir==='asc'?'desc':'asc';}
   else{prodSortKey=key;prodSortDir='asc';}
@@ -699,8 +748,18 @@ function updateSortIndicators(){
 function renderProducts(){
   const tbody=document.getElementById('products-tbody');
   updateSortIndicators();
-  if(!products.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:40px">Henüz ürün yok</td></tr>';updateProdBulkBar();return;}
-  const sorted=applyProductSort(products);
+  // Filtre sayımları
+  const activeCount=products.filter(p=>p.is_active!==false).length;
+  const inactiveCount=products.filter(p=>p.is_active===false).length;
+  const elA=document.getElementById('cnt-active'); if(elA)elA.textContent='('+activeCount+')';
+  const elI=document.getElementById('cnt-inactive'); if(elI)elI.textContent='('+inactiveCount+')';
+  const elT=document.getElementById('cnt-all'); if(elT)elT.textContent='('+products.length+')';
+  // Filtrele
+  let filtered=products;
+  if(productFilter==='active')   filtered=products.filter(p=>p.is_active!==false);
+  if(productFilter==='inactive') filtered=products.filter(p=>p.is_active===false);
+  if(!filtered.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:40px">Bu filtrede ürün yok</td></tr>';updateProdBulkBar();return;}
+  const sorted=applyProductSort(filtered);
   tbody.innerHTML=sorted.map(p=>{
     const priceCount=p.platforms?p.platforms.split(',').length:0;
     const imgEl=p.image_url?`<img src="${p.image_url}" class="product-img-thumb" onerror="this.outerHTML='<div class=product-img-ph>📦</div>'">`:`<div class="product-img-ph">📦</div>`;
@@ -708,7 +767,8 @@ function renderProducts(){
     const priceText=p.discount_price?`<del style="color:#bbb;font-size:12px">${p.tane_price.toLocaleString('tr-TR')} ₺</del><br><span style="color:#ef4444;font-weight:700">${p.discount_price.toLocaleString('tr-TR')} ₺</span>`:`<span style="font-weight:700;color:#C49660">${p.tane_price.toLocaleString('tr-TR')} ₺</span>`;
     const stars=p.rating?'★'.repeat(Math.round(p.rating))+'☆'.repeat(5-Math.round(p.rating)):'—';
     const stockBadge=p.stock===0?'<span class="badge badge-red">Stok Yok</span>':p.stock<=10?`<span class="badge badge-orange">Son ${p.stock}</span>`:`<span style="font-size:12px;color:#888">${p.stock||99}</span>`;
-    return`<tr>
+    const isInactive=p.is_active===false;
+    return`<tr class="${isInactive?'row-inactive':''}">
       <td><input type="checkbox" class="prod-check" data-id="${p.id}" onchange="updateProdBulkBar()"></td>
       <td><div style="display:flex;align-items:center;gap:10px">${imgEl}<div><div style="font-weight:600">${p.name}</div><div style="font-size:11px;color:#aaa">${p.description?p.description.substring(0,40)+'…':''}</div></div></div></td>
       <td><span class="badge badge-orange">${p.category||'Genel'}</span>${p.brand?`<div style="font-size:11px;color:#888;margin-top:3px">${p.brand}</div>`:''}</td>
@@ -716,7 +776,8 @@ function renderProducts(){
       <td>${priceText}</td>
       <td><span class="badge ${priceCount>0?'badge-green':'badge-gray'}">${priceCount>0?priceCount+' platform':'Girilmedi'}</span></td>
       <td><span class="stars-small">${stars}</span><div style="font-size:11px;color:#aaa">${p.review_count||0} yorum</div></td>
-      <td><div style="display:flex;gap:5px">
+      <td><div style="display:flex;gap:5px;align-items:center">
+        <button class="toggle-btn ${isInactive?'inactive':'active'}" onclick="toggleProductActive(${p.id},${isInactive})" title="${isInactive?'Aktifleştir':'Pasife al'}">${isInactive?'⏸ Pasif':'✓ Aktif'}</button>
         <button class="btn-blue" onclick="openEditModal(${p.id})">✏️</button>
         <button class="btn-orange" onclick="openPriceModal(${p.id})">💰</button>
         <button class="btn-danger" onclick="deleteProduct(${p.id})">🗑</button>

@@ -6,19 +6,27 @@ const { audit } = adminAuth;
 
 // Tüm ürünleri getir
 router.get('/', (req, res) => {
-  const { category, parent_slug, child_slug } = req.query;
-  let where = '';
+  const { category, parent_slug, child_slug, admin, status } = req.query;
+  const isAdmin = !!(req.session && req.session.isAdmin);
+  const clauses = [];
   const params = [];
+  // Public isteklerde sadece aktif ürünleri döndür
+  if (!isAdmin) clauses.push('p.is_active = TRUE');
+  // Admin isteklerinde status filtresi
+  if (isAdmin && status === 'active')   clauses.push('p.is_active = TRUE');
+  if (isAdmin && status === 'inactive') clauses.push('p.is_active = FALSE');
+
   if (child_slug) {
-    where = 'WHERE p.category_id = (SELECT id FROM categories WHERE slug = $1 AND parent_id IS NOT NULL)';
+    clauses.push(`p.category_id = (SELECT id FROM categories WHERE slug = $${params.length+1} AND parent_id IS NOT NULL)`);
     params.push(child_slug);
   } else if (parent_slug) {
-    where = 'WHERE p.category_id IN (SELECT id FROM categories WHERE parent_id = (SELECT id FROM categories WHERE slug = $1 AND parent_id IS NULL))';
+    clauses.push(`p.category_id IN (SELECT id FROM categories WHERE parent_id = (SELECT id FROM categories WHERE slug = $${params.length+1} AND parent_id IS NULL))`);
     params.push(parent_slug);
   } else if (category) {
-    where = 'WHERE p.category = $1';
+    clauses.push(`p.category = $${params.length+1}`);
     params.push(category);
   }
+  const where = clauses.length ? 'WHERE ' + clauses.join(' AND ') : '';
   db.all(`
     SELECT p.*,
       c.name AS category_name, c.slug AS category_slug,
@@ -105,6 +113,30 @@ router.post('/bulk-delete', adminAuth, (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     audit(req, 'product.bulk_delete', { ids: safeIds });
     res.json({ message: `✅ ${this.changes} ürün silindi`, changes: this.changes });
+  });
+});
+
+// Ürünü aktif/pasif yap — admin only
+router.put('/:id/toggle-active', adminAuth, (req, res) => {
+  const { is_active } = req.body;
+  if (typeof is_active !== 'boolean') return res.status(400).json({ error: 'is_active boolean olmalı' });
+  db.run('UPDATE products SET is_active = ? WHERE id = ?', [is_active, req.params.id], function(err) {
+    if (err) return res.status(500).json({ error: err.message });
+    audit(req, 'product.toggle_active', { id: req.params.id, is_active });
+    res.json({ message: is_active ? '✅ Ürün aktif' : '⏸ Ürün pasif', is_active });
+  });
+});
+
+// Toplu aktif/pasif — admin only
+router.post('/bulk-active', adminAuth, (req, res) => {
+  const { ids, is_active } = req.body;
+  if (!Array.isArray(ids) || !ids.length) return res.status(400).json({ error: 'ID listesi boş' });
+  if (typeof is_active !== 'boolean') return res.status(400).json({ error: 'is_active boolean olmalı' });
+  const safeIds = ids.map(n => parseInt(n)).filter(Boolean);
+  db.run('UPDATE products SET is_active = $1 WHERE id = ANY($2::int[])', [is_active, safeIds], function(err) {
+    if (err) return res.status(500).json({ error: err.message });
+    audit(req, 'product.bulk_toggle_active', { ids: safeIds, is_active });
+    res.json({ message: `✅ ${this.changes} ürün ${is_active ? 'aktif' : 'pasif'} yapıldı`, changes: this.changes });
   });
 });
 

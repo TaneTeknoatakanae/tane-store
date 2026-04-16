@@ -198,6 +198,8 @@ async function initDB() {
     )`);
     await pool.query(`CREATE INDEX IF NOT EXISTS categories_parent_idx ON categories(parent_id)`);
     await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL`);
+    await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS products_active_idx ON products(is_active)`);
 
     // İlk kez seed et — sadece tablo boşsa
     const seedCheck = await pool.query('SELECT COUNT(*)::int AS c FROM categories');
