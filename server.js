@@ -14,6 +14,9 @@ const adminAuth = require('./middleware/adminAuth');
 const app = express();
 const PORT = process.env.PORT || 3000; 
 
+// Railway healthcheck endpoint — deploy phase'inde container'ın yaşadığını doğrular
+app.get('/_health', (req, res) => res.status(200).send('OK'));
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Tane Store çalışıyor → Port: ${PORT}`);
 });
