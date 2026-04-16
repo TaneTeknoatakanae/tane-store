@@ -48,6 +48,7 @@ router.get('/', (req, res) => {
 
 // Tek ürün getir
 router.get('/:id', (req, res) => {
+  const isAdmin = !!(req.session && req.session.isAdmin);
   db.get(`
     SELECT p.*,
       c.name AS category_name, c.slug AS category_slug,
@@ -59,6 +60,8 @@ router.get('/:id', (req, res) => {
   `, [req.params.id], (err, product) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!product) return res.status(404).json({ error: 'Ürün bulunamadı' });
+    // Pasif ürünleri public için gizle (admin görebilir)
+    if (product.is_active === false && !isAdmin) return res.status(404).json({ error: 'Ürün bulunamadı' });
     db.all('SELECT * FROM prices WHERE product_id = ? ORDER BY price ASC', [req.params.id], (err, prices) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ ...product, prices });
@@ -75,7 +78,8 @@ router.post('/', adminAuth, (req, res) => {
     INSERT INTO products (name, image_url, images, description, category, category_id, brand, sku, tane_price, discount_price, tane_url, stock)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [name, image_url || null, images || null, description || null, category || 'Genel', category_id ? parseInt(category_id) : null, brand || null, sku || null,
-    parseFloat(tane_price) || 0, discount_price ? parseFloat(discount_price) : null, tane_url || null, parseInt(stock) || 99],
+    parseFloat(tane_price) || 0, discount_price ? parseFloat(discount_price) : null, tane_url || null,
+    (stock === undefined || stock === null || stock === '') ? 99 : parseInt(stock)],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
       audit(req, 'product.create', { name, id: this.lastID });
@@ -92,7 +96,7 @@ router.put('/:id', adminAuth, (req, res) => {
     WHERE id=?
   `, [name, image_url || null, images || null, description || null, category || 'Genel', category_id ? parseInt(category_id) : null, brand || null, sku || null,
     parseFloat(tane_price) || 0, discount_price ? parseFloat(discount_price) : null, tane_url || null,
-    parseInt(stock) || 99, req.params.id],
+    (stock === undefined || stock === null || stock === '') ? 99 : parseInt(stock), req.params.id],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
       audit(req, 'product.update', { id: req.params.id, name });

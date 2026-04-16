@@ -114,6 +114,11 @@ app.get('/product.html', (req, res, next) => {
   if (!id) return next();
   db.get('SELECT * FROM products WHERE id = ?', [id], (err, p) => {
     if (err || !p) return next();
+    // Pasif ürün: admin değilse 404 sayfasına yönlendir (SEO için noindex)
+    const isAdmin = !!(req.session && req.session.isAdmin);
+    if (p.is_active === false && !isAdmin) {
+      return res.status(404).sendFile(path.join(__dirname, 'public', 'product.html'));
+    }
     const fs = require('fs');
     let html = fs.readFileSync(path.join(__dirname, 'public', 'product.html'), 'utf8');
     const SITE = 'https://www.tanetekno.com';
@@ -258,7 +263,7 @@ app.get('/sitemap.xml', (req, res) => {
     { url: '/mesafeli-satis',    pri: '0.3', freq: 'yearly'  },
     { url: '/on-bilgilendirme',  pri: '0.3', freq: 'yearly'  }
   ];
-  db.all('SELECT id, name, COALESCE(category, \'\') AS category, created_at FROM products', [], (err, rows) => {
+  db.all('SELECT id, name, COALESCE(category, \'\') AS category, created_at FROM products WHERE is_active = TRUE', [], (err, rows) => {
     const escape = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
     const items = [];
     staticPages.forEach(p => items.push(
