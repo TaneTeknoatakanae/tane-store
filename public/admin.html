@@ -135,7 +135,7 @@ tr:last-child td{border-bottom:none}
   <!-- ÜRÜNLER -->
   <div id="tab-products">
     <div class="table-wrap">
-      <div class="table-head"><h3>Tüm Ürünler</h3><button class="btn-primary" onclick="openAddModal()">➕ Yeni Ürün Ekle</button></div>
+      <div class="table-head" style="gap:8px;flex-wrap:wrap"><h3>Tüm Ürünler</h3><div style="display:flex;gap:8px"><button class="btn-orange" onclick="openBulkModal()">⚡ Toplu Ekle</button><button class="btn-primary" onclick="openAddModal()">➕ Yeni Ürün Ekle</button></div></div>
       <table><thead><tr><th>Ürün</th><th>Kategori / Marka</th><th>SKU / Stok</th><th>Fiyat</th><th>Karşılaştırma</th><th>Puan</th><th>İşlem</th></tr></thead>
       <tbody id="products-tbody"></tbody></table>
     </div>
@@ -422,6 +422,43 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- TOPLU EKLE MODAL -->
+<div class="modal-overlay" id="bulk-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>⚡ Toplu Ürün Ekle</h2>
+      <button class="modal-close" onclick="closeModal('bulk-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Format</div>
+        <div style="background:#FDFAF6;border:1px solid var(--border-light);border-radius:10px;padding:14px;font-size:12px;color:#666;line-height:1.7;font-family:monospace">
+          URL | fiyat<br>
+          URL | fiyat | indirimli<br>
+          URL | fiyat | indirimli | stok<br>
+          <span style="color:#aaa">İndirimli ve stok opsiyonel. Stok varsayılan 99.</span>
+        </div>
+        <div style="margin-top:14px;font-size:13px;color:#555">
+          <strong>Üst Kategori (opsiyonel — tüm satırlar buraya eklenir):</strong>
+        </div>
+        <div class="form-row" style="margin-top:8px">
+          <select class="form-input" id="bulk-parent-cat" onchange="loadChildCats('bulk')"><option value="">— Üst Kategori —</option></select>
+          <select class="form-input" id="bulk-category-id"><option value="">— Alt Kategori —</option></select>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Ürünler (her satıra bir ürün)</div>
+        <textarea id="bulk-input" class="form-input" style="min-height:280px;font-family:monospace;font-size:13px;resize:vertical" placeholder="https://www.amazon.com.tr/dp/B09XYZ | 4999&#10;https://www.trendyol.com/... | 12999 | 11499&#10;https://www.amazon.com.tr/... | 2499 | | 50"></textarea>
+      </div>
+      <div id="bulk-progress" style="display:none;margin-top:16px;padding:14px;background:#FDFAF6;border-radius:10px;font-size:13px;font-family:monospace;max-height:240px;overflow-y:auto"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('bulk-modal')">Kapat</button>
+      <button class="btn-submit" id="bulk-submit-btn" onclick="bulkImport()">Hepsini İçe Aktar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ÜRÜN DÜZENLE MODAL -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
@@ -570,6 +607,7 @@ async function loadCategoryTree(){
     categoryTree = await fetch('/api/categories').then(r=>r.json());
     populateParentCatSelect('new');
     populateParentCatSelect('edit');
+    populateParentCatSelect('bulk');
   }catch(e){console.error('Kategori ağacı yüklenemedi:',e);}
 }
 function populateParentCatSelect(prefix){
@@ -877,6 +915,69 @@ function openAddModal(){
   document.getElementById('new-stock').value=99;
   addImgs=[];renderImgGrid('add');
   document.getElementById('add-modal').classList.add('open');
+}
+
+// ── Toplu ekleme ──
+function openBulkModal(){
+  document.getElementById('bulk-input').value='';
+  document.getElementById('bulk-progress').style.display='none';
+  document.getElementById('bulk-progress').innerHTML='';
+  document.getElementById('bulk-submit-btn').disabled=false;
+  document.getElementById('bulk-submit-btn').textContent='Hepsini İçe Aktar';
+  if(!categoryTree.length){loadCategoryTree();} else {populateParentCatSelect('bulk');}
+  document.getElementById('bulk-modal').classList.add('open');
+}
+
+async function bulkImport(){
+  const raw=document.getElementById('bulk-input').value.trim();
+  if(!raw)return showToast('Önce satır gir');
+  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l && l.startsWith('http'));
+  if(!lines.length)return showToast('Geçerli URL bulunamadı');
+  const categoryId=document.getElementById('bulk-category-id').value||null;
+  const categoryName=document.getElementById('bulk-category-id').selectedOptions[0]?.text||'Genel';
+  const log=document.getElementById('bulk-progress');
+  const btn=document.getElementById('bulk-submit-btn');
+  log.style.display='block';log.innerHTML='';btn.disabled=true;
+  let ok=0,fail=0;
+  for(let i=0;i<lines.length;i++){
+    const parts=lines[i].split('|').map(s=>s.trim());
+    const url=parts[0];
+    const tane_price=parseFloat(parts[1])||0;
+    const discount_price=parts[2]?parseFloat(parts[2]):null;
+    const stock=parts[3]?parseInt(parts[3]):99;
+    btn.textContent=`İşleniyor ${i+1}/${lines.length}…`;
+    log.innerHTML+=`<div>⏳ [${i+1}] ${url.substring(0,55)}…</div>`;log.scrollTop=log.scrollHeight;
+    try{
+      // 1) URL scrape
+      const sr=await fetch('/api/scrape-url',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({url})});
+      const sd=await sr.json();
+      if(!sr.ok)throw new Error(sd.error||'scrape başarısız');
+      // 2) Insert product
+      const body={
+        name:sd.name||'İsimsiz Ürün',
+        image_url:(sd.imgs&&sd.imgs[0])||null,
+        images:sd.imgs&&sd.imgs.length?JSON.stringify(sd.imgs):null,
+        description:sd.desc||null,
+        brand:sd.brand||null,
+        category_id:categoryId,
+        category:categoryName,
+        tane_price,discount_price,stock,
+        tane_url:url
+      };
+      const pr=await fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)});
+      const pd=await pr.json();
+      if(!pr.ok)throw new Error(pd.error||'kayıt başarısız');
+      ok++;
+      log.innerHTML+=`<div style="color:#16a34a">✅ [${i+1}] ${(sd.name||'').substring(0,50)} — ${tane_price}₺</div>`;
+    }catch(e){
+      fail++;
+      log.innerHTML+=`<div style="color:#ef4444">❌ [${i+1}] ${e.message}</div>`;
+    }
+    log.scrollTop=log.scrollHeight;
+  }
+  btn.textContent=`Tamamlandı: ${ok} ✓ / ${fail} ✗`;
+  log.innerHTML+=`<div style="margin-top:10px;font-weight:700">📊 ${ok} başarılı, ${fail} başarısız</div>`;
+  if(ok>0)loadAll();
 }
 
 function closeModal(id){
