@@ -24,8 +24,7 @@
     "node-cron": "^4.2.1",
     "pg": "^8.20.0",
     "puppeteer": "^24.39.0",
-    "speakeasy": "^2.0.0",
-    "sqlite3": "^5.1.7"
+    "speakeasy": "^2.0.0"
   },
   "devDependencies": {
     "xlsx": "^0.18.5"
