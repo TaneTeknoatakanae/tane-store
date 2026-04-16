@@ -33,6 +33,9 @@ nav{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;t
 .table-head h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
 table{width:100%;border-collapse:collapse}
 th{padding:11px 18px;text-align:left;font-size:11px;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #f3f3f1}
+.sort-th{cursor:pointer;user-select:none;transition:color .15s}
+.sort-th:hover{color:#C49660}
+.sort-ind{display:inline-block;width:10px;font-size:10px;color:#C49660;margin-left:2px}
 td{padding:13px 18px;border-bottom:1px solid #f5f5f3;font-size:14px;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 .btn-primary{background:#1C1814;border:none;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:9px;padding:9px 18px;font-size:14px}
@@ -148,7 +151,13 @@ tr:last-child td{border-bottom:none}
       </div>
       <table><thead><tr>
         <th style="width:34px"><input type="checkbox" id="prod-check-all" onchange="toggleAllProducts(this.checked)"></th>
-        <th>Ürün</th><th>Kategori / Marka</th><th>SKU / Stok</th><th>Fiyat</th><th>Karşılaştırma</th><th>Puan</th><th>İşlem</th>
+        <th class="sort-th" onclick="sortProducts('name')">Ürün <span class="sort-ind" data-key="name"></span></th>
+        <th class="sort-th" onclick="sortProducts('category')">Kategori / Marka <span class="sort-ind" data-key="category"></span></th>
+        <th class="sort-th" onclick="sortProducts('stock')">SKU / Stok <span class="sort-ind" data-key="stock"></span></th>
+        <th class="sort-th" onclick="sortProducts('price')">Fiyat <span class="sort-ind" data-key="price"></span></th>
+        <th>Karşılaştırma</th>
+        <th class="sort-th" onclick="sortProducts('rating')">Puan <span class="sort-ind" data-key="rating"></span></th>
+        <th>İşlem</th>
       </tr></thead>
       <tbody id="products-tbody"></tbody></table>
     </div>
@@ -656,10 +665,43 @@ async function loadAll(){
   }catch(e){showToast('❌ Veri yüklenemedi');}
 }
 
+let prodSortKey='', prodSortDir='asc';
+function sortProducts(key){
+  if(prodSortKey===key){prodSortDir=prodSortDir==='asc'?'desc':'asc';}
+  else{prodSortKey=key;prodSortDir='asc';}
+  renderProducts();
+}
+function applyProductSort(arr){
+  if(!prodSortKey) return arr;
+  const dir=prodSortDir==='asc'?1:-1;
+  const key=prodSortKey;
+  const getVal=p=>{
+    if(key==='price') return p.discount_price||p.tane_price||0;
+    if(key==='stock') return parseInt(p.stock)||0;
+    if(key==='rating') return parseFloat(p.rating)||0;
+    if(key==='category') return (p.category||'').toLowerCase();
+    if(key==='name') return (p.name||'').toLowerCase();
+    return p[key]||'';
+  };
+  return [...arr].sort((a,b)=>{
+    const va=getVal(a),vb=getVal(b);
+    if(va<vb)return -1*dir;
+    if(va>vb)return 1*dir;
+    return 0;
+  });
+}
+function updateSortIndicators(){
+  document.querySelectorAll('.sort-ind').forEach(el=>{
+    el.textContent = el.dataset.key===prodSortKey ? (prodSortDir==='asc'?'▲':'▼') : '';
+  });
+}
+
 function renderProducts(){
   const tbody=document.getElementById('products-tbody');
+  updateSortIndicators();
   if(!products.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:40px">Henüz ürün yok</td></tr>';updateProdBulkBar();return;}
-  tbody.innerHTML=products.map(p=>{
+  const sorted=applyProductSort(products);
+  tbody.innerHTML=sorted.map(p=>{
     const priceCount=p.platforms?p.platforms.split(',').length:0;
     const imgEl=p.image_url?`<img src="${p.image_url}" class="product-img-thumb" onerror="this.outerHTML='<div class=product-img-ph>📦</div>'">`:`<div class="product-img-ph">📦</div>`;
     const ep=p.discount_price||p.tane_price;
