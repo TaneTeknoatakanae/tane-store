@@ -20,23 +20,37 @@ async function generateAIDescription(name, brand, rawDesc, url) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
   const axios = require('axios');
-  const prompt = `Aşağıda bir e-ticaret ürünü bilgisi verilmiştir. Bu bilgilerle SINIRLI kalmak üzere, Türkçe, SEO uyumlu, HTML formatında bir ürün açıklaması yaz.
+  const prompt = `Sen bir e-ticaret SEO uzmanısın. Aşağıdaki ürün bilgilerini kullanarak Türkçe ürün açıklaması yaz.
 
-Kurallar:
-- Sadece verilen bilgileri kullan, uydurma özellik EKLEME
-- HTML formatında yaz: <h2> başlıklar, <p> paragraflar, <ul><li> özellik listeleri kullan
-- 150-300 kelime arası olsun
-- Anahtar kelimeleri doğal şekilde yerleştir (ürün adı, marka, kategori)
-- Profesyonel ama okunabilir ton
-- Ürün özelliklerini maddeleyerek sun
+ZORUNLU FORMAT — sadece bu HTML etiketlerini kullan, başka bir şey yazma:
 
-Ürün Adı: ${name}
+<div class="product-description">
+    <h2>[Ürün adı]: [Kısa etkileyici slogan]</h2>
+    <p>[2-3 cümlelik genel tanıtım paragrafı — ürünün ne olduğu, kimin için olduğu]</p>
+
+    <h3>Öne Çıkan Özellikler</h3>
+    <ul>
+        <li><strong>[Özellik]</strong>: [Açıklama]</li>
+        <li><strong>[Özellik]</strong>: [Açıklama]</li>
+        [4-8 madde]
+    </ul>
+
+    <h3>Teknik Detaylar</h3>
+    <p>[Teknik bilgiler paragrafı]</p>
+</div>
+
+KURALLAR:
+- SADECE verilen bilgileri kullan, özellik UYDURMA
+- \`\`\`html bloğu veya markdown KULLANMA, direkt HTML yaz
+- Ürün adını, markayı ve kategoriyi doğal şekilde SEO anahtar kelime olarak yerleştir
+- 150-250 kelime arası
+- Profesyonel, ikna edici, müşteriye yönelik ton
+
+Ürün: ${name}
 Marka: ${brand || 'Belirtilmemiş'}
-Kaynak URL: ${url}
-Mevcut Açıklama/Bilgiler:
-${(rawDesc || '').substring(0, 1500)}
-
-Sadece HTML açıklama döndür, başka bir şey yazma.`;
+URL: ${url}
+Ham Bilgi:
+${(rawDesc || '').substring(0, 1500)}`;
 
   try {
     console.log('[AI-desc] Claude API çağrılıyor — key:', apiKey.substring(0, 15) + '..., ürün:', name.substring(0, 50));
@@ -59,8 +73,17 @@ Sadece HTML açıklama döndür, başka bir şey yazma.`;
       const reason = respData?.error?.message || respData?.stop_reason || JSON.stringify(respData).substring(0, 200);
       throw new Error('Boş yanıt: ' + reason);
     }
-    console.log('[AI-desc] Başarılı — uzunluk:', text.length);
-    return text.trim();
+    // Markdown code block wrapper'ını temizle
+    let cleaned = text.trim()
+      .replace(/^```html?\s*/i, '')
+      .replace(/```\s*$/i, '')
+      .trim();
+    // Eğer HTML tag yoksa, basit paragraf wrap yap
+    if (!cleaned.includes('<')) {
+      cleaned = cleaned.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('\n');
+    }
+    console.log('[AI-desc] Başarılı — uzunluk:', cleaned.length);
+    return cleaned;
   } catch (e) {
     const errMsg = e.response?.data?.error?.message || e.response?.data?.error?.type || e.message;
     const detail = typeof errMsg === 'object' ? JSON.stringify(errMsg).substring(0, 200) : String(errMsg).substring(0, 200);
