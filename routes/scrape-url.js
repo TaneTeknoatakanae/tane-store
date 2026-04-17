@@ -41,7 +41,7 @@ Sadece HTML açıklama döndür, başka bir şey yazma.`;
   try {
     console.log('[AI-desc] Claude API çağrılıyor — key:', apiKey.substring(0, 15) + '..., ürün:', name.substring(0, 50));
     const resp = await axios.post('https://api.anthropic.com/v1/messages', {
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-haiku-20240307',
       max_tokens: 1024,
       messages: [{ role: 'user', content: prompt }]
     }, {
