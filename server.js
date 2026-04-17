@@ -34,6 +34,24 @@ cron.schedule('0 3 * * *', () => {
   );
 }, { timezone: 'Europe/Istanbul' });
 
+const automations = require('./automations');
+
+// ── Stok 0 → otomatik pasif — her saat başı ──────────
+cron.schedule('0 * * * *', () => {
+  console.log('[cron] Stok kontrol tetiklendi');
+  automations.autoDeactivateOutOfStock().catch(e =>
+    console.error('[cron] Stok kontrol hata:', e.message)
+  );
+}, { timezone: 'Europe/Istanbul' });
+
+// ── Rakip fiyat takip — her gün saat 06:00 ve 18:00 ──────────
+cron.schedule('0 6,18 * * *', () => {
+  console.log('[cron] Rakip fiyat kontrol tetiklendi');
+  automations.competitorPriceCheck().catch(e =>
+    console.error('[cron] Fiyat kontrol hata:', e.message)
+  );
+}, { timezone: 'Europe/Istanbul' });
+
 // Uploads klasörünü oluştur
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
