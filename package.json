@@ -24,6 +24,8 @@
     "node-cron": "^4.2.1",
     "pg": "^8.20.0",
     "puppeteer": "^24.39.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "speakeasy": "^2.0.0"
   },
   "devDependencies": {

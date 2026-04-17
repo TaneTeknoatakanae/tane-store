@@ -2,11 +2,14 @@ const express = require('express');
 const router = express.Router();
 const adminAuth = require('../middleware/adminAuth');
 
-// Puppeteer lazy-load — Railway'de cold start'ı yavaşlatmamak için
+// Puppeteer + Stealth — CloudFlare/bot korumasını atlatır
+const puppeteer = require('puppeteer-extra');
+puppeteer.use(require('puppeteer-extra-plugin-stealth')());
+
 let browserPromise = null;
 function getBrowser() {
   if (!browserPromise) {
-    browserPromise = require('puppeteer').launch({
+    browserPromise = puppeteer.launch({
       headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage',
              '--disable-gpu', '--no-first-run', '--no-zygote', '--single-process']

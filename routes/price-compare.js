@@ -20,11 +20,14 @@ function writeData(data) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
 }
 
-// Reuse the Puppeteer browser from scrape-url route
+// Puppeteer + Stealth — CloudFlare bypass
+const puppeteer = require('puppeteer-extra');
+puppeteer.use(require('puppeteer-extra-plugin-stealth')());
+
 let browserPromise = null;
 function getBrowser() {
   if (!browserPromise) {
-    browserPromise = require('puppeteer').launch({
+    browserPromise = puppeteer.launch({
       headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage',
              '--disable-gpu', '--no-first-run', '--no-zygote', '--single-process']
@@ -48,8 +51,10 @@ router.post('/fetch', adminAuth, async (req, res) => {
     page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36');
     await page.setExtraHTTPHeaders({ 'Accept-Language': 'tr-TR,tr;q=0.9' });
-    await page.goto(akakce_url, { waitUntil: 'domcontentloaded', timeout: 25000 });
-    await new Promise(r => setTimeout(r, 3000));
+    await page.goto(akakce_url, { waitUntil: 'networkidle2', timeout: 30000 });
+    // Fiyat listesi DOM'a yüklenene kadar bekle (lazy-load)
+    await page.waitForSelector('ul.pl_v9 li, ul[class*="pl_v"] li', { timeout: 10000 }).catch(() => {});
+    await new Promise(r => setTimeout(r, 2000));
 
     const result = await page.evaluate(() => {
       const sellers = [];

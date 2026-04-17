@@ -11,7 +11,8 @@
  */
 
 require('dotenv').config();
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+puppeteer.use(require('puppeteer-extra-plugin-stealth')());
 const db        = require('./database/db');
 
 // ─── Ayarlar ─────────────────────────────────────────────────────────────────
