@@ -67,13 +67,24 @@ router.post('/', adminAuth, async (req, res) => {
   try {
     const browser = await getBrowser();
     page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36');
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'tr-TR,tr;q=0.9' });
-    await page.setViewport({ width: 1280, height: 900 });
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36');
+    await page.setExtraHTTPHeaders({
+      'Accept-Language': 'tr-TR,tr;q=0.9,en;q=0.8',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Upgrade-Insecure-Requests': '1'
+    });
+    await page.setViewport({ width: 1440, height: 900 });
+    // Webdriver flag'ını gizle — bazı bot korumaları bunu kontrol eder
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    });
 
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
-    // Wait a bit for lazy JS to render images
-    await new Promise(r => setTimeout(r, 2500));
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await new Promise(r => setTimeout(r, 3000));
 
     const data = await page.evaluate(() => {
       // ── Name ──────────────────────────────────────────────
@@ -172,6 +183,11 @@ router.post('/', adminAuth, async (req, res) => {
     });
 
     await page.close();
+
+    // Scrape başarısız — ürün adı bulunamadıysa hata dön
+    if (!data.name || data.name.length < 3) {
+      return res.status(422).json({ error: 'Ürün bilgisi alınamadı — site bot koruması veya sayfa yapısı desteklenmiyor' });
+    }
 
     // AI açıklama üret (generate_desc: true gönderilirse)
     if (generate_desc && data.name) {
