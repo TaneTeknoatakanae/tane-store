@@ -566,6 +566,18 @@ tr:last-child td{border-bottom:none}
       </div>
 
       <div class="modal-section">
+        <div class="modal-section-title">Rakip Fiyat Takibi</div>
+        <div style="display:flex;gap:8px;align-items:end">
+          <div class="form-group" style="flex:1;margin:0">
+            <label class="form-label">Akakçe Ürün URL'i</label>
+            <input class="form-input" id="edit-akakce-url" placeholder="https://www.akakce.com/..."/>
+          </div>
+          <button class="btn-orange" id="edit-fetch-prices-btn" onclick="fetchCompetitorPrices()" style="height:40px;white-space:nowrap">Fiyat Çek</button>
+        </div>
+        <div id="edit-competitor-prices" style="margin-top:10px"></div>
+      </div>
+
+      <div class="modal-section">
         <div class="modal-section-title">Stok & Kategori</div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Üst Kategori</label>
@@ -708,6 +720,29 @@ async function toggleProductActive(id,makeActive){
     await loadAll();
   }catch(e){showToast('Hata: '+e.message);}
 }
+// ── Rakip fiyat çekme (edit modal içinde) ──
+let editCompetitorPrices = [];
+async function fetchCompetitorPrices(){
+  const url = document.getElementById('edit-akakce-url').value.trim();
+  if (!url || !url.includes('akakce')) return showToast('Geçerli bir Akakçe URL gir');
+  const btn = document.getElementById('edit-fetch-prices-btn');
+  const box = document.getElementById('edit-competitor-prices');
+  btn.disabled = true; btn.textContent = 'Çekiliyor…';
+  try {
+    const r = await fetch('/api/price-compare/fetch', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body:JSON.stringify({akakce_url:url}) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Fiyat çekilemedi');
+    editCompetitorPrices = d.all_sellers || [];
+    box.innerHTML = '<div style="font-size:12px;font-weight:700;color:#555;margin-bottom:8px">Bulunan Satıcılar:</div>' +
+      editCompetitorPrices.map(s => `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid #f0f0f0"><span>${escHtml(s.seller)}</span><span style="font-weight:700;color:var(--accent)">${s.price.toLocaleString('tr-TR')} ₺</span></div>`).join('') +
+      (d.trendyol ? `<div style="margin-top:6px;font-size:11px;color:#16a34a">✓ Trendyol: ${d.trendyol.toLocaleString('tr-TR')} ₺</div>` : '') +
+      (d.hepsiburada ? `<div style="font-size:11px;color:#3b82f6">✓ Hepsiburada: ${d.hepsiburada.toLocaleString('tr-TR')} ₺</div>` : '') +
+      `<div style="margin-top:8px;font-size:11px;color:#888">Kaydettiğinde bu fiyatlar ürüne bağlanır.</div>`;
+    showToast(`✅ ${editCompetitorPrices.length} satıcı fiyatı bulundu`);
+  } catch(e) { box.innerHTML = `<div style="color:#ef4444;font-size:13px">❌ ${e.message}</div>`; editCompetitorPrices = []; }
+  finally { btn.disabled = false; btn.textContent = 'Fiyat Çek'; }
+}
+
 async function bulkToggleActive(makeActive){
   const ids=getSelectedProductIds();
   if(!ids.length)return;
@@ -947,6 +982,20 @@ function openEditModal(id){
     else if(p.image_url)editImgs=[{url:p.image_url,file:null}];
   }catch(e){if(p.image_url)editImgs=[{url:p.image_url,file:null}];}
   renderImgGrid('edit');
+  // Rakip fiyat alanını temizle ve mevcut tane_url'den akakçe URL'i koy
+  editCompetitorPrices = [];
+  document.getElementById('edit-akakce-url').value = (p.tane_url && p.tane_url.includes('akakce')) ? p.tane_url : '';
+  document.getElementById('edit-competitor-prices').innerHTML = '';
+  // Mevcut rakip fiyatları göster (prices tablosundan)
+  if (p.platforms && p.platform_prices) {
+    const platforms = p.platforms.split(',');
+    const prices = p.platform_prices.split(',');
+    let html = '<div style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px">Mevcut Kayıtlı Fiyatlar:</div>';
+    platforms.forEach((pl, i) => {
+      html += `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;color:#666"><span>${escHtml(pl)}</span><span>${parseFloat(prices[i]).toLocaleString('tr-TR')} ₺</span></div>`;
+    });
+    document.getElementById('edit-competitor-prices').innerHTML = html;
+  }
   document.getElementById('edit-modal').classList.add('open');
 }
 
@@ -976,6 +1025,10 @@ async function saveEdit(){
     })});
     const d=await res.json();
     if(!res.ok) return showToast('❌ '+(d.error||'Sunucu hatası'));
+    // Rakip fiyatlar varsa kaydet
+    if(editCompetitorPrices.length>0){
+      await fetch('/api/price-compare/save-to-prices',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({product_id:id,sellers:editCompetitorPrices})}).catch(()=>{});
+    }
     showToast(d.message||'✅ Kaydedildi');closeModal('edit-modal');loadAll();
   }catch(e){console.error('saveEdit hata:',e);showToast('❌ Hata: '+e.message);}
 }

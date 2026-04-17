@@ -52,61 +52,55 @@ router.post('/fetch', adminAuth, async (req, res) => {
     await new Promise(r => setTimeout(r, 3000));
 
     const result = await page.evaluate(() => {
-      const sellers = {};
+      const sellers = [];
 
-      // Akakçe price list — rows typically have seller name + price
-      // Try multiple selectors that Akakçe has used
-      const rows = document.querySelectorAll(
-        '.result, .pl, [class*="product-list"] li, [class*="offerList"] li, ' +
-        '.w-full.flex, [data-testid*="offer"], .ProductList__item'
-      );
+      // Akakçe doğrulanmış HTML yapısı: ul.pl_v9 > li (akakce-sync.js ile aynı)
+      const rows = document.querySelectorAll('ul.pl_v9 > li, ul[class*="pl_v"] > li');
 
-      rows.forEach(row => {
-        const text = (row.innerText || '').toLowerCase();
-        const priceMatch = (row.innerText || '').match(/[\d]{1,6}[.,]\d{2}|[\d]{2,6}/);
-        if (!priceMatch) return;
-
-        const priceStr = priceMatch[0].replace(',', '.').replace(/\./g, '');
-        const price = parseFloat(priceStr);
-        if (!price || price < 10) return;
-
-        if (text.includes('trendyol')) {
-          if (!sellers.trendyol || price < sellers.trendyol) sellers.trendyol = price;
+      rows.forEach(li => {
+        // Satıcı adı: logo img[alt] veya span text
+        const sellerSpan = li.querySelector('span.v_v8');
+        let sellerName = '';
+        if (sellerSpan) {
+          const logo = sellerSpan.querySelector('img[alt]');
+          sellerName = logo
+            ? logo.alt.trim()
+            : sellerSpan.textContent.trim().replace(/^\//, '').replace(/\s+/g, ' ');
         }
-        if (text.includes('hepsiburada') || text.includes('hepsi')) {
-          if (!sellers.hepsiburada || price < sellers.hepsiburada) sellers.hepsiburada = price;
+
+        // Fiyat: kampanya varsa onu al, yoksa normal
+        const priceEl =
+          li.querySelector('span.pt_v8.cmpgn_pt_v8') ||
+          li.querySelector('span.pt_v8:not(.orig_pt_v8):not(.cmpgn_pt_v8)');
+        const rawPrice = priceEl ? priceEl.textContent.replace(/\s/g, '') : '';
+
+        const m = rawPrice.match(/([\d.]+)[,](\d{2})/);
+        if (m && sellerName) {
+          const price = parseFloat(m[1].replace(/\./g, '') + '.' + m[2]);
+          if (price > 0) sellers.push({ seller: sellerName, price });
         }
       });
 
-      // Fallback: scan all text nodes on the page
-      if (!sellers.trendyol || !sellers.hepsiburada) {
-        const allText = document.body.innerText || '';
-        const lines = allText.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].toLowerCase().trim();
-          const nextLine = (lines[i + 1] || '').trim();
-          const pm = nextLine.match(/[\d.,]+/);
-          if (!pm) continue;
-          const price = parseFloat(pm[0].replace(',', '.').replace(/\./g, ''));
-          if (!price || price < 10 || price > 999999) continue;
+      // Platform eşleştirme
+      const result = { trendyol: null, hepsiburada: null, all: [] };
+      sellers.forEach(s => {
+        const name = s.seller.toLowerCase();
+        result.all.push(s);
+        if (name.includes('trendyol') && (!result.trendyol || s.price < result.trendyol))
+          result.trendyol = s.price;
+        if ((name.includes('hepsiburada') || name.includes('hepsi')) && (!result.hepsiburada || s.price < result.hepsiburada))
+          result.hepsiburada = s.price;
+      });
 
-          if (!sellers.trendyol && line.includes('trendyol')) sellers.trendyol = price;
-          if (!sellers.hepsiburada && (line.includes('hepsiburada') || line.includes('hepsi'))) sellers.hepsiburada = price;
-        }
-      }
-
-      // Product name from page title or h1
-      const name = document.querySelector('h1')?.innerText?.trim() ||
-                   document.title?.split('|')[0]?.trim() || '';
-
-      return { sellers, name };
+      const productName = document.querySelector('h1[class*="v_h"], h1.v_h, h1')?.innerText?.trim() || '';
+      return { sellers: result, name: productName, allSellers: result.all };
     });
 
     await page.close();
 
-    if (!result.sellers.trendyol && !result.sellers.hepsiburada) {
+    if (!result.allSellers || !result.allSellers.length) {
       return res.status(422).json({
-        error: 'Bu sayfada Trendyol veya Hepsiburada fiyatı bulunamadı.',
+        error: 'Bu sayfada satıcı fiyatı bulunamadı.',
         hint: 'Akakçe ürün sayfasının gerçekten fiyat listesi içerdiğinden emin ol.'
       });
     }
@@ -115,6 +109,7 @@ router.post('/fetch', adminAuth, async (req, res) => {
       product_name: result.name,
       trendyol: result.sellers.trendyol || null,
       hepsiburada: result.sellers.hepsiburada || null,
+      all_sellers: result.allSellers.slice(0, 10)
     });
 
   } catch (e) {
@@ -122,6 +117,27 @@ router.post('/fetch', adminAuth, async (req, res) => {
     console.error('price-compare/fetch hata:', e.message);
     res.status(500).json({ error: 'Sayfa açılamadı: ' + e.message.substring(0, 120) });
   }
+});
+
+// POST /api/price-compare/save-to-prices — rakip fiyatları prices tablosuna kaydet
+router.post('/save-to-prices', adminAuth, (req, res) => {
+  const { product_id, sellers } = req.body;
+  if (!product_id || !Array.isArray(sellers)) return res.status(400).json({ error: 'product_id ve sellers gerekli' });
+  const db = require('../database/db');
+  // Mevcut fiyatları sil, yenilerini ekle
+  db.run('DELETE FROM prices WHERE product_id = ?', [product_id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    let inserted = 0;
+    const stmt = db.prepare('INSERT INTO prices (product_id, platform, price, url, last_updated) VALUES (?, ?, ?, ?, NOW())');
+    sellers.forEach(s => {
+      if (s.seller && s.price > 0) {
+        stmt.run(product_id, s.seller, s.price, s.url || null);
+        inserted++;
+      }
+    });
+    stmt.finalize();
+    res.json({ message: `✅ ${inserted} satıcı fiyatı kaydedildi`, inserted });
+  });
 });
 
 // POST /api/price-compare/approve
