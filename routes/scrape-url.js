@@ -15,8 +15,52 @@ function getBrowser() {
   return browserPromise;
 }
 
+// AI ile SEO açıklama üretici — Claude API
+async function generateAIDescription(name, brand, rawDesc, url) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return null;
+  const axios = require('axios');
+  const prompt = `Aşağıda bir e-ticaret ürünü bilgisi verilmiştir. Bu bilgilerle SINIRLI kalmak üzere, Türkçe, SEO uyumlu, HTML formatında bir ürün açıklaması yaz.
+
+Kurallar:
+- Sadece verilen bilgileri kullan, uydurma özellik EKLEME
+- HTML formatında yaz: <h2> başlıklar, <p> paragraflar, <ul><li> özellik listeleri kullan
+- 150-300 kelime arası olsun
+- Anahtar kelimeleri doğal şekilde yerleştir (ürün adı, marka, kategori)
+- Profesyonel ama okunabilir ton
+- Ürün özelliklerini maddeleyerek sun
+
+Ürün Adı: ${name}
+Marka: ${brand || 'Belirtilmemiş'}
+Kaynak URL: ${url}
+Mevcut Açıklama/Bilgiler:
+${(rawDesc || '').substring(0, 1500)}
+
+Sadece HTML açıklama döndür, başka bir şey yazma.`;
+
+  try {
+    const resp = await axios.post('https://api.anthropic.com/v1/messages', {
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: prompt }]
+    }, {
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json'
+      },
+      timeout: 30000
+    });
+    const text = resp.data?.content?.[0]?.text || '';
+    return text.trim() || null;
+  } catch (e) {
+    console.error('[AI-desc] Hata:', e.response?.data?.error?.message || e.message);
+    return null;
+  }
+}
+
 router.post('/', adminAuth, async (req, res) => {
-  const { url } = req.body;
+  const { url, generate_desc } = req.body;
   if (!url || !/^https?:\/\//.test(url)) return res.status(400).json({ error: 'Geçersiz URL' });
 
   let page;
@@ -128,6 +172,13 @@ router.post('/', adminAuth, async (req, res) => {
     });
 
     await page.close();
+
+    // AI açıklama üret (generate_desc: true gönderilirse)
+    if (generate_desc && data.name) {
+      const aiDesc = await generateAIDescription(data.name, data.brand, data.desc, url);
+      if (aiDesc) data.desc = aiDesc;
+    }
+
     res.json(data);
 
   } catch (e) {
