@@ -102,6 +102,7 @@ tr:last-child td{border-bottom:none}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1C1814;color:#fff;padding:11px 22px;border-radius:11px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.15);white-space:nowrap}
 .hidden{display:none}
 .stars-small{color:#C49660;font-size:11px}
+@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}.form-row,.form-row-3{grid-template-columns:1fr}}
 .url-fill-bar{display:flex;gap:8px;margin-bottom:20px;padding:14px 16px;background:#f8f4ef;border:1px solid var(--border);border-radius:12px}
 .url-fill-bar input{flex:1;border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:#fff}
@@ -727,19 +728,26 @@ async function fetchCompetitorPrices(){
   if (!url || !url.includes('akakce')) return showToast('Geçerli bir Akakçe URL gir');
   const btn = document.getElementById('edit-fetch-prices-btn');
   const box = document.getElementById('edit-competitor-prices');
-  btn.disabled = true; btn.textContent = 'Çekiliyor…';
+  btn.disabled = true; btn.textContent = '⏳ Çekiliyor…';
+  box.innerHTML = `<div style="padding:20px;text-align:center">
+    <div style="width:28px;height:28px;border:3px solid #f0f0f0;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px"></div>
+    <div style="font-size:12px;color:#888">Akakçe sayfası taranıyor…<br><span style="font-size:11px;color:#bbb">CloudFlare koruması aşılıyor, 10-15 sn sürebilir</span></div>
+  </div>`;
   try {
     const r = await fetch('/api/price-compare/fetch', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body:JSON.stringify({akakce_url:url}) });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Fiyat çekilemedi');
     editCompetitorPrices = d.all_sellers || [];
+    const ourPrice = parseFloat(document.getElementById('edit-price').value) || 0;
     box.innerHTML = '<div style="font-size:12px;font-weight:700;color:#555;margin-bottom:8px">Bulunan Satıcılar:</div>' +
-      editCompetitorPrices.map(s => `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid #f0f0f0"><span>${escHtml(s.seller)}</span><span style="font-weight:700;color:var(--accent)">${s.price.toLocaleString('tr-TR')} ₺</span></div>`).join('') +
-      (d.trendyol ? `<div style="margin-top:6px;font-size:11px;color:#16a34a">✓ Trendyol: ${d.trendyol.toLocaleString('tr-TR')} ₺</div>` : '') +
-      (d.hepsiburada ? `<div style="font-size:11px;color:#3b82f6">✓ Hepsiburada: ${d.hepsiburada.toLocaleString('tr-TR')} ₺</div>` : '') +
-      `<div style="margin-top:8px;font-size:11px;color:#888">Kaydettiğinde bu fiyatlar ürüne bağlanır.</div>`;
+      editCompetitorPrices.map(s => {
+        const diff = ourPrice ? s.price - ourPrice : 0;
+        const diffTag = diff > 0 ? `<span style="color:#16a34a;font-size:11px;margin-left:6px">+${diff.toLocaleString('tr-TR')}₺</span>` : diff < 0 ? `<span style="color:#ef4444;font-size:11px;margin-left:6px">${diff.toLocaleString('tr-TR')}₺</span>` : '';
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;border-bottom:1px solid #f0f0f0"><span>${escHtml(s.seller)}</span><span style="font-weight:700;color:var(--accent)">${s.price.toLocaleString('tr-TR')} ₺${diffTag}</span></div>`;
+      }).join('') +
+      `<div style="margin-top:10px;padding:8px 10px;background:#f0fdf4;border-radius:8px;font-size:12px;color:#16a34a;font-weight:600">✅ ${editCompetitorPrices.length} satıcı bulundu — kaydet basınca ürüne bağlanır</div>`;
     showToast(`✅ ${editCompetitorPrices.length} satıcı fiyatı bulundu`);
-  } catch(e) { box.innerHTML = `<div style="color:#ef4444;font-size:13px">❌ ${e.message}</div>`; editCompetitorPrices = []; }
+  } catch(e) { box.innerHTML = `<div style="color:#ef4444;font-size:13px;padding:10px">❌ ${e.message}</div>`; editCompetitorPrices = []; }
   finally { btn.disabled = false; btn.textContent = 'Fiyat Çek'; }
 }
 
