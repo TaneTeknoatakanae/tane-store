@@ -1091,7 +1091,8 @@ async function bulkImport(){
       const pd=await pr.json();
       if(!pr.ok)throw new Error(pd.error||'kayıt başarısız');
       ok++;
-      log.innerHTML+=`<div style="color:#16a34a">✅ [${i+1}] ${(sd.name||'').substring(0,50)} — ${tane_price}₺ ${sd.ai_generated?'🤖':'⚠️ AI yok'}</div>`;
+      const aiTag=sd.ai_generated?'🤖':sd.ai_error?`⚠️ ${sd.ai_error}`:'⚠️ AI yok';
+      log.innerHTML+=`<div style="color:#16a34a">✅ [${i+1}] ${(sd.name||'').substring(0,50)} — ${tane_price}₺ ${aiTag}</div>`;
     }catch(e){
       fail++;
       log.innerHTML+=`<div style="color:#ef4444">❌ [${i+1}] ${e.message}</div>`;

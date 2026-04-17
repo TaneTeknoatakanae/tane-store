@@ -39,9 +39,9 @@ ${(rawDesc || '').substring(0, 1500)}
 Sadece HTML açıklama döndür, başka bir şey yazma.`;
 
   try {
-    console.log('[AI-desc] Claude API çağrılıyor — ürün:', name.substring(0, 50));
+    console.log('[AI-desc] Claude API çağrılıyor — key:', apiKey.substring(0, 15) + '..., ürün:', name.substring(0, 50));
     const resp = await axios.post('https://api.anthropic.com/v1/messages', {
-      model: 'claude-sonnet-4-6',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
       messages: [{ role: 'user', content: prompt }]
     }, {
@@ -194,12 +194,20 @@ router.post('/', adminAuth, async (req, res) => {
 
     // AI açıklama üret (generate_desc: true gönderilirse)
     let ai_generated = false;
+    let ai_error = null;
     if (generate_desc && data.name) {
-      const aiDesc = await generateAIDescription(data.name, data.brand, data.desc, url);
-      if (aiDesc) { data.desc = aiDesc; ai_generated = true; }
+      try {
+        const aiDesc = await generateAIDescription(data.name, data.brand, data.desc, url);
+        if (aiDesc) { data.desc = aiDesc; ai_generated = true; }
+        else { ai_error = 'AI boş yanıt döndü — log kontrol et'; }
+      } catch (e) {
+        ai_error = e.message || 'AI bilinmeyen hata';
+      }
+    } else if (generate_desc && !data.name) {
+      ai_error = 'Ürün adı bulunamadı, AI atlandı';
     }
 
-    res.json({ ...data, ai_generated });
+    res.json({ ...data, ai_generated, ai_error });
 
   } catch (e) {
     if (page) await page.close().catch(() => {});
