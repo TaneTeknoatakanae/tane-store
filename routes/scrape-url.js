@@ -39,8 +39,9 @@ ${(rawDesc || '').substring(0, 1500)}
 Sadece HTML açıklama döndür, başka bir şey yazma.`;
 
   try {
+    console.log('[AI-desc] Claude API çağrılıyor — ürün:', name.substring(0, 50));
     const resp = await axios.post('https://api.anthropic.com/v1/messages', {
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       messages: [{ role: 'user', content: prompt }]
     }, {
@@ -52,9 +53,11 @@ Sadece HTML açıklama döndür, başka bir şey yazma.`;
       timeout: 30000
     });
     const text = resp.data?.content?.[0]?.text || '';
+    console.log('[AI-desc] Başarılı — uzunluk:', text.length);
     return text.trim() || null;
   } catch (e) {
-    console.error('[AI-desc] Hata:', e.response?.data?.error?.message || e.message);
+    const errMsg = e.response?.data?.error?.message || e.response?.data || e.message;
+    console.error('[AI-desc] HATA:', JSON.stringify(errMsg).substring(0, 300));
     return null;
   }
 }
@@ -190,12 +193,13 @@ router.post('/', adminAuth, async (req, res) => {
     }
 
     // AI açıklama üret (generate_desc: true gönderilirse)
+    let ai_generated = false;
     if (generate_desc && data.name) {
       const aiDesc = await generateAIDescription(data.name, data.brand, data.desc, url);
-      if (aiDesc) data.desc = aiDesc;
+      if (aiDesc) { data.desc = aiDesc; ai_generated = true; }
     }
 
-    res.json(data);
+    res.json({ ...data, ai_generated });
 
   } catch (e) {
     if (page) await page.close().catch(() => {});
