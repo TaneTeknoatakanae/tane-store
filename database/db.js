@@ -211,11 +211,9 @@ async function initDB() {
           { name: 'Tablet',                slug: 'tablet' },
           { name: 'Masaüstü PC',           slug: 'masaustu-pc' }
         ]},
-        { name: 'TV & Ses',     slug: 'tv-ses',       children: [
-          { name: 'Televizyonlar',         slug: 'televizyonlar' },
-          { name: 'Soundbar',              slug: 'soundbar' },
-          { name: 'Kulaklıklar',           slug: 'kulakliklar' },
-          { name: 'Projeksiyon',           slug: 'projeksiyon' }
+        { name: 'Hobi & Mühendislik', slug: 'hobi-muhendislik', children: [
+          { name: '3D Printer',            slug: '3d-printer' },
+          { name: '3D Tarayıcı',           slug: '3d-tarayici' }
         ]},
         { name: 'Ev & Yaşam',   slug: 'ev-yasam',     children: [
           { name: 'Robot Süpürgeler',      slug: 'robot-supurgeler' },
@@ -255,8 +253,19 @@ async function initDB() {
       { parent: 'bilgisayar',  name: 'GPU',                     slug: 'gpu' },
       { parent: 'oyun-konsol', name: 'Oyuncu Klavyesi',         slug: 'oyuncu-klavyesi' },
       { parent: 'oyun-konsol', name: 'Oyuncu Mouse',            slug: 'oyuncu-mouse' },
-      { parent: 'oyun-konsol', name: 'Oyuncu Kulaklığı',        slug: 'oyuncu-kulakligi' }
+      { parent: 'oyun-konsol', name: 'Oyuncu Kulaklığı',        slug: 'oyuncu-kulakligi' },
+      { parent: 'hobi-muhendislik', name: '3D Printer',         slug: '3d-printer' },
+      { parent: 'hobi-muhendislik', name: '3D Tarayıcı',        slug: '3d-tarayici' }
     ];
+    // Hobi & Mühendislik üst kategoriyi oluştur (idempotent)
+    await pool.query(
+      `INSERT INTO categories (name, slug, parent_id, sort_order)
+       VALUES ('Hobi & Mühendislik', 'hobi-muhendislik', NULL, 10)
+       ON CONFLICT (slug) DO NOTHING`
+    );
+    // TV & Ses kategorisini sil (alt kategorileri ON DELETE CASCADE ile gider)
+    await pool.query(`DELETE FROM categories WHERE slug = 'tv-ses' AND parent_id IS NULL`);
+    await pool.query(`DELETE FROM categories WHERE slug IN ('televizyonlar','soundbar','kulakliklar','projeksiyon') AND NOT EXISTS (SELECT 1 FROM categories WHERE slug = 'tv-ses')`);
     for (const sc of extraSubcats) {
       const parentRes = await pool.query('SELECT id FROM categories WHERE slug = $1 AND parent_id IS NULL', [sc.parent]);
       if (!parentRes.rows.length) continue;
