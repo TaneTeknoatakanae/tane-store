@@ -52,13 +52,20 @@ Sadece HTML açıklama döndür, başka bir şey yazma.`;
       },
       timeout: 30000
     });
-    const text = resp.data?.content?.[0]?.text || '';
+    const respData = resp.data;
+    console.log('[AI-desc] API yanıt:', JSON.stringify(respData).substring(0, 500));
+    const text = respData?.content?.[0]?.text || '';
+    if (!text) {
+      const reason = respData?.error?.message || respData?.stop_reason || JSON.stringify(respData).substring(0, 200);
+      throw new Error('Boş yanıt: ' + reason);
+    }
     console.log('[AI-desc] Başarılı — uzunluk:', text.length);
-    return text.trim() || null;
+    return text.trim();
   } catch (e) {
-    const errMsg = e.response?.data?.error?.message || e.response?.data || e.message;
-    console.error('[AI-desc] HATA:', JSON.stringify(errMsg).substring(0, 300));
-    return null;
+    const errMsg = e.response?.data?.error?.message || e.response?.data?.error?.type || e.message;
+    const detail = typeof errMsg === 'object' ? JSON.stringify(errMsg).substring(0, 200) : String(errMsg).substring(0, 200);
+    console.error('[AI-desc] HATA:', detail);
+    throw new Error(detail);
   }
 }
 
