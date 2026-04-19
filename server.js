@@ -265,6 +265,69 @@ app.get('/cerez-politikasi', (req, res) => res.sendFile(path.join(__dirname, 'pu
 app.get('/on-bilgilendirme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'on-bilgilendirme.html')));
 app.get('/odeme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'odeme.html')));
 
+// ─── Google Merchant Center Product Feed (RSS/XML) ───
+app.get('/feed/products.xml', (req, res) => {
+  const SITE = 'https://www.tanetekno.com';
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const stripHtml = s => String(s||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+
+  db.all(`
+    SELECT p.*, c.name AS category_name, pc.name AS parent_cat_name
+    FROM products p
+    LEFT JOIN categories c ON c.id = p.category_id
+    LEFT JOIN categories pc ON pc.id = c.parent_id
+    WHERE p.is_active = TRUE AND p.tane_price > 0
+    ORDER BY p.id
+  `, [], (err, rows) => {
+    if (err) return res.status(500).send('DB error');
+    const items = (rows || []).map(p => {
+      const price = p.discount_price || p.tane_price;
+      const salePrice = p.discount_price && p.discount_price < p.tane_price ? p.discount_price : null;
+      const imgUrl = p.image_url
+        ? (p.image_url.startsWith('http') ? p.image_url : `${SITE}${p.image_url}`)
+        : `${SITE}/AmblemTane.png`;
+      const category = [p.parent_cat_name, p.category_name].filter(Boolean).join(' > ') || 'Genel';
+      const desc = stripHtml(p.description || p.name).substring(0, 5000);
+      const availability = p.stock > 0 ? 'in_stock' : 'out_of_stock';
+      const condition = 'new';
+      const gtin = (p.sku && /^\d{8,14}$/.test(p.sku)) ? `<g:gtin>${esc(p.sku)}</g:gtin>` : '';
+      const mpn = p.sku ? `<g:mpn>${esc(p.sku)}</g:mpn>` : '';
+
+      return `<item>
+      <g:id>${p.id}</g:id>
+      <g:title>${esc(p.name.substring(0, 150))}</g:title>
+      <g:description>${esc(desc.substring(0, 5000))}</g:description>
+      <g:link>${SITE}/product.html?id=${p.id}</g:link>
+      <g:image_link>${esc(imgUrl)}</g:image_link>
+      <g:price>${p.tane_price.toFixed(2)} TRY</g:price>
+      ${salePrice ? `<g:sale_price>${salePrice.toFixed(2)} TRY</g:sale_price>` : ''}
+      <g:availability>${availability}</g:availability>
+      <g:condition>${condition}</g:condition>
+      <g:brand>${esc(p.brand || 'Tane Store')}</g:brand>
+      ${gtin}
+      ${mpn}
+      <g:product_type>${esc(category)}</g:product_type>
+      <g:shipping>
+        <g:country>TR</g:country>
+        <g:price>${price >= 4000 ? '0.00' : '49.90'} TRY</g:price>
+      </g:shipping>
+    </item>`;
+    }).join('\n');
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+<channel>
+  <title>Tane Store — Ürünler</title>
+  <link>${SITE}</link>
+  <description>Tane Store ürün kataloğu</description>
+${items}
+</channel>
+</rss>`;
+    res.set('Content-Type', 'application/xml; charset=utf-8');
+    res.send(xml);
+  });
+});
+
 // ─── Dinamik sitemap.xml ───
 app.get('/sitemap.xml', (req, res) => {
   const SITE = 'https://www.tanetekno.com';
