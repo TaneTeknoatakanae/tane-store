@@ -184,11 +184,13 @@ app.get('/product.html', (req, res, next) => {
         }
       }
     };
-    const meta = `<meta name="description" content="${desc}">
+    const canonical = `${SITE}/product.html?id=${id}`;
+    const meta = `<link rel="canonical" href="${canonical}">
+    <meta name="description" content="${desc}">
     <meta property="og:title" content="${title.replace(/"/g,'&quot;')}">
     <meta property="og:description" content="${desc}">
     <meta property="og:image" content="${imgAbs}">
-    <meta property="og:url" content="${SITE}/product.html?id=${id}">
+    <meta property="og:url" content="${canonical}">
     <meta property="og:type" content="product">
     <meta name="twitter:card" content="summary_large_image">
     <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`;
@@ -213,6 +215,9 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+// API endpoint'lerini Google'dan gizle
+app.use('/api', (req, res, next) => { res.set('X-Robots-Tag', 'noindex, nofollow'); next(); });
 
 app.use(express.static(path.join(__dirname, 'public')));
 

@@ -10,6 +10,5 @@ Disallow: /hesabim
 Disallow: /odeme
 Disallow: /siparis-alindi
 Disallow: /track
-Disallow: /uploads/
 
 Sitemap: https://www.tanetekno.com/sitemap.xml
