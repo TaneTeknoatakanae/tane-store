@@ -243,6 +243,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;display:none;white-space:nowrap;box-shadow:var(--shadow)}
+.clients-section{padding:56px 24px;background:var(--bg);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light)}
+.clients-label{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);margin-bottom:28px}
+.clients-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.client-item{display:flex;align-items:center;gap:10px;padding:12px 28px}
+.client-logo{font-size:24px;opacity:.7}
+.client-name{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+.client-sep{width:1px;height:28px;background:var(--border-light);flex-shrink:0}
+@media(max-width:600px){.client-item{padding:10px 16px}.client-sep{display:none}.clients-row{flex-direction:column;gap:4px}}
 .why-section{background:#1C1814;padding:88px 24px}
 .why-in{max-width:1280px;margin:0 auto;text-align:center}
 .why-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
@@ -474,6 +482,29 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="cat-grid" id="cat-grid">
   </div>
 </div>
+
+<!-- GÜVENEN KURUMLAR -->
+<section class="clients-section reveal">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px;text-align:center">
+    <div class="clients-label">Bize Güvenen Kurumlar</div>
+    <div class="clients-row">
+      <div class="client-item">
+        <div class="client-logo">🏛️</div>
+        <div class="client-name">İstanbul Aydın Üniversitesi</div>
+      </div>
+      <div class="client-sep"></div>
+      <div class="client-item">
+        <div class="client-logo">🏢</div>
+        <div class="client-name">Özmen Holding</div>
+      </div>
+      <div class="client-sep"></div>
+      <div class="client-item">
+        <div class="client-logo">⚡</div>
+        <div class="client-name">Sis Enerji</div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- NEDEN TANE -->
 <section class="why-section reveal">
