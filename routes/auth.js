@@ -97,4 +97,21 @@ router.put('/password', async (req, res) => {
   });
 });
 
+// Üye listesi — admin only
+const adminAuth = require('../middleware/adminAuth');
+router.get('/members', adminAuth, (req, res) => {
+  db.all(`
+    SELECT u.id, u.name, u.email, u.phone, u.city, u.created_at,
+      COUNT(DISTINCT o.id) AS order_count,
+      COALESCE(SUM(o.total_price), 0) AS total_spent
+    FROM users u
+    LEFT JOIN orders o ON o.user_id = u.id
+    GROUP BY u.id
+    ORDER BY u.created_at DESC
+  `, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows || []);
+  });
+});
+
 module.exports = router;

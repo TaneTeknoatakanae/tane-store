@@ -147,6 +147,7 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="setTab('prices',this)">💰 Fiyat Gir</button>
     <button class="tab" onclick="setTab('analytics',this)">📊 Analitik</button>
     <button class="tab" onclick="setTab('pricecompare',this)">🏷 Rakip Fiyat</button>
+    <button class="tab" onclick="setTab('members',this)">👥 Üyeler</button>
   </div>
 
   <!-- ÜRÜNLER -->
@@ -347,6 +348,22 @@ tr:last-child td{border-bottom:none}
         <button class="btn-primary" onclick="pcLoadList()" style="font-size:12px;padding:6px 14px">↻ Yenile</button>
       </div>
       <div id="pc-list"><div style="padding:20px;color:#aaa;font-size:13px">Yükleniyor...</div></div>
+    </div>
+  </div>
+
+  <!-- ÜYELER -->
+  <div id="tab-members" class="hidden">
+    <div class="table-wrap">
+      <div class="table-head" style="gap:10px;flex-wrap:wrap">
+        <h3>Kayıtlı Üyeler</h3>
+        <span id="members-count" style="font-size:13px;color:#888"></span>
+      </div>
+      <div class="table-scroll">
+      <table><thead><tr>
+        <th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Şehir</th><th>Sipariş</th><th>Toplam Harcama</th><th>Kayıt Tarihi</th>
+      </tr></thead>
+      <tbody id="members-tbody"></tbody></table>
+      </div>
     </div>
   </div>
 
@@ -1185,6 +1202,28 @@ function closeModal(id){
   });
 });
 
+// ── Üye yönetimi ──
+async function loadMembers(){
+  try{
+    const members = await fetch('/api/auth/members',{credentials:'include'}).then(r=>r.json());
+    const tbody = document.getElementById('members-tbody');
+    document.getElementById('members-count').textContent = members.length + ' üye';
+    if(!members.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:40px">Henüz kayıtlı üye yok</td></tr>';return;}
+    tbody.innerHTML = members.map(m => {
+      const spent = m.total_spent ? parseFloat(m.total_spent).toLocaleString('tr-TR') + ' ₺' : '0 ₺';
+      return `<tr>
+        <td style="font-weight:600">${escHtml(m.name)}</td>
+        <td><a href="mailto:${escHtml(m.email)}" style="color:var(--accent);text-decoration:none">${escHtml(m.email)}</a></td>
+        <td>${escHtml(m.phone||'—')}</td>
+        <td>${escHtml(m.city||'—')}</td>
+        <td style="text-align:center"><span class="badge ${m.order_count>0?'badge-green':'badge-gray'}">${m.order_count||0}</span></td>
+        <td style="font-weight:700;color:var(--accent)">${spent}</td>
+        <td style="font-size:12px;color:#aaa">${new Date(m.created_at).toLocaleDateString('tr-TR')}</td>
+      </tr>`;
+    }).join('');
+  }catch(e){console.error('Üye yükleme hata:',e);}
+}
+
 // ── Ürün toplu işlemleri ──
 function getSelectedProductIds(){
   return Array.from(document.querySelectorAll('.prod-check:checked')).map(c=>parseInt(c.dataset.id));
@@ -1255,6 +1294,7 @@ function setTab(tab,btn){
   document.getElementById('tab-'+tab).classList.remove('hidden');
   if(tab==='analytics')loadAnalytics();
   if(tab==='pricecompare')pcLoadList();
+  if(tab==='members')loadMembers();
 }
 
 let visitChart=null, salesChart=null;
