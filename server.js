@@ -295,25 +295,36 @@ app.get('/feed/products.xml', (req, res) => {
       const desc = stripHtml(p.description || p.name).substring(0, 5000);
       const availability = p.stock > 0 ? 'in_stock' : 'out_of_stock';
       const condition = 'new';
-      const gtin = (p.sku && /^\d{8,14}$/.test(p.sku)) ? `<g:gtin>${esc(p.sku)}</g:gtin>` : '';
-      const mpn = p.sku ? `<g:mpn>${esc(p.sku)}</g:mpn>` : '';
+      const hasGtin = p.sku && /^\d{8,14}$/.test(p.sku);
+      const identifierBlock = hasGtin
+        ? `<g:gtin>${esc(p.sku)}</g:gtin>`
+        : `<g:identifier_exists>false</g:identifier_exists>${p.sku ? `\n      <g:mpn>${esc(p.sku)}</g:mpn>` : ''}`;
+      // Ek görseller (images JSON'dan)
+      let additionalImages = '';
+      try {
+        const imgs = p.images ? JSON.parse(p.images) : [];
+        imgs.slice(1, 10).forEach(img => {
+          const u = img.startsWith('http') ? img : `${SITE}${img}`;
+          additionalImages += `\n      <g:additional_image_link>${esc(u)}</g:additional_image_link>`;
+        });
+      } catch(_) {}
 
       return `<item>
       <g:id>${p.id}</g:id>
       <g:title>${esc(p.name.substring(0, 150))}</g:title>
       <g:description>${esc(desc.substring(0, 5000))}</g:description>
       <g:link>${SITE}/product.html?id=${p.id}</g:link>
-      <g:image_link>${esc(imgUrl)}</g:image_link>
+      <g:image_link>${esc(imgUrl)}</g:image_link>${additionalImages}
       <g:price>${p.tane_price.toFixed(2)} TRY</g:price>
       ${salePrice ? `<g:sale_price>${salePrice.toFixed(2)} TRY</g:sale_price>` : ''}
       <g:availability>${availability}</g:availability>
       <g:condition>${condition}</g:condition>
       <g:brand>${esc(p.brand || 'Tane Store')}</g:brand>
-      ${gtin}
-      ${mpn}
+      ${identifierBlock}
       <g:product_type>${esc(category)}</g:product_type>
       <g:shipping>
         <g:country>TR</g:country>
+        <g:service>Standart Kargo</g:service>
         <g:price>${price >= 4000 ? '0.00' : '49.90'} TRY</g:price>
       </g:shipping>
     </item>`;
