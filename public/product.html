@@ -442,7 +442,8 @@ function loadPaytrTaksit(price) {
     @media(max-width:380px){#paytr_taksit_tablosu{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:260px){#paytr_taksit_tablosu{grid-template-columns:1fr}}
   </style></head><body><div id="paytr_taksit_tablosu"></div>
-  <script src="${scriptUrl}"><\/script></body></html>`;
+  <script src="${scriptUrl}"><\/script><script src="/whatsapp.js" defer></script>
+</body></html>`;
   target.innerHTML = '<iframe class="paytr-taksit-iframe" id="paytr-taksit-iframe"></iframe>';
   const iframe = document.getElementById('paytr-taksit-iframe');
   iframe.srcdoc = html;
@@ -855,5 +856,6 @@ initAuth().then(() => loadProduct());
   </div>
 </footer>
 <script src="/price-compare.js" defer></script>
+<script src="/whatsapp.js" defer></script>
 </body>
 </html>
