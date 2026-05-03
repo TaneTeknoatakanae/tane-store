@@ -105,4 +105,32 @@ router.get('/audit', adminAuth, (req, res) => {
   );
 });
 
+// ── Görsel migration: external URL'leri kendi sunucumuza indir ──────────────
+let migrationStatus = { running: false, processed: 0, total: 0, downloaded: 0, failed: 0, current: '', startedAt: null, finishedAt: null };
+
+router.post('/migrate-images', adminAuth, (req, res) => {
+  if (migrationStatus.running) return res.status(409).json({ error: 'Migration zaten çalışıyor', status: migrationStatus });
+
+  migrationStatus = { running: true, processed: 0, total: 0, downloaded: 0, failed: 0, current: 'Başlatılıyor…', startedAt: Date.now(), finishedAt: null };
+  audit(req, 'admin.migrate_images_start', {});
+
+  // Async — request bekletmeden başlat
+  const { migrate } = require('../scripts/migrate-images');
+  migrate((p) => {
+    Object.assign(migrationStatus, p, { running: true });
+  }).then(stats => {
+    migrationStatus = { ...migrationStatus, ...stats, running: false, finishedAt: Date.now(), current: 'Tamamlandı' };
+  }).catch(e => {
+    migrationStatus.running = false;
+    migrationStatus.error = e.message;
+    migrationStatus.finishedAt = Date.now();
+  });
+
+  res.json({ message: 'Migration başladı', status: migrationStatus });
+});
+
+router.get('/migrate-images/status', adminAuth, (req, res) => {
+  res.json(migrationStatus);
+});
+
 module.exports = router;

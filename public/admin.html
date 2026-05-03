@@ -148,6 +148,7 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="setTab('analytics',this)">📊 Analitik</button>
     <button class="tab" onclick="setTab('pricecompare',this)">🏷 Rakip Fiyat</button>
     <button class="tab" onclick="setTab('members',this)">👥 Üyeler</button>
+    <button class="tab" onclick="setTab('maintenance',this)">🔧 Bakım</button>
   </div>
 
   <!-- ÜRÜNLER -->
@@ -348,6 +349,20 @@ tr:last-child td{border-bottom:none}
         <button class="btn-primary" onclick="pcLoadList()" style="font-size:12px;padding:6px 14px">↻ Yenile</button>
       </div>
       <div id="pc-list"><div style="padding:20px;color:#aaa;font-size:13px">Yükleniyor...</div></div>
+    </div>
+  </div>
+
+  <!-- BAKIM -->
+  <div id="tab-maintenance" class="hidden">
+    <div class="table-wrap" style="padding:24px">
+      <h3 style="font-size:16px;font-weight:800;margin-bottom:6px">🖼 Görsel Migration</h3>
+      <p style="color:#666;font-size:13px;line-height:1.6;margin-bottom:18px">
+        Mevcut ürünlerin Amazon/MediaMarkt gibi external CDN'lerdeki görsellerini sunucumuza indirir.<br>
+        <strong>Google Merchant Center "yanlış beyan" hatasını çözmek için kritik.</strong>
+        Yüzlerce görsel için 5-15 dk sürebilir, arka planda çalışır.
+      </p>
+      <button id="mig-btn" class="btn-primary" onclick="startImageMigration()">▶ Migration Başlat</button>
+      <div id="mig-status" style="margin-top:18px;display:none;padding:16px;background:#FDFAF6;border:1px solid var(--border);border-radius:10px;font-family:monospace;font-size:13px"></div>
     </div>
   </div>
 
@@ -1201,6 +1216,46 @@ function closeModal(id){
     if(e.target===this) closeModal(id);
   });
 });
+
+// ── Görsel migration ──
+let migPoll = null;
+async function startImageMigration(){
+  if(!confirm('Tüm external ürün görselleri sunucuya indirilecek. Devam?'))return;
+  const btn=document.getElementById('mig-btn');
+  const box=document.getElementById('mig-status');
+  btn.disabled=true;btn.textContent='⏳ Başlatılıyor…';
+  box.style.display='block';box.textContent='Başlatılıyor…';
+  try{
+    const r=await fetch('/api/admin/migrate-images',{method:'POST',credentials:'include'});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Başlatılamadı');
+    btn.textContent='⏳ Çalışıyor…';
+    if(migPoll)clearInterval(migPoll);
+    migPoll=setInterval(pollMigStatus,2000);
+    pollMigStatus();
+  }catch(e){box.textContent='❌ '+e.message;btn.disabled=false;btn.textContent='▶ Migration Başlat';}
+}
+async function pollMigStatus(){
+  try{
+    const r=await fetch('/api/admin/migrate-images/status',{credentials:'include'});
+    const s=await r.json();
+    const box=document.getElementById('mig-status');
+    const pct=s.total?Math.round((s.processed/s.total)*100):0;
+    box.innerHTML=`İlerleme: <strong>${s.processed}/${s.total}</strong> (%${pct})<br>
+      ✅ İndirilen görsel: <strong style="color:#16a34a">${s.downloaded||0}</strong><br>
+      ⏭ Atlanan (zaten local): <strong>${s.skipped||0}</strong><br>
+      ❌ Hata: <strong style="color:#ef4444">${s.failed||0}</strong><br>
+      <span style="color:#888">Şu an: ${(s.current||'').substring(0,60)}</span>
+      ${s.error?'<br><span style="color:#ef4444">⚠️ '+s.error+'</span>':''}`;
+    if(!s.running){
+      clearInterval(migPoll);
+      const btn=document.getElementById('mig-btn');
+      btn.disabled=false;
+      btn.textContent='▶ Migration Tekrar Çalıştır';
+      box.innerHTML+='<br><br><strong style="color:#16a34a">✅ Tamamlandı!</strong>';
+    }
+  }catch(e){}
+}
 
 // ── Üye yönetimi ──
 async function loadMembers(){
