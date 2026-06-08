@@ -904,14 +904,17 @@ function renderCategories() {
   const grid = document.getElementById('cat-grid');
   if (!grid || !categoryTree.length) return;
   grid.innerHTML = categoryTree.map(parent => {
-    const fb = CAT_ICONS[parent.slug] || '🛍️';
     const childIds = parent.children.map(c => c.id);
     const prods = allProducts.filter(p => childIds.includes(p.category_id));
+    // Ürünü olmayan üst kategoriyi gösterme
+    if (!prods.length) return '';
+    const fb = CAT_ICONS[parent.slug] || '🛍️';
     const img = prods.find(p => p.image_url)?.image_url;
-    const childLinks = parent.children.map(c => {
-      const cnt = allProducts.filter(p => p.category_id === c.id).length;
-      return `<a href="/kategori/${parent.slug}/${c.slug}" class="cat-sub-link">${c.name}${cnt?` <span class="cat-sub-cnt">(${cnt})</span>`:''}</a>`;
-    }).join('');
+    const childLinks = parent.children
+      .map(c => ({ c, cnt: allProducts.filter(p => p.category_id === c.id).length }))
+      .filter(x => x.cnt > 0) // ürünü olmayan alt kategoriyi gösterme
+      .map(({ c, cnt }) => `<a href="/kategori/${parent.slug}/${c.slug}" class="cat-sub-link">${c.name} <span class="cat-sub-cnt">(${cnt})</span></a>`)
+      .join('');
     return `<div class="cat-card-wrap">
       <a href="/kategori/${parent.slug}" class="cat-card">
         <div class="cat-img-wrap">
