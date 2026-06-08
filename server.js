@@ -141,7 +141,10 @@ app.get('/product.html', (req, res, next) => {
     let html = fs.readFileSync(path.join(__dirname, 'public', 'product.html'), 'utf8');
     const SITE = 'https://www.tanetekno.com';
     const title = `${p.name} — Tane Store`;
-    const desc = (p.description || `${p.name} - Tane Store'da satın al`).substring(0, 160).replace(/"/g, '&quot;');
+    // Açıklamadan HTML etiketlerini temizle — meta/OG description düz metin olmalı (Google snippet'i)
+    const stripTags = s => String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+    const descText = stripTags(p.description) || `${p.name} - Tane Store'da satın al`;
+    const desc = descText.substring(0, 160).replace(/"/g, '&quot;');
     const imgAbs = p.image_url
       ? (p.image_url.startsWith('http') ? p.image_url : `${SITE}${p.image_url}`)
       : `${SITE}/AmblemTane.png`;
