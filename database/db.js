@@ -277,6 +277,91 @@ async function initDB() {
       );
     }
 
+    // ── 3D Baskı Hizmeti & B2B modülleri ───────────────────
+    // Genel ayar tablosu (admin'den düzenlenebilir fiyat config'i burada JSON olarak tutulur)
+    await pool.query(`CREATE TABLE IF NOT EXISTS app_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`);
+
+    // Kullanıcı hesap tipi (bireysel / kurumsal) — B2B için
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS account_type TEXT NOT NULL DEFAULT 'individual'`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS company_name TEXT`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS tax_no TEXT`);
+
+    // 3D baskı işleri — yüklenen model + hesaplanan teklif
+    await pool.query(`CREATE TABLE IF NOT EXISTS print_jobs (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      original_name TEXT NOT NULL,
+      file_path TEXT NOT NULL,
+      file_format TEXT,
+      material TEXT NOT NULL,
+      infill INTEGER NOT NULL DEFAULT 20,
+      quality TEXT DEFAULT 'standart',
+      volume_cm3 REAL,
+      est_grams REAL,
+      est_hours REAL,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      unit_price REAL NOT NULL DEFAULT 0,
+      total_price REAL NOT NULL DEFAULT 0,
+      note TEXT,
+      status TEXT NOT NULL DEFAULT 'quoted',
+      order_id INTEGER REFERENCES orders(id) ON DELETE SET NULL,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS print_jobs_order_idx ON print_jobs(order_id)`);
+
+    // B2B kurumsal talepler (toplu sipariş / özel teklif)
+    await pool.query(`CREATE TABLE IF NOT EXISTS b2b_requests (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      company_name TEXT NOT NULL,
+      tax_office TEXT,
+      tax_no TEXT,
+      contact_name TEXT NOT NULL,
+      contact_phone TEXT NOT NULL,
+      contact_email TEXT,
+      request_type TEXT NOT NULL DEFAULT 'toplu-siparis',
+      details TEXT NOT NULL,
+      budget REAL,
+      status TEXT NOT NULL DEFAULT 'new',
+      created_at TIMESTAMP DEFAULT NOW()
+    )`);
+
+    // 3D baskı fiyat config'i — yoksa varsayılanlarla seed et (admin sonradan düzenler)
+    const cfgCheck = await pool.query(`SELECT 1 FROM app_settings WHERE key = 'print_pricing'`);
+    if (cfgCheck.rows.length === 0) {
+      const defaultPricing = {
+        baseFee: 50,                  // sipariş başına taban ücret (₺)
+        machineRatePerHour: 15,       // makine/işçilik (₺/saat)
+        throughputGramsPerHour: 12,   // ortalama baskı hızı (g/saat) — süre tahmini için
+        infillBase: 0.30,             // gram çarpanı = infillBase + infillRange × (infill/100)
+        infillRange: 0.70,
+        minPrice: 75,                 // minimum sipariş tutarı (₺)
+        qualityFactors: {             // baskı kalitesi → süre (makine maliyeti) çarpanı
+          taslak: 0.8,                // hızlı/kaba (0.3mm)
+          standart: 1.0,              // standart (0.2mm)
+          yuksek: 1.5                 // yüksek detay (0.1mm)
+        },
+        materials: {
+          PLA:   { label: 'PLA',              density: 1.24, ratePerGram: 4.0 },
+          PETG:  { label: 'PETG',             density: 1.27, ratePerGram: 5.0 },
+          ABS:   { label: 'ABS',              density: 1.04, ratePerGram: 5.5 },
+          RESIN: { label: 'Reçine (Resin)',   density: 1.10, ratePerGram: 8.0 },
+          TPU:   { label: 'TPU (Esnek)',      density: 1.21, ratePerGram: 6.5 },
+          ASA:   { label: 'ASA',              density: 1.07, ratePerGram: 6.0 },
+          PC:    { label: 'PC (Polikarbonat)',density: 1.20, ratePerGram: 9.0 },
+          PA:    { label: 'PA (Naylon)',      density: 1.01, ratePerGram: 9.0 },
+          PET:   { label: 'PET',              density: 1.38, ratePerGram: 5.5 },
+          PPS:   { label: 'PPS',              density: 1.35, ratePerGram: 14.0 }
+        }
+      };
+      await pool.query(`INSERT INTO app_settings (key, value) VALUES ('print_pricing', $1)`, [JSON.stringify(defaultPricing)]);
+      console.log('3D baskı fiyat config seed edildi');
+    }
+
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
     console.error('DB hatasi:', e.message);

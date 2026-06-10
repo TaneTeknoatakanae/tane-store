@@ -252,6 +252,7 @@ app.use('/api/scrape-url', scrapeUrlRoutes);
 app.use('/api/price-compare', require('./routes/price-compare'));
 app.use('/api/paytr', require('./routes/paytr'));
 app.use('/api/categories', require('./routes/categories'));
+app.use('/api/print', require('./routes/print-service'));
 
 // SEO-friendly category URL: /kategori/bilgisayar veya /kategori/bilgisayar/laptop → landing.html
 app.get('/kategori/:parent', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
@@ -267,6 +268,7 @@ app.get('/teslimat-iade', (req, res) => res.sendFile(path.join(__dirname, 'publi
 app.get('/gizlilik', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gizlilik.html')));
 app.get('/mesafeli-satis', (req, res) => res.sendFile(path.join(__dirname, 'public', 'mesafeli-satis.html')));
 app.get('/landing', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
+app.get('/3d-baski', (req, res) => res.sendFile(path.join(__dirname, 'public', '3d-baski.html')));
 app.get('/iletisim', (req, res) => res.sendFile(path.join(__dirname, 'public', 'iletisim.html')));
 app.get('/kvkk', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kvkk.html')));
 app.get('/cerez-politikasi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cerez-politikasi.html')));

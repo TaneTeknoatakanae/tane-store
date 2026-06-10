@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D Baskı Hizmeti — Model Yükle & Anında Fiyat Al | Tane Store</title>
+<meta name="description" content="STL/OBJ modelinizi yükleyin, materyal ve doluluk seçin, 3D baskınızın fiyatını anında öğrenin. PLA, PETG, ABS, reçine ve daha fazlası.">
+<link rel="canonical" href="https://www.tanetekno.com/3d-baski">
+<script async src="/ga.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fdfaf6;--surface:#f5f0e8;--text:#1a1a1a;--text2:#555;--text3:#999;--accent:#e8590c;--accent2:#fd7e14;--border:#e0d8cc;--border-light:#ece4d8;--r-lg:12px;--shadow-sm:0 1px 3px rgba(0,0,0,.06)}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+  a{color:inherit}
+  .nav{position:sticky;top:0;z-index:100;background:rgba(253,250,246,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light)}
+  .nav-in{max-width:1280px;margin:0 auto;padding:0 24px;height:62px;display:flex;align-items:center;gap:16px}
+  .logo{font-weight:800;font-size:19px;text-decoration:none;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
+  .logo img{height:30px}
+  .nav-sp{flex:1}
+  .nav-a{text-decoration:none;color:var(--text2);font-weight:500;font-size:14px;padding:8px 12px;border-radius:8px}
+  .nav-a:hover{color:var(--text);background:var(--surface)}
+  .cart-link{position:relative}
+  .cart-badge{position:absolute;top:-2px;right:-2px;background:var(--accent);color:#fff;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px}
+
+  .hero{max-width:1280px;margin:0 auto;padding:36px 24px 12px}
+  .hero h1{font-size:30px;font-weight:800;letter-spacing:-.8px;margin-bottom:8px}
+  .hero p{color:var(--text2);font-size:15px;max-width:620px}
+  .steps{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .step{font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border-light);padding:6px 12px;border-radius:20px;font-weight:500}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:20px 24px 60px;display:grid;grid-template-columns:1fr 400px;gap:24px;align-items:start}
+  @media(max-width:880px){.wrap{grid-template-columns:1fr}}
+
+  .card{background:#fff;border:1px solid var(--border-light);border-radius:16px;padding:22px;box-shadow:var(--shadow-sm)}
+  .card h2{font-size:15px;font-weight:700;margin-bottom:14px}
+
+  /* Upload / viewer */
+  #drop{border:2px dashed var(--border);border-radius:14px;background:var(--surface);min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+  #drop.drag{border-color:var(--accent);background:#fff4ec}
+  #drop .up-ic{font-size:40px;margin-bottom:10px}
+  #drop .up-t{font-weight:600;font-size:15px;margin-bottom:4px}
+  #drop .up-s{font-size:12px;color:var(--text3)}
+  #viewer{width:100%;height:380px;border-radius:14px;background:#1a1a22;display:none;position:relative}
+  #viewer canvas{border-radius:14px;display:block}
+  .viewer-tag{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:4px 9px;border-radius:6px;backdrop-filter:blur(4px)}
+  .viewer-reset{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+  .file-meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--text2)}
+  .file-meta b{color:var(--text)}
+
+  /* Controls */
+  .fld{margin-bottom:16px}
+  .fld label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+  select,input[type=number],textarea{width:100%;font-family:inherit;font-size:14px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--text)}
+  select:focus,input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  .mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px}
+  .mat-chip{border:1.5px solid var(--border);border-radius:9px;padding:9px 6px;text-align:center;font-size:12.5px;font-weight:600;cursor:pointer;background:#fff;transition:all .12s}
+  .mat-chip:hover{border-color:var(--accent2)}
+  .mat-chip.sel{border-color:var(--accent);background:#fff4ec;color:var(--accent)}
+  .infill-row{display:flex;align-items:center;gap:12px}
+  input[type=range]{flex:1;accent-color:var(--accent)}
+  .infill-val{font-weight:700;min-width:44px;text-align:right}
+  .qty-row{display:flex;align-items:center;gap:10px}
+  .qty-row button{width:34px;height:34px;border:1px solid var(--border);background:#fff;border-radius:8px;font-size:18px;cursor:pointer;font-family:inherit}
+  .qty-row input{width:64px;text-align:center}
+
+  /* Price box (sticky) */
+  .pricebox{position:sticky;top:78px}
+  .price-big{font-size:34px;font-weight:800;color:var(--accent);letter-spacing:-1px}
+  .price-sub{font-size:12px;color:var(--text3);margin-bottom:14px}
+  .breakdown{font-size:13px;border-top:1px solid var(--border-light);padding-top:12px;margin-top:4px}
+  .bd-row{display:flex;justify-content:space-between;padding:4px 0;color:var(--text2)}
+  .bd-row b{color:var(--text);font-weight:600}
+  .btn{width:100%;border:none;border-radius:10px;padding:14px;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-add{background:var(--accent);color:#fff;margin-top:16px}
+  .btn-add:hover{background:#d24f08}
+  .btn-add:disabled{background:var(--border);color:var(--text3);cursor:not-allowed}
+  .btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text);margin-top:8px;text-decoration:none}
+  .quote-note{font-size:11px;color:var(--text3);margin-top:12px;line-height:1.5}
+  .warn{background:#fff8ec;border:1px solid #ffe0a3;border-radius:9px;padding:10px 12px;font-size:12px;color:#8a5a00;margin-top:12px}
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1a1a1a;color:#fff;padding:13px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;transition:transform .3s;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-in">
+  <a href="/" class="logo"><img src="/AmblemTane.png" alt="" onerror="this.style.display='none'">Tane Store</a>
+  <span class="nav-sp"></span>
+  <a href="/" class="nav-a">Mağaza</a>
+  <a href="/#kategoriler" class="nav-a">Kategoriler</a>
+  <a href="/" class="nav-a cart-link" title="Sepet">🛒<span class="cart-badge" id="cart-badge">0</span></a>
+</div></nav>
+
+<div class="hero">
+  <h1>3D Baskı Hizmeti</h1>
+  <p>Kendi 3D modelinizi yükleyin, materyal ve doluluk oranını seçin; baskı fiyatınızı <b>anında</b> hesaplayalım. Endüstriyel kalitede üretim, kapınıza teslim.</p>
+  <div class="steps">
+    <span class="step">1 · Model Yükle (STL / OBJ)</span>
+    <span class="step">2 · Materyal & Ayar Seç</span>
+    <span class="step">3 · Fiyatı Gör, Sepete Ekle</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- SOL: yükleme/önizleme + ayarlar -->
+  <div>
+    <div class="card">
+      <h2>1 · Modelinizi Yükleyin</h2>
+      <div id="drop">
+        <div class="up-ic">📦</div>
+        <div class="up-t">Dosyayı buraya sürükleyin veya seçmek için tıklayın</div>
+        <div class="up-s">STL, OBJ, 3MF · maksimum 60 MB</div>
+      </div>
+      <div id="viewer">
+        <button class="viewer-reset" id="reset-view">Görünümü Sıfırla</button>
+        <div class="viewer-tag" id="viewer-tag"></div>
+      </div>
+      <input type="file" id="file" accept=".stl,.obj,.3mf" class="hide">
+      <div class="file-meta hide" id="file-meta"></div>
+      <div class="warn hide" id="upload-warn"></div>
+    </div>
+
+    <div class="card hide" id="params-card" style="margin-top:20px">
+      <h2>2 · Baskı Ayarları</h2>
+      <div class="fld">
+        <label>Materyal</label>
+        <div class="mat-grid" id="mat-grid"></div>
+      </div>
+      <div class="fld">
+        <label>Doluluk (Infill) — <span id="infill-hint">dayanıklılık ↑ = malzeme ↑</span></label>
+        <div class="infill-row">
+          <input type="range" id="infill" min="5" max="100" step="5" value="20">
+          <span class="infill-val" id="infill-val">20%</span>
+        </div>
+      </div>
+      <div class="fld">
+        <label>Baskı Kalitesi</label>
+        <select id="quality"></select>
+      </div>
+      <div class="fld">
+        <label>Adet</label>
+        <div class="qty-row">
+          <button type="button" id="qty-dn">−</button>
+          <input type="number" id="qty" value="1" min="1" max="1000">
+          <button type="button" id="qty-up">+</button>
+        </div>
+      </div>
+      <div class="fld" style="margin-bottom:0">
+        <label>Not (opsiyonel)</label>
+        <textarea id="note" rows="2" placeholder="Renk tercihi, teslim notu vb."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAĞ: fiyat -->
+  <div class="card pricebox" id="pricebox">
+    <h2>Fiyat</h2>
+    <div id="price-empty" style="color:var(--text3);font-size:14px;padding:20px 0;text-align:center">
+      Fiyatı görmek için bir model yükleyin.
+    </div>
+    <div id="price-content" class="hide">
+      <div class="price-big" id="price-big">—</div>
+      <div class="price-sub">KDV dahil tahmini fiyat</div>
+      <div class="breakdown" id="breakdown"></div>
+      <button class="btn btn-add" id="btn-add">Sepete Ekle</button>
+      <a class="btn btn-ghost" href="/">Mağazaya Dön</a>
+      <div class="quote-note">
+        ℹ️ Fiyat, modelin geometrik hacmine göre <b>otomatik tahmindir</b>. Karmaşık destek yapıları gerektiren modellerde ekibimiz onay öncesi fiyatı revize edebilir. <b>Özel üretim ürünlerde iade yapılamaz.</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Three.js (klasik global build) + yükleyiciler -->
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const fmt = n => new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY',minimumFractionDigits:2}).format(n);
+const $ = id => document.getElementById(id);
+
+let CONFIG=null, upload=null, geometryVolumeCm3=0, currentQuote=null, quoteTimer=null;
+const state = { material:null, infill:20, quality:'standart', quantity:1 };
+
+// ── Sepet rozeti ──
+function refreshBadge(){
+  try{
+    const cart=JSON.parse(localStorage.getItem('tane-cart')||'[]');
+    const c=cart.reduce((s,i)=>s+(i.qty||1),0);
+    const b=$('cart-badge'); b.textContent=c; b.style.display=c>0?'flex':'none';
+  }catch(_){}
+}
+
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+// ── Config yükle ──
+async function loadConfig(){
+  try{
+    CONFIG = await fetch('/api/print/config').then(r=>r.json());
+    // materyaller
+    $('mat-grid').innerHTML = CONFIG.materials.map((m,i)=>
+      `<div class="mat-chip${i===0?' sel':''}" data-key="${m.key}">${m.label}</div>`).join('');
+    state.material = CONFIG.materials[0]?.key || null;
+    document.querySelectorAll('.mat-chip').forEach(ch=>ch.onclick=()=>{
+      document.querySelectorAll('.mat-chip').forEach(x=>x.classList.remove('sel'));
+      ch.classList.add('sel'); state.material=ch.dataset.key; requestQuote();
+    });
+    // kaliteler
+    $('quality').innerHTML = CONFIG.qualities.map(q=>`<option value="${q.key}"${q.key==='standart'?' selected':''}>${q.label}</option>`).join('');
+  }catch(e){ console.error('config',e); }
+}
+
+// ── Three.js sahne ──
+let scene,camera,renderer,controls,mesh;
+function initViewer(){
+  const v=$('viewer'); v.style.display='block';
+  const w=v.clientWidth,h=v.clientHeight;
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0x1a1a22);
+  camera=new THREE.PerspectiveCamera(45,w/h,0.1,5000);
+  renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(w,h); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  v.insertBefore(renderer.domElement,v.firstChild);
+  scene.add(new THREE.AmbientLight(0xffffff,0.6));
+  const d=new THREE.DirectionalLight(0xffffff,0.8); d.position.set(1,1,1); scene.add(d);
+  const d2=new THREE.DirectionalLight(0xffffff,0.4); d2.position.set(-1,-0.5,-1); scene.add(d2);
+  controls=new THREE.OrbitControls(camera,renderer.domElement); controls.enableDamping=true;
+  $('reset-view').onclick=()=>frameObject();
+  (function animate(){requestAnimationFrame(animate);controls&&controls.update();renderer&&renderer.render(scene,camera);})();
+  window.addEventListener('resize',()=>{const nw=v.clientWidth,nh=v.clientHeight;if(!nw)return;camera.aspect=nw/nh;camera.updateProjectionMatrix();renderer.setSize(nw,nh);});
+}
+function setMesh(geometry){
+  if(mesh){scene.remove(mesh);mesh.geometry.dispose();mesh.material.dispose();}
+  geometry.computeVertexNormals();
+  const mat=new THREE.MeshPhongMaterial({color:0xfd7e14,specular:0x222222,shininess:30,flatShading:false});
+  mesh=new THREE.Mesh(geometry,mat); scene.add(mesh); frameObject();
+}
+function frameObject(){
+  if(!mesh)return;
+  mesh.geometry.computeBoundingBox();
+  const box=mesh.geometry.boundingBox, c=new THREE.Vector3(); box.getCenter(c);
+  const size=new THREE.Vector3(); box.getSize(size);
+  mesh.position.set(-c.x,-c.y,-c.z);
+  const maxd=Math.max(size.x,size.y,size.z)||1;
+  camera.position.set(maxd*1.4,maxd*1.0,maxd*1.6); camera.near=maxd/100; camera.far=maxd*20; camera.updateProjectionMatrix();
+  controls.target.set(0,0,0); controls.update();
+}
+
+// ── Hacim hesabı (işaretli tetrahedra toplamı), mm³ → cm³ ──
+function geometryVolume(geometry){
+  const pos=geometry.attributes.position; if(!pos)return 0;
+  let vol=0; const a=new THREE.Vector3(),b=new THREE.Vector3(),cc=new THREE.Vector3();
+  const tri=(i,j,k)=>{a.fromBufferAttribute(pos,i);b.fromBufferAttribute(pos,j);cc.fromBufferAttribute(pos,k);vol+=a.dot(b.clone().cross(cc))/6;};
+  if(geometry.index){const idx=geometry.index.array;for(let i=0;i<idx.length;i+=3)tri(idx[i],idx[i+1],idx[i+2]);}
+  else{for(let i=0;i<pos.count;i+=3)tri(i,i+1,i+2);}
+  return Math.abs(vol); // model birimi (STL=mm varsayımı)
+}
+function dims(geometry){geometry.computeBoundingBox();const s=new THREE.Vector3();geometry.boundingBox.getSize(s);return s;}
+
+// ── Dosya işle ──
+function handleFile(file){
+  const ext=(file.name.split('.').pop()||'').toLowerCase();
+  if(!['stl','obj','3mf'].includes(ext)){ showWarn('Sadece STL, OBJ veya 3MF dosyaları kabul edilir.'); return; }
+  if(file.size>60*1024*1024){ showWarn('Dosya 60MB sınırını aşıyor.'); return; }
+  $('upload-warn').classList.add('hide');
+  if(!renderer) initViewer();
+  $('drop').style.display='none';
+
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    let geometry=null;
+    try{
+      if(ext==='stl'){ geometry=new THREE.STLLoader().parse(e.target.result); }
+      else if(ext==='obj'){
+        const obj=new THREE.OBJLoader().parse(typeof e.target.result==='string'?e.target.result:new TextDecoder().decode(e.target.result));
+        let geos=[]; obj.traverse(o=>{if(o.isMesh)geos.push(o.geometry);});
+        geometry=geos[0]; // ilk mesh (çoğu OBJ tek parça)
+        if(!geometry){showWarn('OBJ içinde geometri bulunamadı.');resetUpload();return;}
+      } else { // 3mf — tarayıcıda parse edilemiyor; hacimsiz, manuel inceleme
+        await uploadAndQuote3mfFallback(file); return;
+      }
+    }catch(err){ console.error(err); showWarn('Model okunamadı, dosya bozuk olabilir.'); resetUpload(); return; }
+
+    setMesh(geometry);
+    const volMm3=geometryVolume(geometry);
+    geometryVolumeCm3=volMm3/1000;
+    const s=dims(geometry);
+    $('viewer-tag').textContent=`${s.x.toFixed(0)}×${s.y.toFixed(0)}×${s.z.toFixed(0)} mm · ${geometryVolumeCm3.toFixed(1)} cm³`;
+
+    // sunucuya yükle
+    const up=await doUpload(file);
+    if(!up)return;
+    upload=up;
+    $('file-meta').classList.remove('hide');
+    $('file-meta').innerHTML=`<span>Dosya: <b>${file.name}</b></span><span>Hacim: <b>${geometryVolumeCm3.toFixed(1)} cm³</b></span><span>Boyut: <b>${s.x.toFixed(0)}×${s.y.toFixed(0)}×${s.z.toFixed(0)} mm</b></span>`;
+    $('params-card').classList.remove('hide');
+    requestQuote();
+  };
+  if(ext==='obj') reader.readAsText(file); else reader.readAsArrayBuffer(file);
+}
+
+async function uploadAndQuote3mfFallback(file){
+  const up=await doUpload(file); if(!up)return; upload=up;
+  geometryVolumeCm3=0;
+  $('drop').style.display='flex'; $('viewer').style.display='none';
+  $('file-meta').classList.remove('hide');
+  $('file-meta').innerHTML=`<span>Dosya: <b>${file.name}</b></span><span style="color:var(--accent)">3MF önizleme/otomatik fiyat desteklenmiyor — ekibimiz manuel fiyatlandıracak.</span>`;
+  showWarn('3MF dosyaları için anlık fiyat hesaplanamıyor. Yine de yükleyebilir, B2B/iletişim üzerinden teklif alabilirsiniz.');
+}
+
+async function doUpload(file){
+  const fd=new FormData(); fd.append('model',file);
+  try{
+    const r=await fetch('/api/print/upload',{method:'POST',body:fd,credentials:'include'});
+    const j=await r.json();
+    if(!r.ok){ showWarn(j.error||'Yükleme başarısız.'); resetUpload(); return null; }
+    return j;
+  }catch(e){ showWarn('Yükleme sırasında bağlantı hatası.'); resetUpload(); return null; }
+}
+
+function showWarn(msg){const w=$('upload-warn');w.textContent=msg;w.classList.remove('hide');}
+function resetUpload(){ $('drop').style.display='flex'; if($('viewer'))$('viewer').style.display='none'; }
+
+// ── Fiyat iste (debounce) ──
+function requestQuote(){
+  if(!upload || !geometryVolumeCm3) return;
+  state.infill=+$('infill').value; state.quality=$('quality').value; state.quantity=Math.max(1,+$('qty').value||1);
+  clearTimeout(quoteTimer);
+  quoteTimer=setTimeout(async()=>{
+    try{
+      const r=await fetch('/api/print/quote',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',
+        body:JSON.stringify({file_path:upload.file_path,original_name:upload.original_name,file_format:upload.file_format,
+          volume_cm3:geometryVolumeCm3,material:state.material,infill:state.infill,quality:state.quality,quantity:state.quantity,note:$('note').value})});
+      const j=await r.json();
+      if(!r.ok){ console.error(j.error); return; }
+      currentQuote=j; renderPrice(j);
+    }catch(e){ console.error('quote',e); }
+  },250);
+}
+
+function renderPrice(q){
+  $('price-empty').classList.add('hide'); $('price-content').classList.remove('hide');
+  $('price-big').textContent=fmt(q.totalPrice);
+  $('breakdown').innerHTML=`
+    <div class="bd-row"><span>Materyal (${q.materialLabel})</span><b>${q.grams.toFixed(0)} g</b></div>
+    <div class="bd-row"><span>Tahmini baskı süresi</span><b>${q.hours.toFixed(1)} saat</b></div>
+    <div class="bd-row"><span>Materyal maliyeti</span><b>${fmt(q.materialCost)}</b></div>
+    <div class="bd-row"><span>İşçilik / makine</span><b>${fmt(q.machineCost)}</b></div>
+    <div class="bd-row"><span>Taban ücret</span><b>${fmt(q.baseFee)}</b></div>
+    <div class="bd-row"><span>Adet</span><b>${q.quantity}</b></div>`;
+}
+
+// ── Sepete ekle ──
+$('btn-add').onclick=()=>{
+  if(!currentQuote){ toast('Önce fiyat hesaplanmalı'); return; }
+  const cart=JSON.parse(localStorage.getItem('tane-cart')||'[]');
+  // Her 3D baskı işi benzersiz bir kalemdir (id = print_job_id tabanlı, çakışmayı önlemek için yüksek aralık)
+  const item={
+    id: 900000000 + currentQuote.print_job_id,
+    print_job_id: currentQuote.print_job_id,
+    is_print_service: true,
+    name: `3D Baskı: ${upload.original_name} (${currentQuote.materialLabel}, ${state.infill}% dolu, ${state.quantity} adet)`,
+    image_url: null,
+    qty: 1,                          // tek satır — toplam fiyat içinde adet zaten var
+    tane_price: currentQuote.totalPrice,
+    locked: true
+  };
+  cart.push(item);
+  localStorage.setItem('tane-cart', JSON.stringify(cart));
+  refreshBadge();
+  toast('✓ 3D baskı sepete eklendi');
+  $('btn-add').textContent='✓ Sepete Eklendi';
+  setTimeout(()=>$('btn-add').textContent='Tekrar Sepete Ekle',1500);
+};
+
+// ── Event'ler ──
+$('drop').onclick=()=>$('file').click();
+$('file').onchange=e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); };
+['dragover','dragenter'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.remove('drag');}));
+$('drop').addEventListener('drop',e=>{ if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+$('infill').oninput=()=>{ $('infill-val').textContent=$('infill').value+'%'; requestQuote(); };
+$('quality').onchange=requestQuote;
+$('qty').oninput=requestQuote;
+$('qty-up').onclick=()=>{ $('qty').value=Math.min(1000,(+$('qty').value||1)+1); requestQuote(); };
+$('qty-dn').onclick=()=>{ $('qty').value=Math.max(1,(+$('qty').value||1)-1); requestQuote(); };
+$('note').oninput=()=>{ clearTimeout(quoteTimer); quoteTimer=setTimeout(requestQuote,600); };
+
+loadConfig(); refreshBadge();
+</script>
+</body>
+</html>
