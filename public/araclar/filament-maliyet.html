@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Filament & Elektrik Maliyet Hesaplayıcı — 3D Baskı | Tane Store</title>
+<meta name="description" content="3D baskının filament ve elektrik maliyetini ücretsiz hesapla. Makara fiyatı, baskı ağırlığı, yazıcı gücü ve elektrik birim fiyatından anında sonuç. Makarada kalan gram hesabı dahil.">
+<link rel="canonical" href="https://www.tanetekno.com/araclar/filament-maliyet">
+<script async src="/ga.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/araclar/tools.css">
+</head>
+<body>
+<nav class="tnav"><div class="tnav-in">
+  <a href="/" class="tlogo"><img src="/AmblemTane.png" alt="" onerror="this.style.display='none'"><span>Tane Store</span></a>
+  <span class="tnav-sp"></span>
+  <a href="/" class="tnav-a">Mağaza</a>
+  <a href="/3d-baski" class="tnav-a">3D Baskı Hizmeti</a>
+  <a href="/araclar" class="tnav-a active">3D Araçlar</a>
+</div></nav>
+
+<header class="thero">
+  <div class="thero-tag">🧮 Ücretsiz Araç</div>
+  <h1>Filament & Elektrik Maliyet Hesaplayıcı</h1>
+  <p>Bir 3D baskının gerçek maliyetini öğren: filament + elektrik. Tüm hesap tarayıcında, anında.</p>
+</header>
+
+<div class="tpage">
+  <a href="/araclar" class="tback">← Tüm araçlar</a>
+
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:18px" id="layout">
+    <div>
+      <div class="tcard">
+        <h2>Filament</h2>
+        <div class="grid2">
+          <div class="fld"><label>Makara fiyatı</label><div class="inputwrap"><input type="number" id="spoolPrice" value="600" min="0"><span class="unit">₺</span></div></div>
+          <div class="fld"><label>Makara ağırlığı</label><div class="inputwrap"><input type="number" id="spoolWeight" value="1000" min="1"><span class="unit">g</span></div></div>
+        </div>
+        <div class="fld">
+          <label>Baskı ağırlığı <span class="hint">— slicer'da "kullanılan filament" (g)</span></label>
+          <div class="inputwrap"><input type="number" id="printWeight" value="50" min="0"><span class="unit">g</span></div>
+        </div>
+        <details>
+          <summary style="cursor:pointer;font-size:13px;color:var(--accent);font-weight:600">Ağırlığı bilmiyor musun? Uzunluktan hesapla</summary>
+          <div class="grid2" style="margin-top:12px">
+            <div class="fld"><label>Filament uzunluğu</label><div class="inputwrap"><input type="number" id="filLen" value="0" min="0"><span class="unit">m</span></div></div>
+            <div class="fld"><label>Çap</label><select id="filDia"><option value="1.75">1.75 mm</option><option value="2.85">2.85 mm</option></select></div>
+            <div class="fld"><label>Materyal (yoğunluk)</label><select id="filMat"></select></div>
+            <div class="fld" style="display:flex;align-items:flex-end"><button class="btn btn-accent" style="width:100%" id="lenToWeight" type="button">→ Ağırlığa çevir</button></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="tcard">
+        <h2>Elektrik</h2>
+        <div class="grid2">
+          <div class="fld"><label>Yazıcı gücü <span class="hint">ortalama</span></label><div class="inputwrap"><input type="number" id="watt" value="120" min="0"><span class="unit">W</span></div></div>
+          <div class="fld"><label>Baskı süresi</label><div class="inputwrap"><input type="number" id="hours" value="3" min="0" step="0.1"><span class="unit">saat</span></div></div>
+        </div>
+        <div class="fld"><label>Elektrik birim fiyatı <span class="hint">— meskende ~2,50 ₺/kWh</span></label><div class="inputwrap"><input type="number" id="kwhPrice" value="2.5" min="0" step="0.01"><span class="unit">₺/kWh</span></div></div>
+      </div>
+
+      <div class="tcard">
+        <div class="fld" style="margin:0"><label>Ek maliyet (opsiyonel) <span class="hint">— aşınma, başarısız baskı payı %</span></label><div class="inputwrap"><input type="number" id="markup" value="0" min="0"><span class="unit">%</span></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="result" style="position:sticky;top:78px">
+        <div class="lbl">TOPLAM MALİYET</div>
+        <div class="big" id="rTotal">—</div>
+        <div style="margin-top:14px">
+          <div class="bd-row"><span>Filament</span><b id="rFil">—</b></div>
+          <div class="bd-row"><span>Elektrik</span><b id="rElec">—</b></div>
+          <div class="bd-row" id="rMarkupRow" style="display:none"><span>Ek pay</span><b id="rMarkup">—</b></div>
+          <div class="bd-row"><span>Gram başı maliyet</span><b id="rPerG">—</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tcard">
+    <h2>Makarada Kalan Gram</h2>
+    <div class="grid2">
+      <div class="fld"><label>Makara toplam</label><div class="inputwrap"><input type="number" id="rsTotal" value="1000" min="0"><span class="unit">g</span></div></div>
+      <div class="fld"><label>Kullanılan</label><div class="inputwrap"><input type="number" id="rsUsed" value="350" min="0"><span class="unit">g</span></div></div>
+    </div>
+    <div class="result" style="text-align:left;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div><div class="lbl" style="margin:0">Kalan filament</div><div class="big" id="rsRemain" style="font-size:28px">—</div></div>
+      <div style="font-size:13.5px;color:var(--text2)" id="rsPrints"></div>
+    </div>
+  </div>
+</div>
+
+<section class="dual-cta-wrap">
+  <div class="dual-cta">
+    <a href="/3d-baski" class="dcta dcta-print"><b>Yazıcın yok mu?</b><span>Modelini biz basalım →</span></a>
+    <a href="/" class="dcta dcta-shop"><b>Filament / yazıcı mı lazım?</b><span>Mağazaya göz at →</span></a>
+  </div>
+</section>
+
+<footer class="tfoot">
+  <p>© 2026 Tane Store · 3D Atölye · <a href="/iletisim">İletişim</a> · <a href="tel:+905323623730">0532 362 37 30</a></p>
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY',minimumFractionDigits:2}).format(n);
+const num=id=>Math.max(0,parseFloat($(id).value)||0);
+const DENS={PLA:1.24,PETG:1.27,ABS:1.04,RESIN:1.10,TPU:1.21,ASA:1.07,PC:1.20,PA:1.01,PET:1.38,PPS:1.35};
+const MATLBL={PLA:'PLA',PETG:'PETG',ABS:'ABS',RESIN:'Reçine',TPU:'TPU',ASA:'ASA',PC:'PC',PA:'Naylon',PET:'PET',PPS:'PPS'};
+$('filMat').innerHTML=Object.keys(DENS).map(k=>`<option value="${k}">${MATLBL[k]} (${DENS[k]} g/cm³)</option>`).join('');
+
+function calc(){
+  const spoolPrice=num('spoolPrice'), spoolWeight=num('spoolWeight'), printW=num('printWeight');
+  const perKg = spoolWeight>0 ? spoolPrice/(spoolWeight/1000) : 0;
+  const filCost = printW * (perKg/1000);
+  const elec = (num('watt')/1000)*num('hours')*num('kwhPrice');
+  const sub = filCost+elec;
+  const markupPct = num('markup');
+  const markup = sub*markupPct/100;
+  const total = sub+markup;
+  $('rTotal').textContent=fmt(total);
+  $('rFil').textContent=fmt(filCost);
+  $('rElec').textContent=fmt(elec);
+  if(markupPct>0){ $('rMarkupRow').style.display='flex'; $('rMarkup').textContent=fmt(markup); } else $('rMarkupRow').style.display='none';
+  $('rPerG').textContent = printW>0 ? fmt(total/printW)+'/g' : '—';
+}
+function lenToWeight(){
+  const L=num('filLen'); if(!L){return;}
+  const d=parseFloat($('filDia').value); const dens=DENS[$('filMat').value];
+  const area=Math.PI*Math.pow(d/2,2);          // mm²
+  const volMm3=area*(L*1000);                   // mm³ (L metre → mm)
+  const grams=(volMm3/1000)*dens;               // cm³ × yoğunluk
+  $('printWeight').value=grams.toFixed(1); calc();
+}
+function calcSpool(){
+  const tot=num('rsTotal'), used=num('rsUsed');
+  const rem=Math.max(0,tot-used);
+  $('rsRemain').textContent=rem.toFixed(0)+' g';
+  const pw=num('printWeight');
+  $('rsPrints').textContent = pw>0 ? `≈ ${Math.floor(rem/pw)} adet daha bu baskıdan (${pw.toFixed(0)} g)` : '';
+}
+['spoolPrice','spoolWeight','printWeight','watt','hours','kwhPrice','markup'].forEach(id=>$(id).addEventListener('input',()=>{calc();calcSpool();}));
+['rsTotal','rsUsed'].forEach(id=>$(id).addEventListener('input',calcSpool));
+$('lenToWeight').addEventListener('click',lenToWeight);
+calc(); calcSpool();
+</script>
+</body>
+</html>

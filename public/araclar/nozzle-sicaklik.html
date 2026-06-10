@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nozzle & Tabla Sıcaklık Tablosu — 3D Baskı Ayar Rehberi | Tane Store</title>
+<meta name="description" content="Her 3D baskı filamenti için önerilen nozzle sıcaklığı, tabla sıcaklığı, baskı hızı, fan ve retraction ayarları. PLA, PETG, ABS, ASA, TPU, PC, Naylon ve daha fazlası — ücretsiz ayar tablosu.">
+<link rel="canonical" href="https://www.tanetekno.com/araclar/nozzle-sicaklik">
+<script async src="/ga.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/araclar/tools.css">
+</head>
+<body>
+<nav class="tnav"><div class="tnav-in">
+  <a href="/" class="tlogo"><img src="/AmblemTane.png" alt="" onerror="this.style.display='none'"><span>Tane Store</span></a>
+  <span class="tnav-sp"></span>
+  <a href="/" class="tnav-a">Mağaza</a>
+  <a href="/3d-baski" class="tnav-a">3D Baskı Hizmeti</a>
+  <a href="/araclar" class="tnav-a active">3D Araçlar</a>
+</div></nav>
+
+<header class="thero">
+  <div class="thero-tag">🌡️ Ücretsiz Referans</div>
+  <h1>Nozzle & Tabla Sıcaklık Tablosu</h1>
+  <p>Her filament için başlangıç ayarları: nozzle/tabla sıcaklığı, hız, fan ve retraction. Markaya göre ince ayar gerekebilir.</p>
+</header>
+
+<div class="tpage">
+  <a href="/araclar" class="tback">← Tüm araçlar</a>
+  <div class="fld"><input type="text" id="search" placeholder="🔍 Materyal ara (PLA, PETG, ABS…)"></div>
+  <div class="ttable-wrap">
+    <table class="ttable">
+      <thead><tr>
+        <th>Materyal</th><th>Nozzle (°C)</th><th>Tabla (°C)</th><th>Hız</th><th>Fan</th><th>Retraction</th><th>Not</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <p style="font-size:11.5px;color:var(--text3);margin-top:12px">ℹ️ Değerler tipik başlangıç aralıklarıdır. Filament markası, yazıcı ve nozzle çapına göre 5–10 °C oynama normaldir. Üreticinin makara etiketini esas alın.</p>
+</div>
+
+<section class="dual-cta-wrap"><div class="dual-cta">
+  <a href="/3d-baski" class="dcta dcta-print"><b>Uğraşmak istemiyor musun?</b><span>Modelini biz basalım →</span></a>
+  <a href="/" class="dcta dcta-shop"><b>Filament / yazıcı mı lazım?</b><span>Mağazaya göz at →</span></a>
+</div></section>
+
+<footer class="tfoot"><p>© 2026 Tane Store · 3D Atölye · <a href="/iletisim">İletişim</a> · <a href="tel:+905323623730">0532 362 37 30</a></p></footer>
+
+<script>
+const ROWS=[
+  ['PLA','190–220','50–60','Yüksek (60+ mm/s)','%100 açık','1–2 mm','En kolay malzeme; kapalı hazne gerekmez.'],
+  ['PLA+ / Tough PLA','205–225','55–65','Orta–yüksek','%100','1–2 mm','Daha tok PLA; biraz daha sıcak bas.'],
+  ['PETG','230–250','70–85','Orta','%30–50','2–4 mm','İpliklenmeye (stringing) eğilimli; tablaya iyi yapışır, ayırması zor olabilir.'],
+  ['ABS','230–250','90–110','Orta','Kapalı / çok az','3–5 mm','Kapalı hazne + havalandırma şart; warping (kıvrılma) riski yüksek.'],
+  ['ASA','240–260','90–110','Orta','Çok az','3–5 mm','ABS gibi ama UV/dış mekan dayanımlı. Kapalı hazne önerilir.'],
+  ['TPU (Esnek)','210–235','30–50','Düşük (15–30 mm/s)','%30–60','0–1 mm (direct)','Yavaş bas; bowden ekstruderde zor. Direct drive ideal.'],
+  ['PC (Polikarbonat)','260–300','100–120','Orta','Çok az / kapalı','4–6 mm','Çok yüksek sıcaklık; tüm-metal hotend + kapalı hazne gerekir. Kuru tut.'],
+  ['PA / Naylon','240–270','70–100','Orta','Az','2–4 mm','Aşırı nem çeker — baskıdan önce mutlaka kurutun.'],
+  ['PET','230–250','70–80','Orta','%30–50','2–4 mm','PETG benzeri; net/şeffaf sonuç verir.'],
+  ['PPS','300–340','120–150','Düşük–orta','Kapalı','4–6 mm','Endüstriyel; yüksek sıcaklık yazıcısı ve kapalı hazne şarttır.'],
+  ['Wood-fill PLA','190–215','50–60','Orta','%100','1–2 mm','Ahşap dolgulu; tıkanmamak için ≥0.5 mm nozzle önerilir.'],
+  ['CF (Karbon katkılı)','denk malzeme +10','denk malzeme','Orta','denk malzeme','denk malzeme','Aşındırıcı! Sertleştirilmiş çelik nozzle kullanın.']
+];
+const tb=document.getElementById('tbody');
+function render(f=''){
+  const q=f.trim().toLowerCase();
+  tb.innerHTML=ROWS.filter(r=>!q||r[0].toLowerCase().includes(q)).map(r=>
+    `<tr><td class="mat">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td style="color:var(--text2)">${r[6]}</td></tr>`).join('')
+    || `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:24px">Sonuç yok.</td></tr>`;
+}
+document.getElementById('search').addEventListener('input',e=>render(e.target.value));
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Online STL / OBJ Görüntüleyici — Tarayıcıda 3D Model İzle | Tane Store</title>
+<meta name="description" content="STL ve OBJ dosyalarını tarayıcıda ücretsiz görüntüle. Sürükle-bırak, döndür, boyut · hacim · tahmini ağırlık öğren. Kurulum yok, dosyan cihazından çıkmaz.">
+<link rel="canonical" href="https://www.tanetekno.com/araclar/stl-goruntuleyici">
+<script async src="/ga.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/araclar/tools.css">
+</head>
+<body>
+<nav class="tnav"><div class="tnav-in">
+  <a href="/" class="tlogo"><img src="/AmblemTane.png" alt="" onerror="this.style.display='none'"><span>Tane Store</span></a>
+  <span class="tnav-sp"></span>
+  <a href="/" class="tnav-a">Mağaza</a>
+  <a href="/3d-baski" class="tnav-a">3D Baskı Hizmeti</a>
+  <a href="/araclar" class="tnav-a active">3D Araçlar</a>
+</div></nav>
+
+<header class="thero">
+  <div class="thero-tag">🔍 Ücretsiz · Kurulum yok</div>
+  <h1>Online STL / OBJ Görüntüleyici</h1>
+  <p>Modelini sürükle-bırak, tarayıcında döndürerek incele. Boyut, hacim ve tahmini ağırlığı anında gör. Dosyan cihazından çıkmaz — gizli kalır.</p>
+</header>
+
+<div class="tpage">
+  <a href="/araclar" class="tback">← Tüm araçlar</a>
+  <div class="tcard">
+    <div id="drop">
+      <div class="up-ic">📦</div>
+      <div class="up-t">STL veya OBJ dosyasını buraya sürükle ya da tıkla</div>
+      <div class="up-s">Dosya sunucuya yüklenmez, tamamen tarayıcında işlenir</div>
+    </div>
+    <div id="viewer" class="hide"><div class="viewer-tag" id="vtag"></div></div>
+    <input type="file" id="file" accept=".stl,.obj" class="hide">
+
+    <div id="info" class="hide" style="margin-top:16px">
+      <div class="grid2">
+        <div class="fld" style="margin:0"><label>Tahmini ağırlık — materyal</label>
+          <select id="mat"></select>
+        </div>
+        <div class="fld" style="margin:0"><label>Doluluk (infill)</label>
+          <div class="inputwrap"><input type="number" id="infill" value="100" min="1" max="100"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="result" style="margin-top:14px;text-align:left">
+        <div class="bd-row"><span>Boyut (G×Y×D)</span><b id="iDims">—</b></div>
+        <div class="bd-row"><span>Hacim</span><b id="iVol">—</b></div>
+        <div class="bd-row"><span>Üçgen (yüzey) sayısı</span><b id="iTris">—</b></div>
+        <div class="bd-row"><span>Tahmini ağırlık <span style="color:var(--text3)">(%<span id="iInfPct">100</span> dolu)</span></span><b id="iWeight" style="color:var(--accent)">—</b></div>
+      </div>
+      <p style="font-size:11.5px;color:var(--text3);margin-top:10px">ℹ️ Ağırlık, modelin geometrik hacmine göre yaklaşık değerdir; gerçek ağırlık duvar kalınlığı ve destek yapısına göre değişir.</p>
+    </div>
+  </div>
+</div>
+
+<section class="dual-cta-wrap">
+  <div class="dual-cta">
+    <a href="/3d-baski" class="dcta dcta-print"><b>Bu modeli bastırmak ister misin?</b><span>Anında fiyat al, biz basalım →</span></a>
+    <a href="/" class="dcta dcta-shop"><b>Filament / yazıcı mı lazım?</b><span>Mağazaya göz at →</span></a>
+  </div>
+</section>
+
+<footer class="tfoot">
+  <p>© 2026 Tane Store · 3D Atölye · <a href="/iletisim">İletişim</a> · <a href="tel:+905323623730">0532 362 37 30</a></p>
+</footer>
+
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const DENS={PLA:1.24,PETG:1.27,ABS:1.04,RESIN:1.10,TPU:1.21,ASA:1.07,PC:1.20,PA:1.01,PET:1.38,PPS:1.35};
+const MATLBL={PLA:'PLA',PETG:'PETG',ABS:'ABS',RESIN:'Reçine',TPU:'TPU',ASA:'ASA',PC:'PC (Polikarbonat)',PA:'Naylon (PA)',PET:'PET',PPS:'PPS'};
+$('mat').innerHTML=Object.keys(DENS).map(k=>`<option value="${k}">${MATLBL[k]}</option>`).join('');
+let volCm3=0;
+
+let scene,camera,renderer,controls,mesh;
+function initViewer(){
+  const v=$('viewer'); v.classList.remove('hide'); $('drop').classList.add('hide');
+  const w=v.clientWidth,h=v.clientHeight;
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0x1a1a22);
+  camera=new THREE.PerspectiveCamera(45,w/h,0.1,8000);
+  renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(w,h); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  v.insertBefore(renderer.domElement,v.firstChild);
+  scene.add(new THREE.AmbientLight(0xffffff,0.6));
+  const d=new THREE.DirectionalLight(0xffffff,0.85);d.position.set(1,1,1);scene.add(d);
+  const d2=new THREE.DirectionalLight(0xffffff,0.4);d2.position.set(-1,-0.5,-1);scene.add(d2);
+  controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;
+  (function a(){requestAnimationFrame(a);controls&&controls.update();renderer&&renderer.render(scene,camera);})();
+  addEventListener('resize',()=>{const nw=v.clientWidth,nh=v.clientHeight;if(!nw)return;camera.aspect=nw/nh;camera.updateProjectionMatrix();renderer.setSize(nw,nh);});
+}
+function setMesh(geo){
+  if(mesh){scene.remove(mesh);mesh.geometry.dispose();mesh.material.dispose();}
+  geo.computeVertexNormals();
+  mesh=new THREE.Mesh(geo,new THREE.MeshPhongMaterial({color:0xfd7e14,shininess:30}));
+  scene.add(mesh);
+  geo.computeBoundingBox();const c=new THREE.Vector3();geo.boundingBox.getCenter(c);
+  const s=new THREE.Vector3();geo.boundingBox.getSize(s);
+  mesh.position.set(-c.x,-c.y,-c.z);
+  const md=Math.max(s.x,s.y,s.z)||1;
+  camera.position.set(md*1.4,md,md*1.6);camera.near=md/100;camera.far=md*20;camera.updateProjectionMatrix();
+  controls.target.set(0,0,0);controls.update();
+  return s;
+}
+function volume(geo){const p=geo.attributes.position;if(!p)return 0;let v=0;const a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3();
+  const t=(i,j,k)=>{a.fromBufferAttribute(p,i);b.fromBufferAttribute(p,j);c.fromBufferAttribute(p,k);v+=a.dot(b.clone().cross(c))/6;};
+  if(geo.index){const x=geo.index.array;for(let i=0;i<x.length;i+=3)t(x[i],x[i+1],x[i+2]);}else{for(let i=0;i<p.count;i+=3)t(i,i+1,i+2);}
+  return Math.abs(v);}
+function triCount(geo){return geo.index?geo.index.count/3:geo.attributes.position.count/3;}
+
+function handle(file){
+  const ext=(file.name.split('.').pop()||'').toLowerCase();
+  if(!['stl','obj'].includes(ext)){alert('Sadece STL veya OBJ dosyası açılabilir.');return;}
+  if(!renderer)initViewer();
+  const rd=new FileReader();
+  rd.onload=e=>{
+    let geo=null;
+    try{
+      if(ext==='stl')geo=new THREE.STLLoader().parse(e.target.result);
+      else{const o=new THREE.OBJLoader().parse(e.target.result);o.traverse(m=>{if(m.isMesh&&!geo)geo=m.geometry;});}
+    }catch(err){alert('Model okunamadı, dosya bozuk olabilir.');return;}
+    if(!geo){alert('Modelde geometri bulunamadı.');return;}
+    const s=setMesh(geo);
+    volCm3=volume(geo)/1000;
+    $('info').classList.remove('hide');
+    $('iDims').textContent=`${s.x.toFixed(1)} × ${s.y.toFixed(1)} × ${s.z.toFixed(1)} mm`;
+    $('iVol').textContent=`${volCm3.toFixed(2)} cm³`;
+    $('iTris').textContent=triCount(geo).toLocaleString('tr-TR');
+    $('vtag').textContent=`${s.x.toFixed(0)}×${s.y.toFixed(0)}×${s.z.toFixed(0)} mm`;
+    weight();
+  };
+  if(ext==='obj')rd.readAsText(file);else rd.readAsArrayBuffer(file);
+}
+function weight(){
+  const inf=Math.min(100,Math.max(1,parseFloat($('infill').value)||100));
+  $('iInfPct').textContent=inf;
+  const factor=0.30+0.70*(inf/100);              // duvar + dolgu yaklaşımı
+  const g=volCm3*DENS[$('mat').value]*factor;
+  $('iWeight').textContent=`${g.toFixed(1)} g`;
+}
+$('drop').onclick=()=>$('file').click();
+$('file').onchange=e=>{if(e.target.files[0])handle(e.target.files[0]);};
+['dragover','dragenter'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.remove('drag');}));
+$('drop').addEventListener('drop',e=>{if(e.dataTransfer.files[0])handle(e.dataTransfer.files[0]);});
+$('mat').onchange=weight; $('infill').oninput=weight;
+</script>
+</body>
+</html>

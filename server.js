@@ -269,6 +269,13 @@ app.get('/gizlilik', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 app.get('/mesafeli-satis', (req, res) => res.sendFile(path.join(__dirname, 'public', 'mesafeli-satis.html')));
 app.get('/landing', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
 app.get('/3d-baski', (req, res) => res.sendFile(path.join(__dirname, 'public', '3d-baski.html')));
+// 3D Araçlar — temiz URL'ler
+app.get('/araclar', (req, res) => res.sendFile(path.join(__dirname, 'public', 'araclar', 'index.html')));
+app.get('/araclar/:tool', (req, res) => {
+  const allowed = ['filament-maliyet', 'stl-goruntuleyici', 'filament-secici', 'nozzle-sicaklik'];
+  if (!allowed.includes(req.params.tool)) return res.redirect('/araclar');
+  res.sendFile(path.join(__dirname, 'public', 'araclar', req.params.tool + '.html'));
+});
 app.get('/iletisim', (req, res) => res.sendFile(path.join(__dirname, 'public', 'iletisim.html')));
 app.get('/kvkk', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kvkk.html')));
 app.get('/cerez-politikasi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cerez-politikasi.html')));
@@ -356,6 +363,12 @@ app.get('/sitemap.xml', (req, res) => {
   const staticPages = [
     { url: '/',                  pri: '1.0', freq: 'daily'   },
     { url: '/landing',           pri: '0.9', freq: 'daily'   },
+    { url: '/3d-baski',          pri: '0.9', freq: 'weekly'  },
+    { url: '/araclar',                       pri: '0.8', freq: 'weekly' },
+    { url: '/araclar/filament-maliyet',      pri: '0.7', freq: 'monthly' },
+    { url: '/araclar/stl-goruntuleyici',     pri: '0.7', freq: 'monthly' },
+    { url: '/araclar/filament-secici',       pri: '0.7', freq: 'monthly' },
+    { url: '/araclar/nozzle-sicaklik',       pri: '0.7', freq: 'monthly' },
     { url: '/hakkimizda',        pri: '0.5', freq: 'monthly' },
     { url: '/iletisim',          pri: '0.5', freq: 'monthly' },
     { url: '/teslimat-iade',     pri: '0.4', freq: 'monthly' },

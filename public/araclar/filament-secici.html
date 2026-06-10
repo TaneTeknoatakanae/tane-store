@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hangi Filament? — Projene Uygun 3D Baskı Malzemesi Sihirbazı | Tane Store</title>
+<meta name="description" content="PLA mı PETG mi ABS mi? Birkaç soruyla projene en uygun 3D baskı filamentini bul. Dayanıklılık, ısı, esneklik ve baskı kolaylığına göre ücretsiz öneri.">
+<link rel="canonical" href="https://www.tanetekno.com/araclar/filament-secici">
+<script async src="/ga.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/araclar/tools.css">
+<style>
+  .wiz{max-width:620px;margin:0 auto}
+  .prog{height:6px;background:var(--surface);border-radius:6px;overflow:hidden;margin-bottom:20px}
+  .prog-fill{height:100%;background:var(--accent);width:0;transition:width .3s}
+  .q-num{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.5px;margin-bottom:6px}
+  .q-text{font-size:21px;font-weight:800;letter-spacing:-.4px;margin-bottom:18px}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{border:1.5px solid var(--border);border-radius:11px;padding:15px 16px;font-size:15px;font-weight:600;cursor:pointer;background:#fff;transition:all .12s;text-align:left}
+  .opt:hover{border-color:var(--accent2);background:#fff8f3}
+  .opt small{display:block;font-weight:400;font-size:12.5px;color:var(--text3);margin-top:2px}
+  .wiz-nav{display:flex;justify-content:space-between;margin-top:18px}
+  .wiz-back{background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;font-family:inherit}
+  .res-mat{font-size:38px;font-weight:800;color:var(--accent);letter-spacing:-1px}
+  .res-tag{display:inline-block;background:var(--surface);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px}
+  .prop{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .prop span{background:var(--surface);border:1px solid var(--border-light);font-size:12.5px;padding:5px 11px;border-radius:8px}
+  .runner{font-size:13.5px;color:var(--text2);margin-top:12px;padding-top:12px;border-top:1px solid var(--border-light)}
+</style>
+</head>
+<body>
+<nav class="tnav"><div class="tnav-in">
+  <a href="/" class="tlogo"><img src="/AmblemTane.png" alt="" onerror="this.style.display='none'"><span>Tane Store</span></a>
+  <span class="tnav-sp"></span>
+  <a href="/" class="tnav-a">Mağaza</a>
+  <a href="/3d-baski" class="tnav-a">3D Baskı Hizmeti</a>
+  <a href="/araclar" class="tnav-a active">3D Araçlar</a>
+</div></nav>
+
+<header class="thero">
+  <div class="thero-tag">🧩 Ücretsiz Sihirbaz</div>
+  <h1>Hangi Filament?</h1>
+  <p>Birkaç soruyla projene en uygun 3D baskı malzemesini önerelim.</p>
+</header>
+
+<div class="tpage">
+  <a href="/araclar" class="tback">← Tüm araçlar</a>
+  <div class="tcard wiz">
+    <div class="prog"><div class="prog-fill" id="prog"></div></div>
+    <div id="quiz"></div>
+    <div id="result" class="hide"></div>
+  </div>
+</div>
+
+<section class="dual-cta-wrap"><div class="dual-cta">
+  <a href="/3d-baski" class="dcta dcta-print"><b>Yazıcın yok mu?</b><span>Modelini biz basalım →</span></a>
+  <a href="/" class="dcta dcta-shop"><b>Filament mi lazım?</b><span>Mağazaya göz at →</span></a>
+</div></section>
+
+<footer class="tfoot"><p>© 2026 Tane Store · 3D Atölye · <a href="/iletisim">İletişim</a> · <a href="tel:+905323623730">0532 362 37 30</a></p></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const MATS={
+  PLA:{label:'PLA',tag:'En kolay, dekoratif',why:'En kolay basılan malzeme; dekoratif objeler, figür ve prototipler için ideal. Ucuz ve kokusuz — ama ısıya ve dış mekana dayanıksız.',props:['🟢 Çok kolay baskı','❄️ Düşük ısı dayanımı','🎨 Canlı renkler','💰 Ekonomik']},
+  PETG:{label:'PETG',tag:'Günlük fonksiyonel',why:'Tokluk, neme/suya dayanım ve baskı kolaylığını dengeleyen en popüler "iş gören" malzeme. Günlük fonksiyonel parçaların gözdesi.',props:['💪 Tok & esnek-toleranslı','💧 Suya dayanıklı','🌡️ Orta ısı dayanımı','🟡 Orta kolaylık']},
+  ABS:{label:'ABS',tag:'Dayanıklı & ısıya dayanıklı',why:'Yüksek ısı ve darbe dayanımı; mekanik parçalar için klasik tercih. Basması zordur, kapalı hazne ve havalandırma ister.',props:['🔥 Yüksek ısı dayanımı','💪 Darbeye dayanıklı','🔴 Zor baskı (kapalı hazne)','🛠️ Sonradan işlenebilir']},
+  ASA:{label:'ASA',tag:'Dış mekan / UV',why:'ABS\'nin UV ve hava koşullarına dayanıklı versiyonu. Bahçe, araç dışı ve güneş gören parçalar için en doğru seçim.',props:['☀️ UV dayanımı','🌧️ Hava koşullarına dirençli','🔥 Yüksek ısı dayanımı','🔴 Zor baskı']},
+  TPU:{label:'TPU',tag:'Esnek / lastiksi',why:'Esnek, lastik kıvamında malzeme: telefon kılıfı, tampon, conta, esneyen parçalar. Sert parça istiyorsan bu değil.',props:['🤸 Çok esnek','🛡️ Aşınmaya dayanıklı','🐢 Yavaş baskı','🔧 Titreşim sönümler']},
+  PC:{label:'PC (Polikarbonat)',tag:'Mühendislik / yüksek mukavemet',why:'Çok yüksek mukavemet ve ısı dayanımı; ciddi mühendislik parçaları için. Baskısı en zorlardan, yüksek sıcaklık gerektirir.',props:['🏗️ Çok yüksek mukavemet','🔥 Çok yüksek ısı dayanımı','🔴 Çok zor baskı','🔍 Şeffaf olabilir']},
+  PA:{label:'PA (Naylon)',tag:'Aşınma / mühendislik',why:'Aşınmaya ve yorulmaya dayanıklı, tok mühendislik malzemesi: dişli, menteşe, kayar parçalar. Neme çok hassas, kuru saklanmalı.',props:['⚙️ Aşınmaya dayanıklı','💪 Tok & yorulma dirençli','💧 Nem hassas','🔴 Zor baskı']}
+};
+const QUESTIONS=[
+  {q:'Ne basacaksın?',opts:[
+    {t:'Dekoratif obje / figür / hediyelik',s:{PLA:3,PETG:1}},
+    {t:'Günlük fonksiyonel parça',s:{PETG:3,PLA:1,ABS:1}},
+    {t:'Dış mekan / araç / güneş gören parça',s:{ASA:3,PETG:2,PC:1}},
+    {t:'Esnek / lastiksi parça (kılıf, conta)',s:{TPU:5}},
+    {t:'Mühendislik / yüksek mukavemet parçası',s:{PC:3,PA:3,ABS:2}}
+  ]},
+  {q:'Parça ne kadar dayanıklı olmalı?',opts:[
+    {t:'Düşük — sadece görsel / hafif kullanım',s:{PLA:2}},
+    {t:'Orta — günlük kullanıma dayansın',s:{PETG:2,ASA:1,ABS:1}},
+    {t:'Yüksek — zorlu mekanik yük',s:{PC:2,PA:2,ABS:2,PETG:1}}
+  ]},
+  {q:'Isıya maruz kalacak mı?',opts:[
+    {t:'Hayır, oda sıcaklığında',s:{PLA:2,PETG:1}},
+    {t:'Biraz — güneş / araç içi',s:{PETG:2,ASA:2,ABS:1}},
+    {t:'Çok — motor yakını / mutfak / sıcak su',s:{PC:3,ABS:2,ASA:1,PA:1}}
+  ]},
+  {q:'Esneklik gerekiyor mu?',opts:[
+    {t:'Hayır, sert ve rijit olsun',s:{PLA:1,PC:1,PETG:1}},
+    {t:'Biraz tokluk iyi olur',s:{PETG:2,ABS:1,PA:1}},
+    {t:'Çok esnek / bükülebilir olmalı',s:{TPU:5}}
+  ]},
+  {q:'Baskı kolaylığı senin için önemli mi?',opts:[
+    {t:'Evet, sorunsuz / kolay bassın',s:{PLA:3,PETG:1}},
+    {t:'Fark etmez, kaliteden ödün vermem',s:{ABS:1,ASA:1,PC:1,PA:1}}
+  ]}
+];
+const PRIORITY=['TPU','PETG','PLA','ASA','ABS','PC','PA']; // eşitlik bozucu
+let step=0; const answers=[];
+
+function render(){
+  const Q=QUESTIONS[step];
+  $('prog').style.width=`${(step/QUESTIONS.length)*100}%`;
+  $('quiz').innerHTML=`
+    <div class="q-num">SORU ${step+1} / ${QUESTIONS.length}</div>
+    <div class="q-text">${Q.q}</div>
+    <div class="opts">${Q.opts.map((o,i)=>`<button class="opt" data-i="${i}">${o.t}</button>`).join('')}</div>
+    <div class="wiz-nav">${step>0?'<button class="wiz-back" id="back">← Geri</button>':'<span></span>'}<span></span></div>`;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ answers[step]=+b.dataset.i; step++; (step<QUESTIONS.length)?render():showResult(); });
+  if($('back'))$('back').onclick=()=>{ step--; render(); };
+}
+function showResult(){
+  $('prog').style.width='100%';
+  const scores={}; Object.keys(MATS).forEach(k=>scores[k]=0);
+  QUESTIONS.forEach((Q,i)=>{ const s=Q.opts[answers[i]].s; for(const k in s)scores[k]+=s[k]; });
+  const ranked=Object.keys(scores).sort((a,b)=>{ if(scores[b]!==scores[a])return scores[b]-scores[a]; return PRIORITY.indexOf(a)-PRIORITY.indexOf(b); });
+  const win=MATS[ranked[0]], run=MATS[ranked[1]];
+  $('quiz').classList.add('hide'); $('result').classList.remove('hide');
+  $('result').innerHTML=`
+    <div class="res-tag">SENİN İÇİN ÖNERİ</div>
+    <div class="res-mat">${win.label}</div>
+    <div class="prop">${win.props.map(p=>`<span>${p}</span>`).join('')}</div>
+    <p style="font-size:14.5px;color:var(--text2);line-height:1.6">${win.why}</p>
+    <div class="runner"><b>Alternatif:</b> ${run.label} — ${run.tag}.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+      <a class="btn btn-accent" href="/3d-baski">Bu malzemeyle bastır →</a>
+      <a class="btn" style="border:1.5px solid var(--border);background:#fff" href="/">${win.label} filament al →</a>
+      <button class="btn" style="border:1.5px solid var(--border);background:#fff" id="again">↻ Tekrar dene</button>
+    </div>`;
+  $('again').onclick=()=>{ step=0; answers.length=0; $('quiz').classList.remove('hide'); $('result').classList.add('hide'); render(); };
+}
+render();
+</script>
+</body>
+</html>
