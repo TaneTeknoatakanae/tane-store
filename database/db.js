@@ -362,6 +362,57 @@ async function initDB() {
       console.log('3D baskı fiyat config seed edildi');
     }
 
+    // ── Lazer Kesim & Gravür Hizmeti ───────────────────────
+    await pool.query(`CREATE TABLE IF NOT EXISTS laser_jobs (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      mode TEXT NOT NULL DEFAULT 'engrave',
+      original_name TEXT NOT NULL,
+      file_path TEXT NOT NULL,
+      file_format TEXT,
+      material TEXT NOT NULL,
+      width_mm REAL,
+      height_mm REAL,
+      area_cm2 REAL,
+      path_length_m REAL,
+      coverage REAL,
+      passes INTEGER DEFAULT 1,
+      est_minutes REAL,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      unit_price REAL NOT NULL DEFAULT 0,
+      total_price REAL NOT NULL DEFAULT 0,
+      note TEXT,
+      status TEXT NOT NULL DEFAULT 'quoted',
+      order_id INTEGER REFERENCES orders(id) ON DELETE SET NULL,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS laser_jobs_order_idx ON laser_jobs(order_id)`);
+
+    const laserCfg = await pool.query(`SELECT 1 FROM app_settings WHERE key = 'laser_pricing'`);
+    if (laserCfg.rows.length === 0) {
+      const defaultLaser = {
+        baseFee: 40,                 // sipariş başına taban ücret (₺)
+        minPrice: 60,                // minimum sipariş (₺)
+        engrave: { ratePerCm2: 1.2, cm2PerMin: 4 },   // gravür: ₺/cm² (tam kapanım) + hız (cm²/dk)
+        cut:     { ratePerMeter: 25, mPerMin: 0.6 },  // kesim: ₺/metre (tek geçiş) + hız (m/dk)
+        materials: {
+          AHSAP3:   { label: 'Ahşap / Kontrplak 3mm', cuttable: true,  passes: 1, costPerCm2: 0.15 },
+          AHSAP5:   { label: 'Ahşap / Kontrplak 5mm', cuttable: true,  passes: 2, costPerCm2: 0.22 },
+          MDF3:     { label: 'MDF 3mm',               cuttable: true,  passes: 1, costPerCm2: 0.12 },
+          AKRILIK3: { label: 'Koyu Akrilik 3mm',      cuttable: true,  passes: 2, costPerCm2: 0.40 },
+          DERI:     { label: 'Deri',                  cuttable: true,  passes: 1, costPerCm2: 0.30 },
+          KECE:     { label: 'Keçe',                  cuttable: true,  passes: 1, costPerCm2: 0.10 },
+          KARTON:   { label: 'Karton / Mukavva',      cuttable: true,  passes: 1, costPerCm2: 0.05 },
+          KAYRAK:   { label: 'Kayrak Taşı (gravür)',  cuttable: false, passes: 0, costPerCm2: 0.35 },
+          METAL_AN: { label: 'Anodize / Boyalı Metal (gravür)', cuttable: false, passes: 0, costPerCm2: 0 },
+          CAM:      { label: 'Cam / Ayna (gravür)',   cuttable: false, passes: 0, costPerCm2: 0 },
+          MUSTERI:  { label: 'Kendi ürünüm (gravür)', cuttable: false, passes: 0, costPerCm2: 0 }
+        }
+      };
+      await pool.query(`INSERT INTO app_settings (key, value) VALUES ('laser_pricing', $1)`, [JSON.stringify(defaultLaser)]);
+      console.log('Lazer fiyat config seed edildi');
+    }
+
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
     console.error('DB hatasi:', e.message);

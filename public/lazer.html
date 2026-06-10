@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lazer Kesim & Gravür Hizmeti — Tasarımını Yükle, Anında Fiyat Al | Tane Store</title>
+<meta name="description" content="Ahşap, akrilik, deri ve daha fazlasına lazer kesim & gravür. Tasarımını (SVG/PNG/JPG) yükle, malzeme seç, fiyatını anında öğren. Kişiye özel üretim, kapına teslim.">
+<link rel="canonical" href="https://www.tanetekno.com/lazer">
+<script async src="/ga.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fdfaf6;--surface:#f5f0e8;--text:#1a1a1a;--text2:#555;--text3:#999;--accent:#e8590c;--accent2:#fd7e14;--border:#e0d8cc;--border-light:#ece4d8;--shadow-sm:0 1px 3px rgba(0,0,0,.06)}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+  a{color:inherit}
+  .nav{position:sticky;top:0;z-index:100;background:rgba(253,250,246,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light)}
+  .nav-in{max-width:1280px;margin:0 auto;padding:0 24px;height:62px;display:flex;align-items:center;gap:16px}
+  .logo{font-weight:800;font-size:19px;text-decoration:none;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
+  .logo img{height:30px}
+  .nav-sp{flex:1}
+  .nav-a{text-decoration:none;color:var(--text2);font-weight:500;font-size:14px;padding:8px 12px;border-radius:8px}
+  .nav-a:hover{color:var(--text);background:var(--surface)}
+  .hero{max-width:1280px;margin:0 auto;padding:36px 24px 12px}
+  .hero h1{font-size:30px;font-weight:800;letter-spacing:-.8px;margin-bottom:8px}
+  .hero p{color:var(--text2);font-size:15px;max-width:640px}
+  .steps{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .step{font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border-light);padding:6px 12px;border-radius:20px;font-weight:500}
+  .wrap{max-width:1280px;margin:0 auto;padding:20px 24px 60px;display:grid;grid-template-columns:1fr 400px;gap:24px;align-items:start}
+  @media(max-width:880px){.wrap{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--border-light);border-radius:16px;padding:22px;box-shadow:var(--shadow-sm)}
+  .card h2{font-size:15px;font-weight:700;margin-bottom:14px}
+  /* Mode tabs */
+  .modes{display:flex;gap:8px;margin-bottom:18px}
+  .mode-tab{flex:1;border:1.5px solid var(--border);border-radius:11px;padding:14px;text-align:center;font-weight:700;font-size:15px;cursor:pointer;background:#fff;transition:all .12s}
+  .mode-tab small{display:block;font-weight:400;font-size:11.5px;color:var(--text3);margin-top:2px}
+  .mode-tab.sel{border-color:var(--accent);background:#fff4ec;color:var(--accent)}
+  .mode-tab.sel small{color:var(--accent2)}
+  /* Upload / preview */
+  #drop{border:2px dashed var(--border);border-radius:14px;background:var(--surface);min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;cursor:pointer;transition:all .15s}
+  #drop.drag{border-color:var(--accent);background:#fff4ec}
+  .up-ic{font-size:40px;margin-bottom:10px}
+  .up-t{font-weight:600;font-size:15px;margin-bottom:4px}
+  .up-s{font-size:12px;color:var(--text3)}
+  #preview{display:none;border-radius:14px;background:repeating-conic-gradient(#f0ece4 0% 25%,#fff 0% 50%) 50%/20px 20px;min-height:300px;align-items:center;justify-content:center;padding:14px;position:relative;border:1px solid var(--border-light)}
+  #preview img,#preview canvas{max-width:100%;max-height:340px;display:block}
+  .prev-tag{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:4px 9px;border-radius:6px}
+  .file-meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--text2)}
+  .file-meta b{color:var(--text)}
+  .fld{margin-bottom:16px}
+  .fld label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+  .fld .hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)}
+  select,input[type=number],textarea{width:100%;font-family:inherit;font-size:14px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--text)}
+  select:focus,input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .inputwrap{position:relative}.inputwrap .unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}.inputwrap input{padding-right:42px}
+  .infill-row{display:flex;align-items:center;gap:12px}
+  input[type=range]{flex:1;accent-color:var(--accent)}
+  .infill-val{font-weight:700;min-width:48px;text-align:right}
+  .qty-row{display:flex;align-items:center;gap:10px}
+  .qty-row button{width:34px;height:34px;border:1px solid var(--border);background:#fff;border-radius:8px;font-size:18px;cursor:pointer;font-family:inherit}
+  .qty-row input{width:64px;text-align:center}
+  .pricebox{position:sticky;top:78px}
+  .price-big{font-size:34px;font-weight:800;color:var(--accent);letter-spacing:-1px}
+  .price-sub{font-size:12px;color:var(--text3);margin-bottom:14px}
+  .breakdown{font-size:13px;border-top:1px solid var(--border-light);padding-top:12px;margin-top:4px}
+  .bd-row{display:flex;justify-content:space-between;padding:4px 0;color:var(--text2)}.bd-row b{color:var(--text);font-weight:600}
+  .btn{width:100%;border:none;border-radius:10px;padding:14px;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-add{background:var(--accent);color:#fff;margin-top:16px}.btn-add:hover{background:#d24f08}
+  .btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text);margin-top:8px;text-decoration:none}
+  .quote-note{font-size:11px;color:var(--text3);margin-top:12px;line-height:1.5}
+  .warn{background:#fff8ec;border:1px solid #ffe0a3;border-radius:9px;padding:10px 12px;font-size:12px;color:#8a5a00;margin-top:12px}
+  .rescue{margin-top:16px;border:1.5px solid var(--accent);border-radius:14px;padding:20px;background:linear-gradient(135deg,#fff4ec,#fff);text-align:center}
+  .rescue-ic{font-size:34px;margin-bottom:8px}.rescue-t{font-weight:800;font-size:17px;margin-bottom:6px}
+  .rescue-s{font-size:13.5px;color:var(--text2);max-width:440px;margin:0 auto 16px;line-height:1.55}
+  .rescue-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .rescue-btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-weight:700;font-size:14px;padding:11px 18px;border-radius:10px;cursor:pointer}
+  .rescue-btn.wa{background:#25d366;color:#fff}.rescue-btn.mail{background:var(--accent);color:#fff}.rescue-btn.tel{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1a1a1a;color:#fff;padding:13px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;transition:transform .3s;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .hide{display:none!important}
+  .mat-warn{font-size:12px;color:#c0392b;margin-top:6px;display:none}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="nav-in">
+  <a href="/" class="logo"><img src="/AmblemTane.png" alt="" onerror="this.style.display='none'">Tane Store</a>
+  <span class="nav-sp"></span>
+  <a href="/" class="nav-a">Mağaza</a>
+  <a href="/3d-baski" class="nav-a">3D Baskı</a>
+  <a href="/araclar" class="nav-a">3D Araçlar</a>
+</div></nav>
+
+<div class="hero">
+  <h1>Lazer Kesim & Gravür Hizmeti</h1>
+  <p>Tasarımını yükle, malzeme ve boyutu seç; lazer kesim veya gravür fiyatını <b>anında</b> öğren. Ahşap, akrilik, deri ve dahası — kişiye özel üretim, kapına teslim.</p>
+  <div class="steps">
+    <span class="step">1 · Gravür mü Kesim mi?</span>
+    <span class="step">2 · Tasarım Yükle (SVG / PNG / JPG)</span>
+    <span class="step">3 · Fiyatı Gör, Sepete Ekle</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <div>
+    <div class="card">
+      <h2>1 · İşlem Türü</h2>
+      <div class="modes">
+        <div class="mode-tab sel" data-mode="engrave">🔥 Gravür<small>Yüzeye desen/yazı kazıma</small></div>
+        <div class="mode-tab" data-mode="cut">✂️ Kesim<small>Malzemeyi şekilde kesme</small></div>
+      </div>
+      <div id="drop">
+        <div class="up-ic">🎨</div>
+        <div class="up-t" id="drop-title">Tasarımı sürükle ya da seçmek için tıkla</div>
+        <div class="up-s" id="drop-sub">Gravür: PNG, JPG, SVG · maks 60 MB</div>
+      </div>
+      <div id="preview"><div class="prev-tag" id="prev-tag"></div></div>
+      <input type="file" id="file" class="hide">
+      <div class="file-meta hide" id="file-meta"></div>
+      <div class="warn hide" id="upload-warn"></div>
+      <div class="rescue hide" id="rescue">
+        <div class="rescue-ic">📨</div>
+        <div class="rescue-t" id="rescue-t">Bu dosya otomatik hesaplanamadı — sorun değil!</div>
+        <div class="rescue-s" id="rescue-s">Tasarımını doğrudan bize gönder; ekibimiz <b>aynı iş günü</b> manuel fiyatlandırsın. DXF / büyük dosya / karmaşık iş — hepsini hallederiz.</div>
+        <div class="rescue-actions">
+          <a class="rescue-btn wa" id="rescue-wa" target="_blank" rel="noopener">WhatsApp ile Gönder</a>
+          <a class="rescue-btn mail" id="rescue-mail">✉️ E-posta ile Gönder</a>
+          <a class="rescue-btn tel" href="tel:+905323623730">📞 0532 362 37 30</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card hide" id="params-card" style="margin-top:20px">
+      <h2>2 · Üretim Ayarları</h2>
+      <div class="fld">
+        <label>Boyut <span class="hint">— genişlik gir, yükseklik orantılı</span></label>
+        <div class="grid2">
+          <div class="inputwrap"><input type="number" id="width" min="5" max="1200" value="100"><span class="unit">mm G</span></div>
+          <div class="inputwrap"><input type="number" id="height" readonly><span class="unit">mm Y</span></div>
+        </div>
+      </div>
+      <div class="fld">
+        <label>Materyal</label>
+        <select id="material"></select>
+        <div class="mat-warn" id="mat-warn"></div>
+      </div>
+      <div class="fld" id="coverage-fld">
+        <label>Gravür yoğunluğu (kapanım) <span class="hint">— görselden otomatik, ayarlayabilirsin</span></label>
+        <div class="infill-row"><input type="range" id="coverage" min="5" max="100" step="5" value="50"><span class="infill-val" id="coverage-val">50%</span></div>
+      </div>
+      <div class="fld">
+        <label>Adet</label>
+        <div class="qty-row"><button type="button" id="qty-dn">−</button><input type="number" id="qty" value="1" min="1" max="1000"><button type="button" id="qty-up">+</button></div>
+      </div>
+      <div class="fld" style="margin-bottom:0">
+        <label>Not (opsiyonel)</label>
+        <textarea id="note" rows="2" placeholder="Renk, yazı içeriği, teslim notu vb."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card pricebox" id="pricebox">
+    <h2>Fiyat</h2>
+    <div id="price-empty" style="color:var(--text3);font-size:14px;padding:20px 0;text-align:center">Fiyatı görmek için bir tasarım yükleyin.</div>
+    <div id="price-content" class="hide">
+      <div class="price-big" id="price-big">—</div>
+      <div class="price-sub">KDV dahil tahmini fiyat</div>
+      <div class="breakdown" id="breakdown"></div>
+      <button class="btn btn-add" id="btn-add">Sepete Ekle</button>
+      <a class="btn btn-ghost" href="/">Mağazaya Dön</a>
+      <div class="quote-note">ℹ️ Fiyat, tasarımın boyut ve geometrisine göre <b>otomatik tahmindir</b>; karmaşık işlerde ekibimiz onay öncesi revize edebilir. <b>Kişiye özel üretimde iade yapılamaz.</b></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY',minimumFractionDigits:2}).format(n);
+let CONFIG=null, MODE='engrave', upload=null, currentQuote=null, quoteTimer=null;
+let aspect=1, autoCoverage=0.5, svgPathLenMmPer1=0; // svgPathLenMmPer1: 1mm genişlikte yol uzunluğu (mm) — ölçekle çarpılır
+
+function refreshBadge(){try{const c=JSON.parse(localStorage.getItem('tane-cart')||'[]').reduce((s,i)=>s+(i.qty||1),0);}catch(_){}}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+async function loadConfig(){
+  try{ CONFIG=await fetch('/api/laser/config').then(r=>r.json()); fillMaterials(); }catch(e){ console.error(e); }
+}
+function fillMaterials(){
+  const list = MODE==='cut' ? CONFIG.materials.filter(m=>m.cuttable) : CONFIG.materials;
+  $('material').innerHTML = list.map(m=>`<option value="${m.key}">${m.label}</option>`).join('');
+  checkMat();
+}
+function checkMat(){
+  const key=$('material').value; const m=CONFIG.materials.find(x=>x.key===key);
+  const w=$('mat-warn');
+  if(MODE==='cut' && m && !m.cuttable){ w.textContent='Bu malzeme yalnızca gravürlenebilir, kesilemez.'; w.style.display='block'; }
+  else w.style.display='none';
+}
+
+// Mode değişimi
+document.querySelectorAll('.mode-tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.mode-tab').forEach(x=>x.classList.remove('sel'));
+  t.classList.add('sel'); MODE=t.dataset.mode;
+  $('drop-sub').textContent = MODE==='cut' ? 'Kesim: SVG (vektör) · DXF · maks 60 MB' : 'Gravür: PNG, JPG, SVG · maks 60 MB';
+  $('coverage-fld').classList.toggle('hide', MODE==='cut');
+  $('file').accept = MODE==='cut' ? '.svg,.dxf' : '.png,.jpg,.jpeg,.webp,.svg';
+  if(CONFIG) fillMaterials();
+  resetAll();
+});
+
+function resetAll(){
+  upload=null;currentQuote=null;
+  $('drop').style.display='flex';$('preview').style.display='none';
+  $('params-card').classList.add('hide');$('price-content').classList.add('hide');$('price-empty').classList.remove('hide');
+  $('file-meta').classList.add('hide');$('rescue').classList.add('hide');$('upload-warn').classList.add('hide');
+  $('preview').querySelectorAll('img,canvas').forEach(el=>el.remove());
+}
+
+// ── Görsel kapanım (koyuluk) hesabı ──
+function imageCoverage(img){
+  const c=document.createElement('canvas'); const W=220; const r=(img.naturalHeight||img.height)/(img.naturalWidth||img.width)||1;
+  c.width=W; c.height=Math.max(1,Math.round(W*r));
+  const ctx=c.getContext('2d'); ctx.drawImage(img,0,0,c.width,c.height);
+  let d; try{ d=ctx.getImageData(0,0,c.width,c.height).data; }catch(e){ return 0.5; }
+  let sum=0,n=0;
+  for(let i=0;i<d.length;i+=4){ const a=d[i+3]; if(a<20)continue; const lum=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; sum+=(255-lum)/255; n++; }
+  return n? Math.min(1,Math.max(0.05,sum/n)) : 0.5;
+}
+// ── SVG ölçü: bbox + yol uzunluğu (user unit) ──
+function measureSVG(svgText){
+  const holder=document.createElement('div'); holder.style.cssText='position:absolute;left:-99999px;top:0;opacity:0';
+  holder.innerHTML=svgText; const svg=holder.querySelector('svg'); if(!svg)return null;
+  document.body.appendChild(holder);
+  let bw=0,bh=0,len=0;
+  try{ const bb=svg.getBBox(); bw=bb.width; bh=bb.height; }catch(e){}
+  if(!bw){ const vb=svg.viewBox&&svg.viewBox.baseVal; bw=(vb&&vb.width)||0; bh=(vb&&vb.height)||0; }
+  svg.querySelectorAll('path,line,polyline,polygon').forEach(el=>{ if(typeof el.getTotalLength==='function'){try{len+=el.getTotalLength();}catch(e){}} });
+  document.body.removeChild(holder);
+  if(!bw||!bh)return null;
+  return { bw, bh, lenPerUnit: len/bw }; // 1 user-unit genişlik başına yol — sonra mm'ye ölçeklenir
+}
+
+function showImagePreview(src){
+  $('preview').style.display='flex'; $('drop').style.display='none';
+  const img=new Image(); img.onload=()=>{}; img.src=src;
+  const el=document.createElement('img'); el.src=src; $('preview').appendChild(el);
+}
+
+function handleFile(file){
+  $('rescue').classList.add('hide'); $('upload-warn').classList.add('hide');
+  const ext=(file.name.split('.').pop()||'').toLowerCase();
+  if(file.size>60*1024*1024){ showRescue(file,'big'); return; }
+  if(ext==='dxf'){ doUpload(file).then(up=>{ if(up){upload=up;} }); showRescue(file,'dxf'); return; }
+
+  const allowed = MODE==='cut' ? ['svg'] : ['png','jpg','jpeg','webp','svg'];
+  if(!allowed.includes(ext)){ showWarn(MODE==='cut'?'Kesim için SVG (vektör) gerekir. Görseli vektöre çevirip yükleyin ya da bize gönderin.':'Sadece PNG, JPG veya SVG.'); return; }
+
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    if(ext==='svg'){
+      const txt=e.target.result;
+      const m=measureSVG(txt);
+      showImagePreview('data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(txt))));
+      if(m){ aspect=m.bh/m.bw; svgPathLenMmPer1=m.lenPerUnit; }
+      else { aspect=1; svgPathLenMmPer1=0; if(MODE==='cut'){ showRescue(file,'fail'); return; } }
+      // gravür için SVG kapanımını da görselden tahmin et
+      if(MODE==='engrave'){ const im=new Image(); im.onload=()=>{ autoCoverage=imageCoverage(im); setCoverage(autoCoverage); afterUpload(file,'svg'); }; im.onerror=()=>{ autoCoverage=0.5; setCoverage(0.5); afterUpload(file,'svg'); }; im.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(txt))); }
+      else afterUpload(file,'svg');
+    } else {
+      const im=new Image();
+      im.onload=()=>{ aspect=im.naturalHeight/im.naturalWidth||1; autoCoverage=imageCoverage(im); setCoverage(autoCoverage);
+        showImagePreview(e.target.result); afterUpload(file,ext); };
+      im.onerror=()=>{ showRescue(file,'fail'); };
+      im.src=e.target.result;
+    }
+  };
+  if(ext==='svg') reader.readAsText(file); else reader.readAsDataURL(file);
+}
+
+function setCoverage(c){ const v=Math.round(c*100/5)*5; $('coverage').value=Math.min(100,Math.max(5,v)); $('coverage-val').textContent=$('coverage').value+'%'; }
+
+async function afterUpload(file,fmtExt){
+  const up=await doUpload(file); if(!up)return; upload=up;
+  syncHeight();
+  $('params-card').classList.remove('hide');
+  $('file-meta').classList.remove('hide');
+  $('file-meta').innerHTML=`<span>Dosya: <b>${file.name}</b></span><span>Mod: <b>${MODE==='cut'?'Kesim':'Gravür'}</b></span>`;
+  $('prev-tag').textContent = (MODE==='cut'?'Kesim':'Gravür')+' önizleme';
+  requestQuote();
+}
+function syncHeight(){ const w=Math.max(1,+$('width').value||100); $('height').value=(w*aspect).toFixed(0); }
+
+async function doUpload(file){
+  const fd=new FormData(); fd.append('design',file);
+  try{
+    const r=await fetch('/api/laser/upload',{method:'POST',body:fd,credentials:'include'});
+    const j=await r.json();
+    if(!r.ok){ if(r.status===413) showRescue(file,'big'); else { showWarn(j.error||'Yükleme başarısız'); resetAll(); } return null; }
+    return j;
+  }catch(e){ showWarn('Bağlantı hatası'); resetAll(); return null; }
+}
+
+function requestQuote(){
+  if(!upload) return;
+  syncHeight();
+  const w=Math.max(1,+$('width').value||100), h=Math.max(1,+$('height').value||100);
+  const path_length_m = MODE==='cut' ? (svgPathLenMmPer1 * w)/1000 : 0; // lenPerUnit × hedef genişlik(mm) → mm → m
+  const body={ mode:MODE, file_path:upload.file_path, original_name:upload.original_name, file_format:upload.file_format,
+    material:$('material').value, width_mm:w, height_mm:h, coverage:(+$('coverage').value)/100,
+    path_length_m, quantity:Math.max(1,+$('qty').value||1), note:$('note').value };
+  clearTimeout(quoteTimer);
+  quoteTimer=setTimeout(async()=>{
+    try{
+      const r=await fetch('/api/laser/quote',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)});
+      const j=await r.json();
+      if(!r.ok){ $('price-content').classList.add('hide'); $('price-empty').classList.remove('hide'); $('price-empty').textContent=j.error||'Fiyat hesaplanamadı'; return; }
+      currentQuote=j; renderPrice(j);
+    }catch(e){ console.error(e); }
+  },250);
+}
+
+function renderPrice(q){
+  $('price-empty').classList.add('hide'); $('price-content').classList.remove('hide');
+  $('price-big').textContent=fmt(q.totalPrice);
+  let rows=`<div class="bd-row"><span>İşlem</span><b>${q.mode==='cut'?'Kesim':'Gravür'} (${q.materialLabel})</b></div>`;
+  if(q.mode==='cut') rows+=`<div class="bd-row"><span>Kesim yolu</span><b>${q.path_length_m.toFixed(2)} m × ${q.passes} geçiş</b></div>`;
+  else rows+=`<div class="bd-row"><span>Alan · kapanım</span><b>${q.area_cm2.toFixed(0)} cm² · %${Math.round(q.coverage*100)}</b></div>`;
+  rows+=`<div class="bd-row"><span>Tahmini süre</span><b>${q.est_minutes.toFixed(0)} dk</b></div>
+    <div class="bd-row"><span>İşçilik</span><b>${fmt(q.workCost)}</b></div>
+    <div class="bd-row"><span>Malzeme</span><b>${fmt(q.materialCost)}</b></div>
+    <div class="bd-row"><span>Taban ücret</span><b>${fmt(q.baseFee)}</b></div>
+    <div class="bd-row"><span>Adet</span><b>${q.quantity}</b></div>`;
+  $('breakdown').innerHTML=rows;
+}
+
+$('btn-add').onclick=()=>{
+  if(!currentQuote){ toast('Önce fiyat hesaplanmalı'); return; }
+  const cart=JSON.parse(localStorage.getItem('tane-cart')||'[]');
+  cart.push({
+    id: 800000000 + currentQuote.laser_job_id,
+    laser_job_id: currentQuote.laser_job_id,
+    is_laser_service: true,
+    name: `Lazer ${currentQuote.mode==='cut'?'Kesim':'Gravür'}: ${upload.original_name} (${currentQuote.materialLabel}, ${$('width').value}mm, ${currentQuote.quantity} adet)`,
+    image_url: null, qty: 1, tane_price: currentQuote.totalPrice, locked: true
+  });
+  localStorage.setItem('tane-cart', JSON.stringify(cart));
+  toast('✓ Lazer işi sepete eklendi');
+  $('btn-add').textContent='✓ Sepete Eklendi'; setTimeout(()=>$('btn-add').textContent='Tekrar Sepete Ekle',1500);
+};
+
+function showWarn(m){const w=$('upload-warn');w.textContent=m;w.classList.remove('hide');}
+function showRescue(file,reason){
+  $('drop').style.display='flex'; $('preview').style.display='none'; $('params-card').classList.add('hide');
+  $('price-content').classList.add('hide'); $('price-empty').classList.remove('hide'); $('upload-warn').classList.add('hide');
+  const sizeMB=file&&file.size?(file.size/1048576).toFixed(0):null; const name=file?file.name:'tasarımım';
+  $('rescue-t').textContent =
+    reason==='dxf' ? 'DXF için anlık fiyat veremiyoruz — ama seni kaçırmak istemeyiz!' :
+    reason==='fail'? 'Tasarımı otomatik ölçemedik — sorun değil, biz hallederiz!' :
+    sizeMB ? `Dosyan ${sizeMB} MB — 60 MB sınırını aşıyor, ama seni kaçırmak istemeyiz!` : 'Bu dosya otomatik hesaplanamadı — sorun değil!';
+  const wt=encodeURIComponent(`Merhaba, lazer ${MODE==='cut'?'kesim':'gravür'} fiyatı almak istiyorum. Tasarımım "${name}" — WhatsApp/Drive ile paylaşacağım.`);
+  $('rescue-wa').href=`https://wa.me/905323623730?text=${wt}`;
+  const sub=encodeURIComponent('Lazer Kesim/Gravür Teklifi'); const bd=encodeURIComponent(`Merhaba,\n\nLazer ${MODE==='cut'?'kesim':'gravür'} fiyatı almak istiyorum. Tasarımım "${name}" ekte / linkte.\n\nMalzeme:\nBoyut (mm):\nAdet:\nNot:\n\nTeşekkürler.`);
+  $('rescue-mail').href=`mailto:info@tanetekno.com?subject=${sub}&body=${bd}`;
+  $('rescue').classList.remove('hide'); $('rescue').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// Events
+$('drop').onclick=()=>$('file').click();
+$('file').onchange=e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); };
+['dragover','dragenter'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.remove('drag');}));
+$('drop').addEventListener('drop',e=>{ if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+$('width').oninput=()=>{ syncHeight(); requestQuote(); };
+$('material').onchange=()=>{ checkMat(); requestQuote(); };
+$('coverage').oninput=()=>{ $('coverage-val').textContent=$('coverage').value+'%'; requestQuote(); };
+$('qty').oninput=requestQuote;
+$('qty-up').onclick=()=>{ $('qty').value=Math.min(1000,(+$('qty').value||1)+1); requestQuote(); };
+$('qty-dn').onclick=()=>{ $('qty').value=Math.max(1,(+$('qty').value||1)-1); requestQuote(); };
+$('note').oninput=()=>{ clearTimeout(quoteTimer); quoteTimer=setTimeout(requestQuote,600); };
+
+loadConfig();
+</script>
+</body>
+</html>

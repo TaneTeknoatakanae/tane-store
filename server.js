@@ -253,6 +253,7 @@ app.use('/api/price-compare', require('./routes/price-compare'));
 app.use('/api/paytr', require('./routes/paytr'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/print', require('./routes/print-service'));
+app.use('/api/laser', require('./routes/laser-service'));
 
 // SEO-friendly category URL: /kategori/bilgisayar veya /kategori/bilgisayar/laptop → landing.html
 app.get('/kategori/:parent', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
@@ -269,6 +270,7 @@ app.get('/gizlilik', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 app.get('/mesafeli-satis', (req, res) => res.sendFile(path.join(__dirname, 'public', 'mesafeli-satis.html')));
 app.get('/landing', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
 app.get('/3d-baski', (req, res) => res.sendFile(path.join(__dirname, 'public', '3d-baski.html')));
+app.get('/lazer', (req, res) => res.sendFile(path.join(__dirname, 'public', 'lazer.html')));
 // 3D Araçlar — temiz URL'ler
 app.get('/araclar', (req, res) => res.sendFile(path.join(__dirname, 'public', 'araclar', 'index.html')));
 app.get('/araclar/:tool', (req, res) => {
@@ -364,6 +366,7 @@ app.get('/sitemap.xml', (req, res) => {
     { url: '/',                  pri: '1.0', freq: 'daily'   },
     { url: '/landing',           pri: '0.9', freq: 'daily'   },
     { url: '/3d-baski',          pri: '0.9', freq: 'weekly'  },
+    { url: '/lazer',             pri: '0.9', freq: 'weekly'  },
     { url: '/araclar',                       pri: '0.8', freq: 'weekly' },
     { url: '/araclar/filament-maliyet',      pri: '0.7', freq: 'monthly' },
     { url: '/araclar/stl-goruntuleyici',     pri: '0.7', freq: 'monthly' },
