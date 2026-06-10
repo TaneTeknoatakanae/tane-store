@@ -32,7 +32,8 @@ router.put('/pricing/:type', adminAuth, (req, res) => {
   const val = JSON.stringify(cfg);
   db.run(
     `INSERT INTO app_settings (key, value, updated_at) VALUES (?, ?, NOW())
-     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+     RETURNING key`,
     [key, val],
     function (err) {
       if (err) return res.status(500).json({ error: err.message });
