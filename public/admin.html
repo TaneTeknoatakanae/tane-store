@@ -148,6 +148,7 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="setTab('analytics',this)">📊 Analitik</button>
     <button class="tab" onclick="setTab('pricecompare',this)">🏷 Rakip Fiyat</button>
     <button class="tab" onclick="setTab('members',this)">👥 Üyeler</button>
+    <button class="tab" onclick="setTab('hizmetfiyat',this)">⚙️ Hizmet Fiyatları</button>
     <button class="tab" onclick="setTab('maintenance',this)">🔧 Bakım</button>
   </div>
 
@@ -379,6 +380,15 @@ tr:last-child td{border-bottom:none}
       </tr></thead>
       <tbody id="members-tbody"></tbody></table>
       </div>
+    </div>
+  </div>
+
+  <div id="tab-hizmetfiyat" class="hidden">
+    <div class="table-wrap" style="padding:24px">
+      <h3 style="font-size:16px;font-weight:800;margin-bottom:6px">⚙️ 3D Baskı & Lazer Fiyat Ayarları</h3>
+      <p style="color:#666;font-size:13px;line-height:1.6;margin-bottom:20px">Buradan değiştirdiğin oranlar <strong>anında</strong> /3d-baski ve /lazer sayfalarındaki canlı fiyat hesabına yansır. Para birimi ₺.</p>
+      <div id="svc-print">Yükleniyor…</div>
+      <div id="svc-laser" style="margin-top:30px"></div>
     </div>
   </div>
 
@@ -1350,6 +1360,104 @@ function setTab(tab,btn){
   if(tab==='analytics')loadAnalytics();
   if(tab==='pricecompare')pcLoadList();
   if(tab==='members')loadMembers();
+  if(tab==='hizmetfiyat')loadServicePricing();
+}
+
+// ── Hizmet Fiyat Ayarları (3D Baskı & Lazer) ──────────────────────────────
+const SVC={print:null,laser:null};
+const numInput=(val,attrs)=>`<input type="number" step="any" value="${val}" ${attrs} style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px">`;
+const fldRow=(label,inp)=>`<div style="margin-bottom:12px"><label style="display:block;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">${label}</label>${inp}</div>`;
+
+async function loadServicePricing(){
+  for(const t of ['print','laser']){
+    try{ const r=await fetch('/api/admin/settings/pricing/'+t); const d=await r.json(); SVC[t]=r.ok?d.config:null; }
+    catch(e){ SVC[t]=null; }
+  }
+  renderPrintPricing(); renderLaserPricing();
+}
+
+function renderPrintPricing(){
+  const c=SVC.print, el=document.getElementById('svc-print');
+  if(!c){ el.innerHTML='<p style="color:#c0392b">3D fiyat ayarı yüklenemedi.</p>'; return; }
+  const scal=[['baseFee','Taban ücret (₺)'],['machineRatePerHour','Makine/işçilik (₺/saat)'],['throughputGramsPerHour','Baskı hızı (g/saat)'],['infillBase','Doluluk taban çarpanı'],['infillRange','Doluluk aralık çarpanı'],['minPrice','Minimum sipariş (₺)']];
+  const qf=c.qualityFactors||{taslak:0.8,standart:1,yuksek:1.5};
+  let matRows='';
+  for(const k in c.materials){const m=c.materials[k];
+    matRows+=`<tr data-mat="${k}"><td style="font-weight:700;color:#888;font-size:12px">${k}</td>
+      <td><input type="text" value="${(m.label||'').replace(/"/g,'&quot;')}" data-f="label" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px"></td>
+      <td>${numInput(m.density,'data-f="density"')}</td>
+      <td>${numInput(m.ratePerGram,'data-f="ratePerGram"')}</td></tr>`;}
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:20px">🖨️</span><h4 style="font-size:15px;font-weight:800">3D Baskı Fiyatlandırma</h4></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:8px" id="print-scalars">
+      ${scal.map(([k,l])=>fldRow(l,numInput(c[k],`data-p="${k}"`))).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">
+      ${fldRow('Kalite: Taslak ×',numInput(qf.taslak,'data-pq="taslak"'))}
+      ${fldRow('Kalite: Standart ×',numInput(qf.standart,'data-pq="standart"'))}
+      ${fldRow('Kalite: Yüksek ×',numInput(qf.yuksek,'data-pq="yuksek"'))}
+    </div>
+    <p style="font-size:12px;font-weight:700;color:#888;margin-bottom:8px">MATERYALLER</p>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px" id="print-mats">
+      <thead><tr style="text-align:left;color:#888;font-size:11px"><th style="padding:6px">Kod</th><th style="padding:6px">Görünen ad</th><th style="padding:6px">Yoğunluk (g/cm³)</th><th style="padding:6px">₺/gram</th></tr></thead>
+      <tbody>${matRows}</tbody></table></div>
+    <button class="btn-submit" style="margin-top:16px;max-width:260px" onclick="saveServicePricing('print')">💾 3D Fiyatlarını Kaydet</button>
+    <span id="print-save-msg" style="margin-left:12px;font-size:13px"></span>`;
+}
+
+function renderLaserPricing(){
+  const c=SVC.laser, el=document.getElementById('svc-laser');
+  if(!c){ el.innerHTML='<p style="color:#c0392b">Lazer fiyat ayarı yüklenemedi.</p>'; return; }
+  const scal=[['baseFee','Taban ücret (₺)'],['minPrice','Minimum sipariş (₺)']];
+  let matRows='';
+  for(const k in c.materials){const m=c.materials[k];
+    matRows+=`<tr data-mat="${k}"><td style="font-weight:700;color:#888;font-size:12px">${k}</td>
+      <td><input type="text" value="${(m.label||'').replace(/"/g,'&quot;')}" data-f="label" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px"></td>
+      <td style="text-align:center"><input type="checkbox" data-f="cuttable" ${m.cuttable?'checked':''}></td>
+      <td>${numInput(m.passes,'data-f="passes"')}</td>
+      <td>${numInput(m.costPerCm2,'data-f="costPerCm2"')}</td></tr>`;}
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:20px">⚡</span><h4 style="font-size:15px;font-weight:800">Lazer Fiyatlandırma</h4></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:8px">
+      ${scal.map(([k,l])=>fldRow(l,numInput(c[k],`data-l="${k}"`))).join('')}
+      ${fldRow('Gravür ₺/cm² (tam kapanım)',numInput(c.engrave.ratePerCm2,'data-le="ratePerCm2"'))}
+      ${fldRow('Gravür hız (cm²/dk)',numInput(c.engrave.cm2PerMin,'data-le="cm2PerMin"'))}
+      ${fldRow('Kesim ₺/metre',numInput(c.cut.ratePerMeter,'data-lc="ratePerMeter"'))}
+      ${fldRow('Kesim hız (m/dk)',numInput(c.cut.mPerMin,'data-lc="mPerMin"'))}
+    </div>
+    <p style="font-size:12px;font-weight:700;color:#888;margin:8px 0">MATERYALLER</p>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px" id="laser-mats">
+      <thead><tr style="text-align:left;color:#888;font-size:11px"><th style="padding:6px">Kod</th><th style="padding:6px">Görünen ad</th><th style="padding:6px">Kesilebilir</th><th style="padding:6px">Geçiş</th><th style="padding:6px">₺/cm² malzeme</th></tr></thead>
+      <tbody>${matRows}</tbody></table></div>
+    <button class="btn-submit" style="margin-top:16px;max-width:260px" onclick="saveServicePricing('laser')">💾 Lazer Fiyatlarını Kaydet</button>
+    <span id="laser-save-msg" style="margin-left:12px;font-size:13px"></span>`;
+}
+
+async function saveServicePricing(type){
+  const msg=document.getElementById(type+'-save-msg');
+  try{
+    let c;
+    if(type==='print'){
+      c=SVC.print;
+      document.querySelectorAll('#print-scalars [data-p]').forEach(i=>c[i.dataset.p]=parseFloat(i.value)||0);
+      document.querySelectorAll('[data-pq]').forEach(i=>{c.qualityFactors=c.qualityFactors||{};c.qualityFactors[i.dataset.pq]=parseFloat(i.value)||0;});
+      document.querySelectorAll('#print-mats tr[data-mat]').forEach(tr=>{const k=tr.dataset.mat;const m=c.materials[k];
+        m.label=tr.querySelector('[data-f="label"]').value;m.density=parseFloat(tr.querySelector('[data-f="density"]').value)||0;m.ratePerGram=parseFloat(tr.querySelector('[data-f="ratePerGram"]').value)||0;});
+    } else {
+      c=SVC.laser;
+      document.querySelectorAll('[data-l]').forEach(i=>c[i.dataset.l]=parseFloat(i.value)||0);
+      document.querySelectorAll('[data-le]').forEach(i=>{c.engrave=c.engrave||{};c.engrave[i.dataset.le]=parseFloat(i.value)||0;});
+      document.querySelectorAll('[data-lc]').forEach(i=>{c.cut=c.cut||{};c.cut[i.dataset.lc]=parseFloat(i.value)||0;});
+      document.querySelectorAll('#laser-mats tr[data-mat]').forEach(tr=>{const k=tr.dataset.mat;const m=c.materials[k];
+        m.label=tr.querySelector('[data-f="label"]').value;m.cuttable=tr.querySelector('[data-f="cuttable"]').checked;
+        m.passes=parseInt(tr.querySelector('[data-f="passes"]').value)||0;m.costPerCm2=parseFloat(tr.querySelector('[data-f="costPerCm2"]').value)||0;});
+    }
+    const r=await fetch('/api/admin/settings/pricing/'+type,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({config:c})});
+    const d=await r.json();
+    if(r.ok){ msg.textContent='✅ Kaydedildi'; msg.style.color='#0a8a4a'; }
+    else { msg.textContent='❌ '+(d.error||'Hata'); msg.style.color='#c0392b'; }
+  }catch(e){ msg.textContent='❌ '+e.message; msg.style.color='#c0392b'; }
+  setTimeout(()=>{msg.textContent='';},4000);
 }
 
 let visitChart=null, salesChart=null;

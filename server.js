@@ -112,6 +112,7 @@ const adminAuthRoutes = require('./routes/admin-auth');
 app.use('/api/admin', adminApiLimiter);
 app.post('/api/admin/login', adminLoginLimiter, (req, res, next) => next()); // extra rate limit on login
 app.use('/api/admin', adminAuthRoutes);
+app.use('/api/admin/settings', require('./routes/admin-settings'));
 
 // Protect /admin.html — redirect unauthenticated requests server-side
 app.get('/admin.html', (req, res, next) => {
