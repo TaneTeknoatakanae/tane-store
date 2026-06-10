@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lazer Güç / Hız / Geçiş Tablosu — 10W Diyot Lazer Ayarları | Tane Store</title>
+<meta name="description" content="10W diyot lazer için malzeme ve kalınlığa göre güç, hız ve geçiş sayısı ayarları. Ahşap, MDF, akrilik, deri, karton kesim ve gravür ayarları — ücretsiz referans tablosu.">
+<link rel="canonical" href="https://www.tanetekno.com/araclar/lazer-ayarlari">
+<script async src="/ga.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/araclar/tools.css">
+</head>
+<body>
+<nav class="tnav"><div class="tnav-in">
+  <a href="/" class="tlogo"><img src="/AmblemTane.png" alt="" onerror="this.style.display='none'"><span>Tane Store</span></a>
+  <span class="tnav-sp"></span>
+  <a href="/" class="tnav-a">Mağaza</a>
+  <a href="/lazer" class="tnav-a">Lazer Hizmeti</a>
+  <a href="/araclar" class="tnav-a active">Araçlar</a>
+</div></nav>
+
+<header class="thero">
+  <div class="thero-tag">🌡️ Ücretsiz Referans · 10W Diyot</div>
+  <h1>Lazer Güç / Hız / Geçiş Tablosu</h1>
+  <p>10W diyot lazer için malzeme ve kalınlığa göre başlangıç ayarları. Markaya, lensе ve hava desteğine göre ince ayar gerekir.</p>
+</header>
+
+<div class="tpage">
+  <a href="/araclar" class="tback">← Tüm araçlar</a>
+  <div class="fld"><input type="text" id="search" placeholder="🔍 Malzeme ara (ahşap, akrilik, deri…)"></div>
+  <div class="ttable-wrap">
+    <table class="ttable">
+      <thead><tr><th>Malzeme</th><th>Kalınlık</th><th>İşlem</th><th>Güç</th><th>Hız</th><th>Geçiş</th><th>Not</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <p style="font-size:11.5px;color:var(--text3);margin-top:12px">ℹ️ Değerler 10W diyot lazer için tipik başlangıç aralıklarıdır. Her zaman ayar kartonunda (test grid) deneyin. <b>Hava desteği (air assist)</b> kesim kalitesini ve hızını belirgin artırır. <b>PVC / vinil / suni deri kesinlikle kesilmez</b> — zehirli klor gazı çıkarır.</p>
+</div>
+
+<section class="dual-cta-wrap"><div class="dual-cta">
+  <a href="/lazer" class="dcta dcta-print"><b>Lazerin yok mu?</b><span>Tasarımını biz keselim/gravürleyelim →</span></a>
+  <a href="/" class="dcta dcta-shop"><b>Malzeme / lazer mi lazım?</b><span>Mağazaya göz at →</span></a>
+</div></section>
+
+<footer class="tfoot"><p>© 2026 Tane Store · Üretim Atölyesi · <a href="/iletisim">İletişim</a> · <a href="tel:+905323623730">0532 362 37 30</a></p></footer>
+
+<script>
+// 10W diyot lazer — tipik başlangıç değerleri
+const ROWS=[
+  ['Ahşap / Kontrplak','3 mm','Kesim','100%','200–300 mm/dk','2–3','Hava desteği şart; kenar yanığını azaltır.'],
+  ['Ahşap / Kontrplak','5 mm','Kesim','100%','120–180 mm/dk','4–6','Çok geçiş; sabırlı ol, yangına karşı başında dur.'],
+  ['Ahşap (huş/balsa)','Gravür','Gravür','25–45%','2500–4000 mm/dk','1','Açık ton; gücü artırınca koyulaşır.'],
+  ['MDF','3 mm','Kesim','100%','150–220 mm/dk','3–4','Yoğun duman — mutlaka havalandır.'],
+  ['Koyu / Opak Akrilik','3 mm','Kesim','100%','120–180 mm/dk','3–4','Sadece koyu/opak. ŞEFFAF akrilik diyot lazerle KESİLMEZ.'],
+  ['Akrilik (koyu)','Gravür','Gravür','25–40%','2500–3500 mm/dk','1','Mat iz; net sonuç için maskeleme bandı.'],
+  ['Gerçek Deri','2–3 mm','Kesim','80–100%','200–350 mm/dk','1–2','Bitkisel tabaklı tercih et; kromlu deri zararlı duman verir.'],
+  ['Gerçek Deri','Gravür','Gravür','15–30%','3500–5000 mm/dk','1','Hafif yakım; çok güç vurma, sertleşir.'],
+  ['Karton / Mukavva','—','Kesim','40–70%','350–500 mm/dk','1','Yangın riski yüksek — yanından ayrılma.'],
+  ['Kraft / Kağıt','—','Kesim','15–30%','800–1500 mm/dk','1','Düşük güç; kolay tutuşur.'],
+  ['Keçe (yün)','3 mm','Kesim','60–80%','300–450 mm/dk','1','Sentetik keçe erir/koku yapar; yün tercih et.'],
+  ['Mantar (cork)','3 mm','Kesim','80%','250–350 mm/dk','1–2','Gravür için 30–40% güç.'],
+  ['Kayrak Taşı','—','Gravür','100%','1200–1800 mm/dk','1','Beyazımsı kalıcı iz; kesilmez.'],
+  ['Cam / Ayna','—','Gravür','70–90%','800–1200 mm/dk','1','Mat iz; aynada arka yüzeyden daha temiz. Kesilmez.'],
+  ['Anodize / Boyalı Metal','—','Gravür','100%','600–900 mm/dk','1','Kaplamayı/boyayı kaldırır (mark). Çıplak metal işlenmez.'],
+  ['Paslanmaz (mark spray)','—','Gravür','100%','400–700 mm/dk','1–2','Sadece işaretleme spreyi/oksit ile; çıplak metali kesmez.'],
+  ['Seramik / Fayans','—','Gravür','100%','1000–1500 mm/dk','1','Sırlı yüzeyde iz; kesilmez.']
+];
+const tb=document.getElementById('tbody');
+function render(f=''){
+  const q=f.trim().toLowerCase();
+  tb.innerHTML=ROWS.filter(r=>!q||r[0].toLowerCase().includes(q)||r[2].toLowerCase().includes(q)).map(r=>
+    `<tr><td class="mat">${r[0]}</td><td>${r[1]}</td><td><b style="color:${r[2]==='Kesim'?'#e8590c':'#0a8a4a'}">${r[2]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td style="color:var(--text2)">${r[6]}</td></tr>`).join('')
+    || `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:24px">Sonuç yok.</td></tr>`;
+}
+document.getElementById('search').addEventListener('input',e=>render(e.target.value));
+render();
+</script>
+</body>
+</html>

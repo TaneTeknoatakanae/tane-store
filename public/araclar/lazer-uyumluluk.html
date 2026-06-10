@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bu Malzeme Lazerle Kesilir mi? — 10W Diyot Uyumluluk Kontrolü | Tane Store</title>
+<meta name="description" content="10W diyot lazerle hangi malzeme kesilir, hangisi gravürlenir? Ahşap, akrilik, deri, metal, cam ve daha fazlası için uyumluluk + güvenlik uyarıları. PVC neden tehlikeli? Ücretsiz kontrol aracı.">
+<link rel="canonical" href="https://www.tanetekno.com/araclar/lazer-uyumluluk">
+<script async src="/ga.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/araclar/tools.css">
+<style>
+  .matgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .mcard{border:1.5px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;background:#fff;transition:all .12s;text-align:left}
+  .mcard:hover{border-color:var(--accent2);transform:translateY(-2px)}
+  .mcard.sel{border-color:var(--accent);background:#fff4ec}
+  .mcard .mi{font-size:24px}
+  .mcard .mn{font-weight:600;font-size:13.5px;margin-top:4px}
+  .mcard .mb{display:flex;gap:5px;margin-top:8px}
+  .pill{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .ok{background:#e3f6ec;color:#0a8a4a}.warn{background:#fff4e0;color:#a86500}.no{background:#eee;color:#777}.danger{background:#fde2e2;color:#c0392b}
+  .detail{border:1.5px solid var(--accent);border-radius:14px;padding:22px;background:linear-gradient(135deg,#fff4ec,#fff);margin-bottom:18px}
+  .detail h2{font-size:22px;font-weight:800;margin-bottom:4px}
+  .drow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border-light)}
+  .drow:first-of-type{border-top:none}
+  .dlabel{font-weight:700;min-width:80px}
+  .dbadge{font-size:13px;font-weight:700;padding:5px 12px;border-radius:20px}
+  .dnote{font-size:13px;color:var(--text2);flex:1}
+  .safety{background:#fde2e2;border:1.5px solid #f5b7b7;border-radius:12px;padding:14px 16px;margin:16px 0;font-size:13.5px;color:#a02525}
+  .safety b{color:#8a1010}
+</style>
+</head>
+<body>
+<nav class="tnav"><div class="tnav-in">
+  <a href="/" class="tlogo"><img src="/AmblemTane.png" alt="" onerror="this.style.display='none'"><span>Tane Store</span></a>
+  <span class="tnav-sp"></span>
+  <a href="/" class="tnav-a">Mağaza</a>
+  <a href="/lazer" class="tnav-a">Lazer Hizmeti</a>
+  <a href="/araclar" class="tnav-a active">Araçlar</a>
+</div></nav>
+
+<header class="thero">
+  <div class="thero-tag">✅ Ücretsiz · 10W Diyot</div>
+  <h1>Bu Malzeme Lazerle İşlenir mi?</h1>
+  <p>Bir malzeme seç; 10W diyot lazerle <b>kesilir mi, gravürlenir mi</b> ve nelere dikkat etmen gerektiğini gör.</p>
+</header>
+
+<div class="tpage">
+  <a href="/araclar" class="tback">← Tüm araçlar</a>
+  <div class="detail" id="detail"></div>
+  <div class="safety">⚠️ <b>Asla lazerle kesmeyin/işlemeyin:</b> PVC, vinil, suni deri, PVC köpük — yanınca <b>zehirli klor gazı</b> çıkarır, makinenizi de paslandırır. Şüphedeyseniz malzemenin içeriğini doğrulayın.</div>
+  <div class="tcard">
+    <h2>Malzeme seç</h2>
+    <div class="matgrid" id="grid"></div>
+  </div>
+</div>
+
+<section class="dual-cta-wrap"><div class="dual-cta">
+  <a href="/lazer" class="dcta dcta-print"><b>Lazerin yok mu?</b><span>Tasarımını biz işleyelim →</span></a>
+  <a href="/" class="dcta dcta-shop"><b>Malzeme / lazer mi lazım?</b><span>Mağazaya göz at →</span></a>
+</div></section>
+
+<footer class="tfoot"><p>© 2026 Tane Store · Üretim Atölyesi · <a href="/iletisim">İletişim</a> · <a href="tel:+905323623730">0532 362 37 30</a></p></footer>
+
+<script>
+const ST={ok:['✅','Uygun','ok'],warn:['⚠️','Şartlı / Zor','warn'],no:['❌','Yapılmaz','no'],danger:['☠️','TEHLİKELİ','danger']};
+const M=[
+  {n:'Ahşap / Kontrplak',i:'🪵',cut:['ok','İnce (≤6 mm) çok geçişle kesilir. Hava desteği önerilir.'],eng:['ok','Mükemmel gravür; en sevilen malzeme.']},
+  {n:'MDF',i:'🟫',cut:['ok','3 mm rahat kesilir; duman yoğun, havalandırın.'],eng:['ok','İyi gravür, tonlanabilir.']},
+  {n:'Koyu / Opak Akrilik',i:'🟧',cut:['ok','Koyu/opak akrilik kesilir.'],eng:['ok','Mat, şık gravür.']},
+  {n:'Şeffaf Akrilik',i:'🔲',cut:['no','Diyot lazer şeffaftan geçer — kesemez (CO₂ lazer gerekir).'],eng:['warn','Zayıf; arka yüze maskeleme ile denenebilir.']},
+  {n:'Gerçek Deri',i:'🟤',cut:['ok','Bitkisel tabaklı deri kesilir.'],eng:['ok','Şık yakım gravürü.'],note:'Kromlu/işlenmiş deri zararlı duman verebilir — bitkisel tercih edin.'},
+  {n:'Suni Deri / Vinil',i:'⛔',cut:['danger','Genelde PVC içerir — KESMEYİN! Zehirli klor gazı.'],eng:['danger','İşlemeyin!'],danger:true},
+  {n:'Karton / Kağıt',i:'📦',cut:['ok','Kolay kesilir.'],eng:['ok','Damga/gravür olur.'],note:'Yangın riski yüksek — başında durun.'},
+  {n:'Keçe / Kumaş (doğal)',i:'🧶',cut:['ok','Yün/pamuk kesilir.'],eng:['warn','Yüzey kavurma.'],note:'Sentetik (polyester) erir ve koku yapar.'},
+  {n:'Mantar (Cork)',i:'🟤',cut:['ok','İnce mantar kesilir.'],eng:['ok','Güzel gravür.']},
+  {n:'Cam / Ayna',i:'🪟',cut:['no','Lazerle kesilmez.'],eng:['ok','Mat kalıcı iz; aynada arka yüzeyden daha temiz.']},
+  {n:'Çıplak Metal',i:'🔩',cut:['no','10W diyot metal kesmez.'],eng:['no','Çıplak metali işlemez; işaretleme spreyi ile ⚠️ mümkün.']},
+  {n:'Anodize / Boyalı Metal',i:'⚙️',cut:['no','Kesilmez.'],eng:['ok','Kaplama/boyayı kaldırarak kalıcı iz (mark) bırakır.']},
+  {n:'Taş / Kayrak / Seramik',i:'🪨',cut:['no','Kesilmez.'],eng:['ok','Kalıcı açık renk iz.']},
+  {n:'PVC / Vinil / PVC Köpük',i:'☠️',cut:['danger','ASLA! Klor gazı zehirli + makineyi paslandırır.'],eng:['danger','ASLA!'],danger:true},
+  {n:'PP / PE Plastik',i:'🧫',cut:['warn','Erir, kötü kenar — önerilmez.'],eng:['warn','Zayıf sonuç.']},
+  {n:'Köpük (EVA)',i:'🟦',cut:['ok','Kesilir; alev riski, gözetim şart.'],eng:['warn','Yüzey erir.']},
+  {n:'Bambu',i:'🎋',cut:['warn','İncesi çok geçişle kesilir.'],eng:['ok','Net gravür.']}
+];
+const $=id=>document.getElementById(id);
+function badge(s){const[ic,lbl,cls]=ST[s];return `<span class="dbadge ${cls}">${ic} ${lbl}</span>`;}
+function detail(m){
+  $('detail').innerHTML=`
+    <div style="font-size:30px">${m.i}</div>
+    <h2>${m.n}</h2>
+    <div class="drow"><span class="dlabel">✂️ Kesim</span>${badge(m.cut[0])}<span class="dnote">${m.cut[1]}</span></div>
+    <div class="drow"><span class="dlabel">🔥 Gravür</span>${badge(m.eng[0])}<span class="dnote">${m.eng[1]}</span></div>
+    ${m.note?`<div class="drow"><span class="dlabel">💡 Not</span><span class="dnote">${m.note}</span></div>`:''}
+    ${m.danger?`<div class="drow"><span class="dlabel">☠️ Uyarı</span><span class="dnote" style="color:#c0392b;font-weight:600">Bu malzeme lazerle işlenmemelidir — sağlık ve makine riski.</span></div>`:''}
+    <div style="margin-top:14px"><a class="btn btn-accent" href="/lazer">Bu işi bize yaptır →</a></div>`;
+}
+function pills(m){return `<span class="pill ${m.cut[0]}">✂️ ${ST[m.cut[0]][1].split(' ')[0]}</span><span class="pill ${m.eng[0]}">🔥 ${ST[m.eng[0]][1].split(' ')[0]}</span>`;}
+$('grid').innerHTML=M.map((m,i)=>`<div class="mcard${i===0?' sel':''}" data-i="${i}"><div class="mi">${m.i}</div><div class="mn">${m.n}</div><div class="mb">${pills(m)}</div></div>`).join('');
+document.querySelectorAll('.mcard').forEach(c=>c.onclick=()=>{document.querySelectorAll('.mcard').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');detail(M[+c.dataset.i]);window.scrollTo({top:0,behavior:'smooth'});});
+detail(M[0]);
+</script>
+</body>
+</html>

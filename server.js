@@ -274,7 +274,7 @@ app.get('/lazer', (req, res) => res.sendFile(path.join(__dirname, 'public', 'laz
 // 3D Araçlar — temiz URL'ler
 app.get('/araclar', (req, res) => res.sendFile(path.join(__dirname, 'public', 'araclar', 'index.html')));
 app.get('/araclar/:tool', (req, res) => {
-  const allowed = ['filament-maliyet', 'stl-goruntuleyici', 'filament-secici', 'nozzle-sicaklik'];
+  const allowed = ['filament-maliyet', 'stl-goruntuleyici', 'filament-secici', 'nozzle-sicaklik', 'lazer-ayarlari', 'lazer-uyumluluk'];
   if (!allowed.includes(req.params.tool)) return res.redirect('/araclar');
   res.sendFile(path.join(__dirname, 'public', 'araclar', req.params.tool + '.html'));
 });
@@ -372,6 +372,8 @@ app.get('/sitemap.xml', (req, res) => {
     { url: '/araclar/stl-goruntuleyici',     pri: '0.7', freq: 'monthly' },
     { url: '/araclar/filament-secici',       pri: '0.7', freq: 'monthly' },
     { url: '/araclar/nozzle-sicaklik',       pri: '0.7', freq: 'monthly' },
+    { url: '/araclar/lazer-ayarlari',        pri: '0.7', freq: 'monthly' },
+    { url: '/araclar/lazer-uyumluluk',       pri: '0.7', freq: 'monthly' },
     { url: '/hakkimizda',        pri: '0.5', freq: 'monthly' },
     { url: '/iletisim',          pri: '0.5', freq: 'monthly' },
     { url: '/teslimat-iade',     pri: '0.4', freq: 'monthly' },
