@@ -831,6 +831,19 @@ function showToast(msg) { const t = document.getElementById('toast'); t.textCont
 
 initAuth().then(() => loadProduct());
 </script>
+
+<!-- 3D BASKI ÇAPRAZ-SATIŞ — statik banner (template literal dışı, güvenli) -->
+<a href="/3d-baski" style="display:block;text-decoration:none;max-width:1400px;margin:24px auto 0;padding:0 24px">
+  <div style="background:linear-gradient(120deg,#1a1410,#2a1c10 60%,#e8590c 170%);border-radius:18px;padding:26px 30px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;text-align:center;box-shadow:0 16px 40px rgba(232,89,12,.16)">
+    <div style="font-size:40px;animation:none">🖨️</div>
+    <div style="flex:1;min-width:240px;text-align:left">
+      <div style="color:#fff;font-size:19px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px">Aradığını bulamadın mı? Biz üretelim.</div>
+      <div style="color:#d8cfc6;font-size:14px;line-height:1.5">Kendi 3D modelini yükle, materyal seç, <b style="color:#fff">30 saniyede fiyatını gör</b>. Prototip, yedek parça, hediyelik — endüstriyel kalitede 3D baskı.</div>
+    </div>
+    <span style="background:#fd7e14;color:#fff;font-weight:800;font-size:15px;padding:14px 24px;border-radius:11px;white-space:nowrap;box-shadow:0 8px 22px rgba(253,126,20,.4)">Modelini Yükle →</span>
+  </div>
+</a>
+
 <footer style="background:#1C1814;color:#A89480;padding:36px 24px;margin-top:40px;font-size:12px;line-height:1.8;text-align:center">
   <div style="max-width:800px;margin:0 auto">
     <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:16px;font-size:11px;color:#6B5E50">

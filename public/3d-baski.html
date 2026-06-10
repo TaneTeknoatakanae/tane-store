@@ -79,6 +79,18 @@
   .btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text);margin-top:8px;text-decoration:none}
   .quote-note{font-size:11px;color:var(--text3);margin-top:12px;line-height:1.5}
   .warn{background:#fff8ec;border:1px solid #ffe0a3;border-radius:9px;padding:10px 12px;font-size:12px;color:#8a5a00;margin-top:12px}
+  /* 60MB+ / hata → müşteri kurtarma paneli */
+  .rescue{margin-top:16px;border:1.5px solid var(--accent);border-radius:14px;padding:20px;background:linear-gradient(135deg,#fff4ec,#fff);text-align:center}
+  .rescue-ic{font-size:34px;margin-bottom:8px}
+  .rescue-t{font-weight:800;font-size:17px;margin-bottom:6px;letter-spacing:-.3px}
+  .rescue-s{font-size:13.5px;color:var(--text2);max-width:440px;margin:0 auto 16px;line-height:1.55}
+  .rescue-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .rescue-btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-weight:700;font-size:14px;padding:11px 18px;border-radius:10px;border:none;cursor:pointer}
+  .rescue-btn.wa{background:#25d366;color:#fff}
+  .rescue-btn.mail{background:var(--accent);color:#fff}
+  .rescue-btn.tel{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+  .rescue-btn:hover{filter:brightness(.95)}
+  .rescue-hint{font-size:11.5px;color:var(--text3);margin-top:12px}
   .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
   @keyframes spin{to{transform:rotate(360deg)}}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1a1a1a;color:#fff;padding:13px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;transition:transform .3s;box-shadow:0 8px 30px rgba(0,0,0,.25)}
@@ -123,6 +135,22 @@
       <input type="file" id="file" accept=".stl,.obj,.3mf" class="hide">
       <div class="file-meta hide" id="file-meta"></div>
       <div class="warn hide" id="upload-warn"></div>
+
+      <!-- 60MB+ / önizlenemeyen dosya → müşteriyi kaçırma, manuel teklife yönlendir -->
+      <div class="rescue hide" id="rescue">
+        <div class="rescue-ic">📨</div>
+        <div class="rescue-t" id="rescue-t">Dosyanız 60 MB'tan büyük — sorun değil!</div>
+        <div class="rescue-s" id="rescue-s">Büyük modelinizi doğrudan bize gönderin; ekibimiz <b>aynı iş günü</b> manuel fiyatlandırıp size dönsün. WeTransfer / Google Drive linki de gönderebilirsiniz.</div>
+        <div class="rescue-actions">
+          <a class="rescue-btn wa" id="rescue-wa" target="_blank" rel="noopener">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 018.413 3.488 11.82 11.82 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.477-.913zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.017-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413z"/></svg>
+            WhatsApp ile Gönder
+          </a>
+          <a class="rescue-btn mail" id="rescue-mail">✉️ E-posta ile Gönder</a>
+          <a class="rescue-btn tel" href="tel:+905323623730">📞 0532 362 37 30</a>
+        </div>
+        <div class="rescue-hint">Çoğu 60 MB+ model, fiyatı düşürmek için sadeleştirilebilir — yine de yardımcı oluruz.</div>
+      </div>
     </div>
 
     <div class="card hide" id="params-card" style="margin-top:20px">
@@ -265,9 +293,10 @@ function dims(geometry){geometry.computeBoundingBox();const s=new THREE.Vector3(
 
 // ── Dosya işle ──
 function handleFile(file){
+  $('rescue').classList.add('hide');
   const ext=(file.name.split('.').pop()||'').toLowerCase();
   if(!['stl','obj','3mf'].includes(ext)){ showWarn('Sadece STL, OBJ veya 3MF dosyaları kabul edilir.'); return; }
-  if(file.size>60*1024*1024){ showWarn('Dosya 60MB sınırını aşıyor.'); return; }
+  if(file.size>60*1024*1024){ showRescue(file); return; }   // 60MB+ → müşteriyi kaçırma, manuel teklife yönlendir
   $('upload-warn').classList.add('hide');
   if(!renderer) initViewer();
   $('drop').style.display='none';
@@ -282,10 +311,10 @@ function handleFile(file){
         let geos=[]; obj.traverse(o=>{if(o.isMesh)geos.push(o.geometry);});
         geometry=geos[0]; // ilk mesh (çoğu OBJ tek parça)
         if(!geometry){showWarn('OBJ içinde geometri bulunamadı.');resetUpload();return;}
-      } else { // 3mf — tarayıcıda parse edilemiyor; hacimsiz, manuel inceleme
-        await uploadAndQuote3mfFallback(file); return;
+      } else { // 3mf — tarayıcıda parse edilemiyor; manuel teklife yönlendir
+        showRescue(file,'3mf'); return;
       }
-    }catch(err){ console.error(err); showWarn('Model okunamadı, dosya bozuk olabilir.'); resetUpload(); return; }
+    }catch(err){ console.error(err); showRescue(file,'fail'); return; }
 
     setMesh(geometry);
     const volMm3=geometryVolume(geometry);
@@ -305,27 +334,43 @@ function handleFile(file){
   if(ext==='obj') reader.readAsText(file); else reader.readAsArrayBuffer(file);
 }
 
-async function uploadAndQuote3mfFallback(file){
-  const up=await doUpload(file); if(!up)return; upload=up;
-  geometryVolumeCm3=0;
-  $('drop').style.display='flex'; $('viewer').style.display='none';
-  $('file-meta').classList.remove('hide');
-  $('file-meta').innerHTML=`<span>Dosya: <b>${file.name}</b></span><span style="color:var(--accent)">3MF önizleme/otomatik fiyat desteklenmiyor — ekibimiz manuel fiyatlandıracak.</span>`;
-  showWarn('3MF dosyaları için anlık fiyat hesaplanamıyor. Yine de yükleyebilir, B2B/iletişim üzerinden teklif alabilirsiniz.');
-}
-
 async function doUpload(file){
   const fd=new FormData(); fd.append('model',file);
   try{
     const r=await fetch('/api/print/upload',{method:'POST',body:fd,credentials:'include'});
     const j=await r.json();
-    if(!r.ok){ showWarn(j.error||'Yükleme başarısız.'); resetUpload(); return null; }
+    if(!r.ok){
+      if(r.status===413) showRescue(file);          // 60MB+ → iletişim CTA
+      else { showWarn(j.error||'Yükleme başarısız.'); resetUpload(); }
+      return null;
+    }
     return j;
   }catch(e){ showWarn('Yükleme sırasında bağlantı hatası.'); resetUpload(); return null; }
 }
 
 function showWarn(msg){const w=$('upload-warn');w.textContent=msg;w.classList.remove('hide');}
 function resetUpload(){ $('drop').style.display='flex'; if($('viewer'))$('viewer').style.display='none'; }
+
+// 60MB+ veya yüklenemeyen dosya → iletişim CTA'sı (müşteriyi kaçırma)
+function showRescue(file, reason){
+  resetUpload();
+  $('upload-warn').classList.add('hide');
+  $('params-card').classList.add('hide'); $('price-content').classList.add('hide'); $('price-empty').classList.remove('hide');
+  const sizeMB = file && file.size ? (file.size/1048576).toFixed(0) : null;
+  const name = file ? file.name : 'modelim';
+  $('rescue-t').textContent =
+    reason==='3mf'  ? '3MF dosyaları için anlık fiyat hesaplanamıyor — ama sizi kaçırmak istemeyiz!' :
+    reason==='fail' ? 'Modeli otomatik okuyamadık — sorun değil, biz hallederiz!' :
+    sizeMB          ? `Dosyanız ${sizeMB} MB — 60 MB sınırını aşıyor, ama sizi kaçırmak istemeyiz!`
+                    : 'Bu dosya otomatik fiyatlandırılamadı — sorun değil!';
+  const waText = encodeURIComponent(`Merhaba, 3D baskı fiyatı almak istiyorum. Modelim "${name}" 60MB üstü; WhatsApp/Drive ile paylaşacağım.`);
+  $('rescue-wa').href = `https://wa.me/905323623730?text=${waText}`;
+  const sub = encodeURIComponent('3D Baskı Teklifi — Büyük Model');
+  const body = encodeURIComponent(`Merhaba,\n\n3D baskı fiyatı almak istiyorum. Model dosyam "${name}" 60MB'tan büyük; ekte veya WeTransfer/Drive linkiyle gönderiyorum.\n\nMateryal:\nDoluluk (%):\nAdet:\nNot:\n\nTeşekkürler.`);
+  $('rescue-mail').href = `mailto:info@tanetekno.com?subject=${sub}&body=${body}`;
+  $('rescue').classList.remove('hide');
+  $('rescue').scrollIntoView({behavior:'smooth',block:'center'});
+}
 
 // ── Fiyat iste (debounce) ──
 function requestQuote(){

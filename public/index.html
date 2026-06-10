@@ -263,6 +263,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
     <div class="ac-drop" id="ac-drop"></div>
   </div>
   <div class="nav-actions">
+    <a href="/3d-baski" class="nav-link" style="color:var(--accent);font-weight:700">🖨️ 3D Baskı</a>
     <a href="/track" class="nav-link">Siparişim</a>
     <div id="auth-nav"><a href="/login" class="nav-link">Giriş</a></div>
     <button class="btn-cart" onclick="toggleCart()" aria-label="Sepeti aç">
@@ -314,6 +315,70 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
     <div><span class="trust-label">7/24 Destek</span><span class="trust-sub">info@tanetekno.com</span></div>
   </div>
 </div>
+
+<!-- 3D BASKI HİZMETİ PROMO — kendi üretimimiz -->
+<style>
+.print-promo{max-width:1200px;margin:44px auto;padding:0 24px}
+.pp-in{background:linear-gradient(120deg,#1a1410 0%,#2a1c10 55%,#e8590c 160%);border-radius:24px;padding:42px 46px;display:grid;grid-template-columns:1.25fr .85fr;gap:36px;align-items:center;overflow:hidden;position:relative;box-shadow:0 24px 60px rgba(232,89,12,.18)}
+.pp-in::after{content:"";position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(253,126,20,.35),transparent 70%);pointer-events:none}
+.pp-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(253,126,20,.18);color:#ffb27a;border:1px solid rgba(253,126,20,.35);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:16px}
+.pp-title{color:#fff;font-size:32px;font-weight:800;line-height:1.12;letter-spacing:-1px;margin-bottom:14px}
+.pp-title span{color:#fd7e14}
+.pp-sub{color:#d8cfc6;font-size:15px;line-height:1.6;margin-bottom:20px;max-width:560px}
+.pp-sub b{color:#fff}
+.pp-feats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
+.pp-feats span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#f0ebe5;font-size:12.5px;font-weight:500;padding:7px 13px;border-radius:10px}
+.pp-ctas{display:flex;gap:12px;flex-wrap:wrap}
+.pp-btn-main{background:#fd7e14;color:#fff;text-decoration:none;font-weight:800;font-size:15.5px;padding:15px 26px;border-radius:12px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(253,126,20,.4);transition:transform .15s,background .15s}
+.pp-btn-main:hover{background:#e8590c;transform:translateY(-2px)}
+.pp-btn-ghost{background:rgba(255,255,255,.1);color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:15px 22px;border-radius:12px;border:1px solid rgba(255,255,255,.2)}
+.pp-btn-ghost:hover{background:rgba(255,255,255,.18)}
+.pp-visual{position:relative;display:flex;align-items:center;justify-content:center;min-height:200px}
+.pp-card{background:rgba(255,255,255,.96);border-radius:18px;padding:22px;width:100%;max-width:300px;box-shadow:0 20px 50px rgba(0,0,0,.35);transform:rotate(-3deg)}
+.pp-cube{font-size:54px;text-align:center;margin-bottom:6px;animation:ppspin 6s linear infinite}
+@keyframes ppspin{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(180deg) scale(1.08)}100%{transform:rotateY(360deg) scale(1)}}
+.pp-card-row{display:flex;justify-content:space-between;font-size:13px;color:#666;padding:5px 0;border-bottom:1px solid #f0f0f0}
+.pp-card-row b{color:#1a1a1a}
+.pp-card-price{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:2px solid #f5f5f5}
+.pp-card-price .lbl{font-size:12px;color:#999}
+.pp-card-price .val{font-size:24px;font-weight:800;color:#e8590c}
+.pp-float{position:absolute;background:#fff;border-radius:12px;padding:8px 13px;font-size:12px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.pp-float.f1{top:6px;left:-6px;color:#25d366}
+.pp-float.f2{bottom:10px;right:-8px;color:#e8590c}
+@media(max-width:860px){.pp-in{grid-template-columns:1fr;padding:30px 22px;text-align:center}.pp-title{font-size:25px}.pp-feats,.pp-ctas{justify-content:center}.pp-sub{margin-left:auto;margin-right:auto}.pp-right{display:none}}
+</style>
+<section class="print-promo">
+  <div class="pp-in">
+    <div class="pp-left">
+      <div class="pp-badge">🖨️ Kendi atölyemiz · Tane 3D</div>
+      <h2 class="pp-title">Aklındaki parçayı <span>3D bastıralım.</span></h2>
+      <p class="pp-sub">Modelini yükle, materyal ve doluluğu seç — <b>30 saniyede fiyatını gör</b>. Prototip, yedek parça, figür, hediyelik… hayalini kurduğun her şeyi endüstriyel kalitede üretip kapına gönderiyoruz.</p>
+      <div class="pp-feats">
+        <span>⚡ Anında otomatik fiyat</span>
+        <span>🎨 10+ materyal</span>
+        <span>🔍 3D önizleme</span>
+        <span>🚚 Kapına teslim</span>
+      </div>
+      <div class="pp-ctas">
+        <a href="/3d-baski" class="pp-btn-main">Modelini Yükle, Fiyat Al →</a>
+        <a href="/3d-baski" class="pp-btn-ghost">Nasıl çalışır?</a>
+      </div>
+    </div>
+    <div class="pp-right">
+      <div class="pp-visual">
+        <div class="pp-card">
+          <div class="pp-cube">🧊</div>
+          <div class="pp-card-row"><span>Materyal</span><b>PETG</b></div>
+          <div class="pp-card-row"><span>Doluluk</span><b>%20</b></div>
+          <div class="pp-card-row"><span>Tahmini süre</span><b>3.4 saat</b></div>
+          <div class="pp-card-price"><span class="lbl">Anlık fiyat</span><span class="val">₺184,50</span></div>
+        </div>
+        <div class="pp-float f1">✓ Dosya yüklendi</div>
+        <div class="pp-float f2">⚡ Fiyat hazır</div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- PRODUCTS -->
 <main class="products-wrap" id="products">
@@ -425,6 +490,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
       </div>
       <div class="footer-col">
         <h4>Yardım</h4>
+        <a href="/3d-baski" style="color:#fd7e14;font-weight:600">🖨️ 3D Baskı Hizmeti</a>
         <a href="/track">Sipariş Takibi</a>
         <a href="/hesabim">Hesabım</a>
         <a href="/iletisim">İletişim</a>
