@@ -282,6 +282,7 @@ app.get('/iletisim', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 app.get('/kvkk', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kvkk.html')));
 app.get('/cerez-politikasi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cerez-politikasi.html')));
 app.get('/on-bilgilendirme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'on-bilgilendirme.html')));
+app.get('/kullanim-sartlari', (req, res) => res.sendFile(path.join(__dirname, 'public', 'kullanim-sartlari.html')));
 app.get('/odeme', (req, res) => res.sendFile(path.join(__dirname, 'public', 'odeme.html')));
 
 // ─── Google Merchant Center Product Feed (RSS/XML) ───
@@ -381,7 +382,8 @@ app.get('/sitemap.xml', (req, res) => {
     { url: '/kvkk',              pri: '0.3', freq: 'yearly'  },
     { url: '/cerez-politikasi',  pri: '0.3', freq: 'yearly'  },
     { url: '/mesafeli-satis',    pri: '0.3', freq: 'yearly'  },
-    { url: '/on-bilgilendirme',  pri: '0.3', freq: 'yearly'  }
+    { url: '/on-bilgilendirme',  pri: '0.3', freq: 'yearly'  },
+    { url: '/kullanim-sartlari',  pri: '0.4', freq: 'yearly' }
   ];
   db.all('SELECT id, name, COALESCE(category, \'\') AS category, created_at FROM products WHERE is_active = TRUE', [], (err, rows) => {
     const escape = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
