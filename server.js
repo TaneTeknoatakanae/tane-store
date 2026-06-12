@@ -75,6 +75,23 @@ const upload = multer({
 
 app.set('trust proxy', 1); // Railway reverse proxy
 app.use(cors({ origin: true, credentials: true }));
+
+// ── Ortak partial enjeksiyonu ────────────────────────────────────────────────
+// res.sendFile'ı sar: .html servis edilirken <!--P:anahtar--> işaretlerini
+// partials.js'teki değerlerle değiştir. Böylece tüm sendFile route'ları
+// (politika sayfaları, anasayfalar vb.) tek satır değişmeden partial'ları alır.
+const { applyPartials } = require('./partials');
+app.use((req, res, next) => {
+  const origSendFile = res.sendFile.bind(res);
+  res.sendFile = (fp, ...rest) => {
+    if (String(fp).endsWith('.html')) {
+      require('fs').readFile(fp, 'utf8', (err, html) =>
+        err ? origSendFile(fp, ...rest) : res.send(applyPartials(html)));
+    } else origSendFile(fp, ...rest);
+  };
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
@@ -191,6 +208,7 @@ function serveProductPage(p, req, res) {
     <script>window.__PID__=${p.id};</script>`;
   html = html.replace('<!-- OG_META -->', meta);
   html = html.replace('<title>Tane Store — Ürün</title>', `<title>${title}</title>`);
+  html = applyPartials(html);
   // Ürün görüntüleme analitiği
   try {
     const ua = req.headers['user-agent'] || '';
@@ -244,7 +262,16 @@ app.use((req, res, next) => {
 // API endpoint'lerini Google'dan gizle
 app.use('/api', (req, res, next) => { res.set('X-Robots-Tag', 'noindex, nofollow'); next(); });
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Doğrudan /x.html erişiminde de partial'ları uygula (express.static'ten önce)
+const PUBLIC_DIR = path.join(__dirname, 'public');
+app.get(/\.html$/, (req, res, next) => {
+  const fp = path.join(PUBLIC_DIR, req.path);
+  if (!fp.startsWith(PUBLIC_DIR)) return next();
+  require('fs').readFile(fp, 'utf8', (err, html) => err ? next() : res.send(applyPartials(html)));
+});
+
+// index:false → '/' ve '/araclar' kendi route'larına düşsün (partial enjeksiyonu için)
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 // Fotoğraf yükleme endpoint'i — admin only
 app.post('/api/upload', upload.single('image'), adminAuth, (req, res) => {
