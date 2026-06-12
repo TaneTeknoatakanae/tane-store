@@ -127,80 +127,101 @@ app.get('/admin.html', (req, res, next) => {
   next(); // serve the file
 });
 
-// SEO: Serve product.html with injected meta tags for crawlers
-app.get('/product.html', (req, res, next) => {
-  const { id } = req.query;
-  if (!id) return next();
-  db.get('SELECT * FROM products WHERE id = ?', [id], (err, p) => {
-    if (err || !p) return next();
-    // Pasif ürün: admin değilse 404 sayfasına yönlendir (SEO için noindex)
-    const isAdmin = !!(req.session && req.session.isAdmin);
-    if (p.is_active === false && !isAdmin) {
-      return res.status(404).sendFile(path.join(__dirname, 'public', 'product.html'));
-    }
-    const fs = require('fs');
-    let html = fs.readFileSync(path.join(__dirname, 'public', 'product.html'), 'utf8');
-    const SITE = 'https://www.tanetekno.com';
-    const title = `${p.name} — Tane Store`;
-    // Açıklamadan HTML etiketlerini temizle — meta/OG description düz metin olmalı (Google snippet'i)
-    const stripTags = s => String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
-    const descText = stripTags(p.description) || `${p.name} - Tane Store'da satın al`;
-    const desc = descText.substring(0, 160).replace(/"/g, '&quot;');
-    const imgAbs = p.image_url
-      ? (p.image_url.startsWith('http') ? p.image_url : `${SITE}${p.image_url}`)
-      : `${SITE}/AmblemTane.png`;
-    const price = p.discount_price || p.tane_price || 0;
-    const cleanDesc = (str) => String(str||'').replace(/"/g, '\\"').replace(/\n/g,' ').replace(/<[^>]+>/g,'').substring(0,500);
-    const availability = (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
-    const jsonLd = {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "name": p.name,
-      "description": cleanDesc(p.description || p.name),
-      "image": imgAbs,
-      "sku": p.sku || `TANE-${p.id}`,
-      "brand": { "@type": "Brand", "name": p.brand || "Tane Store" },
-      "url": `${SITE}/product.html?id=${id}`,
-      "offers": {
-        "@type": "Offer",
-        "url": `${SITE}/product.html?id=${id}`,
-        "priceCurrency": "TRY",
-        "price": price.toFixed(2),
-        "availability": availability,
-        "itemCondition": "https://schema.org/NewCondition",
-        "shippingDetails": {
-          "@type": "OfferShippingDetails",
-          "shippingRate": { "@type": "MonetaryAmount", "value": price >= 4000 ? "0" : "49.90", "currency": "TRY" },
-          "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "TR" },
-          "deliveryTime": {
-            "@type": "ShippingDeliveryTime",
-            "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 1, "unitCode": "DAY" },
-            "transitTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 3, "unitCode": "DAY" }
-          }
-        },
-        "hasMerchantReturnPolicy": {
-          "@type": "MerchantReturnPolicy",
-          "applicableCountry": "TR",
-          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-          "merchantReturnDays": 14,
-          "returnMethod": "https://schema.org/ReturnByMail",
-          "returnFees": "https://schema.org/FreeReturn"
+// Ürün sayfasını SEO meta'larıyla (SSR) servis et — /urun/<slug>
+function serveProductPage(p, req, res) {
+  const fs = require('fs');
+  let html = fs.readFileSync(path.join(__dirname, 'public', 'product.html'), 'utf8');
+  const SITE = 'https://www.tanetekno.com';
+  const url = `${SITE}/urun/${p.slug}`;
+  const title = `${p.name} — Tane Store`;
+  const stripTags = s => String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  const descText = stripTags(p.description) || `${p.name} - Tane Store'da satın al`;
+  const desc = descText.substring(0, 160).replace(/"/g, '&quot;');
+  const imgAbs = p.image_url
+    ? (p.image_url.startsWith('http') ? p.image_url : `${SITE}${p.image_url}`)
+    : `${SITE}/AmblemTane.png`;
+  const price = p.discount_price || p.tane_price || 0;
+  const cleanDesc = (str) => String(str||'').replace(/"/g, '\\"').replace(/\n/g,' ').replace(/<[^>]+>/g,'').substring(0,500);
+  const availability = (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": p.name,
+    "description": cleanDesc(p.description || p.name),
+    "image": imgAbs,
+    "sku": p.sku || `TANE-${p.id}`,
+    "brand": { "@type": "Brand", "name": p.brand || "Tane Store" },
+    "url": url,
+    "offers": {
+      "@type": "Offer",
+      "url": url,
+      "priceCurrency": "TRY",
+      "price": price.toFixed(2),
+      "availability": availability,
+      "itemCondition": "https://schema.org/NewCondition",
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": { "@type": "MonetaryAmount", "value": price >= 4000 ? "0" : "49.90", "currency": "TRY" },
+        "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "TR" },
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 1, "unitCode": "DAY" },
+          "transitTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 3, "unitCode": "DAY" }
         }
+      },
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": "TR",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 14,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnFees": "https://schema.org/FreeReturn"
       }
-    };
-    const canonical = `${SITE}/product.html?id=${id}`;
-    const meta = `<link rel="canonical" href="${canonical}">
+    }
+  };
+  const meta = `<link rel="canonical" href="${url}">
     <meta name="description" content="${desc}">
     <meta property="og:title" content="${title.replace(/"/g,'&quot;')}">
     <meta property="og:description" content="${desc}">
     <meta property="og:image" content="${imgAbs}">
-    <meta property="og:url" content="${canonical}">
+    <meta property="og:url" content="${url}">
     <meta property="og:type" content="product">
     <meta name="twitter:card" content="summary_large_image">
-    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`;
-    html = html.replace('<!-- OG_META -->', meta);
-    html = html.replace('<title>Tane Store — Ürün</title>', `<title>${title}</title>`);
-    res.send(html);
+    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+    <script>window.__PID__=${p.id};</script>`;
+  html = html.replace('<!-- OG_META -->', meta);
+  html = html.replace('<title>Tane Store — Ürün</title>', `<title>${title}</title>`);
+  // Ürün görüntüleme analitiği
+  try {
+    const ua = req.headers['user-agent'] || '';
+    const device = /mobile|android|iphone|ipad/i.test(ua) ? 'mobile' : 'desktop';
+    const referrer = (req.headers['referer'] || '').substring(0, 200);
+    const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
+    const ip_hash = crypto.createHash('md5').update(ip).digest('hex');
+    db.run('INSERT INTO pageviews (page, referrer, device, ip_hash, product_id) VALUES (?, ?, ?, ?, ?)',
+      ['/product.html', referrer, device, ip_hash, p.id]);
+  } catch (_) {}
+  res.send(html);
+}
+
+// SEO-dostu ürün URL'i: /urun/<slug>
+app.get('/urun/:slug', (req, res) => {
+  db.get('SELECT * FROM products WHERE slug = ?', [req.params.slug], (err, p) => {
+    if (err || !p) return res.status(404).sendFile(path.join(__dirname, 'public', 'product.html'));
+    const isAdmin = !!(req.session && req.session.isAdmin);
+    if (p.is_active === false && !isAdmin) return res.status(404).sendFile(path.join(__dirname, 'public', 'product.html'));
+    serveProductPage(p, req, res);
+  });
+});
+
+// Eski URL /product.html?id=X → kalıcı 301 ile /urun/<slug> (SEO otoritesi korunur)
+app.get('/product.html', (req, res, next) => {
+  const { id } = req.query;
+  if (!id) return next();
+  db.get('SELECT id, slug, name, is_active FROM products WHERE id = ?', [id], (err, p) => {
+    if (err || !p) return next();
+    if (!p.slug) { p.slug = require('./utils/slugify').slugify(p.name); db.run('UPDATE products SET slug = ? WHERE id = ? AND slug IS NULL', [p.slug, p.id], () => {}); }
+    return res.redirect(301, `/urun/${p.slug}`);
   });
 });
 
@@ -329,7 +350,7 @@ app.get('/feed/products.xml', (req, res) => {
       <g:id>${p.id}</g:id>
       <g:title>${esc(p.name.substring(0, 150))}</g:title>
       <g:description>${esc(desc.substring(0, 5000))}</g:description>
-      <g:link>${SITE}/product.html?id=${p.id}</g:link>
+      <g:link>${p.slug ? `${SITE}/urun/${esc(p.slug)}` : `${SITE}/product.html?id=${p.id}`}</g:link>
       <g:image_link>${esc(imgUrl)}</g:image_link>${additionalImages}
       <g:price>${p.tane_price.toFixed(2)} TRY</g:price>
       ${salePrice ? `<g:sale_price>${salePrice.toFixed(2)} TRY</g:sale_price>` : ''}
@@ -386,7 +407,7 @@ app.get('/sitemap.xml', (req, res) => {
     { url: '/on-bilgilendirme',  pri: '0.3', freq: 'yearly'  },
     { url: '/kullanim-sartlari',  pri: '0.4', freq: 'yearly' }
   ];
-  db.all('SELECT id, name, COALESCE(category, \'\') AS category, created_at FROM products WHERE is_active = TRUE', [], (err, rows) => {
+  db.all('SELECT id, name, slug, COALESCE(category, \'\') AS category, created_at FROM products WHERE is_active = TRUE', [], (err, rows) => {
     const escape = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
     const items = [];
     staticPages.forEach(p => items.push(
@@ -408,7 +429,8 @@ app.get('/sitemap.xml', (req, res) => {
     // Products
     (rows || []).forEach(r => {
       const lastmod = r.created_at ? new Date(r.created_at).toISOString().split('T')[0] : today;
-      items.push(`<url><loc>${SITE}/product.html?id=${r.id}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+      const loc = r.slug ? `${SITE}/urun/${escape(r.slug)}` : `${SITE}/product.html?id=${r.id}`;
+      items.push(`<url><loc>${loc}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
     });
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items.join('\n')}\n</urlset>`;
     res.set('Content-Type', 'application/xml; charset=utf-8');

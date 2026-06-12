@@ -413,6 +413,25 @@ async function initDB() {
       console.log('Lazer fiyat config seed edildi');
     }
 
+    // ── SEO: ürün slug'ları (/urun/<slug>) ─────────────────
+    await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS slug TEXT`);
+    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS products_slug_idx ON products(slug) WHERE slug IS NOT NULL`);
+    try {
+      const { slugify } = require('../utils/slugify');
+      const missing = await pool.query('SELECT id, name FROM products WHERE slug IS NULL ORDER BY id');
+      if (missing.rows.length) {
+        const used = new Set((await pool.query('SELECT slug FROM products WHERE slug IS NOT NULL')).rows.map(r => r.slug));
+        for (const r of missing.rows) {
+          const base = slugify(r.name);
+          let s = used.has(base) ? `${base}-${r.id}` : base;
+          while (used.has(s)) s = `${base}-${r.id}-${Math.floor(Math.random() * 1000)}`;
+          used.add(s);
+          await pool.query('UPDATE products SET slug = $1 WHERE id = $2', [s, r.id]);
+        }
+        console.log(`${missing.rows.length} ürün slug backfill edildi`);
+      }
+    } catch (e) { console.error('slug backfill hatası:', e.message); }
+
     console.log('PostgreSQL veritabani hazir');
   } catch(e) {
     console.error('DB hatasi:', e.message);

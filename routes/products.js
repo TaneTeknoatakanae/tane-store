@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../database/db');
 const adminAuth = require('../middleware/adminAuth');
 const { audit } = adminAuth;
+const { slugify } = require('../utils/slugify');
 
 // Tüm ürünleri getir
 router.get('/', (req, res) => {
@@ -42,6 +43,14 @@ router.get('/', (req, res) => {
     ORDER BY p.created_at DESC
   `, params, (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
+    // Slug'ı olmayan ürünlere üret (akakce/scrape ile eklenenler için emniyet)
+    const used = new Set((rows || []).filter(r => r.slug).map(r => r.slug));
+    (rows || []).filter(r => !r.slug).forEach(r => {
+      const base = slugify(r.name);
+      const s = used.has(base) ? `${base}-${r.id}` : base;
+      used.add(s); r.slug = s;
+      db.run('UPDATE products SET slug = ? WHERE id = ? AND slug IS NULL', [s, r.id], () => {});
+    });
     res.json(rows);
   });
 });
@@ -62,6 +71,13 @@ router.get('/:id', (req, res) => {
     if (!product) return res.status(404).json({ error: 'Ürün bulunamadı' });
     // Pasif ürünleri public için gizle (admin görebilir)
     if (product.is_active === false && !isAdmin) return res.status(404).json({ error: 'Ürün bulunamadı' });
+    if (!product.slug) {
+      const base = slugify(product.name);
+      product.slug = base;
+      db.run('UPDATE products SET slug = ? WHERE id = ? AND slug IS NULL', [base, product.id], (e) => {
+        if (e) db.run('UPDATE products SET slug = ? WHERE id = ? AND slug IS NULL', [`${base}-${product.id}`, product.id], () => {});
+      });
+    }
     db.all('SELECT * FROM prices WHERE product_id = ? ORDER BY price ASC', [req.params.id], (err, prices) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ ...product, prices });

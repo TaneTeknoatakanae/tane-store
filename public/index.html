@@ -660,12 +660,12 @@ function renderProducts(list) {
       ? `<img class="card-img" src="${p.image_url}" alt="${p.name}" loading="lazy" onerror="this.outerHTML='<div class=card-img-ph>—</div>'">`
       : `<div class="card-img-ph">—</div>`;
     return `<article class="card">
-      <div class="card-img-wrap" onclick="window.location.href='/product.html?id=${p.id}'">
+      <div class="card-img-wrap" onclick="window.location.href='${p.slug ? '/urun/' + p.slug : '/product.html?id=' + p.id}'">
         ${imgEl}
         ${disc > 0 ? `<span class="card-badge">-%${disc}</span>` : ''}
       </div>
       <div class="card-body">
-        <div class="card-name" onclick="window.location.href='/product.html?id=${p.id}'">${p.name}</div>
+        <div class="card-name" onclick="window.location.href='${p.slug ? '/urun/' + p.slug : '/product.html?id=' + p.id}'">${p.name}</div>
         ${ratingHtml}
         <div class="card-price-row">
           <span class="card-price${disc > 0 ? ' sale' : ''}">${price > 0 ? price.toLocaleString('tr-TR') + ' ₺' : 'Fiyat bekleniyor'}</span>
@@ -820,7 +820,7 @@ function handleSearch() {
   if (q.length < 2) { drop.style.display = 'none'; return; }
   const matches = allProducts.filter(p => p.name.toLowerCase().includes(q) || (p.brand || '').toLowerCase().includes(q)).slice(0, 5);
   if (!matches.length) { drop.style.display = 'none'; return; }
-  drop.innerHTML = matches.map(p => `<div class="ac-item" onmousedown="window.location.href='/product.html?id=${p.id}'">
+  drop.innerHTML = matches.map(p => `<div class="ac-item" onmousedown="window.location.href='${p.slug ? '/urun/' + p.slug : '/product.html?id=' + p.id}'">
     <img class="ac-img" src="${p.image_url || ''}" alt="" onerror="this.style.display='none'" loading="lazy"/>
     <span class="ac-name">${p.name}</span>
     <span class="ac-price">${ep(p) > 0 ? ep(p).toLocaleString('tr-TR') + ' ₺' : ''}</span>

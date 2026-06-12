@@ -386,7 +386,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 <script>
 const params = new URLSearchParams(window.location.search);
-const productId = params.get('id');
+const productId = window.__PID__ || params.get('id');
 let product = null, cart = [], wishlist = [], currentUser = null, selectedRating = 0;
 let galleryImages = [], currentImg = 0;
 
@@ -715,7 +715,7 @@ async function loadSimilar() {
       <div class="section-title">Benzer Ürünler</div>
       <div class="similar-grid">${similar.map(p => {
         const ep = p.discount_price || p.tane_price;
-        return `<div class="sim-card" onclick="window.location.href='/product.html?id=${p.id}'">
+        return `<div class="sim-card" onclick="window.location.href='${p.slug ? '/urun/'+p.slug : '/product.html?id='+p.id}'">
           <img class="sim-img" src="${p.image_url || ''}" alt="${p.name}" loading="lazy" onerror="this.style.visibility='hidden'"/>
           <div class="sim-body">
             <div class="sim-name">${p.name}</div>
