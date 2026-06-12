@@ -443,6 +443,7 @@ function loadPaytrTaksit(price) {
     @media(max-width:260px){#paytr_taksit_tablosu{grid-template-columns:1fr}}
   </style></head><body><div id="paytr_taksit_tablosu"></div>
   <script src="${scriptUrl}"><\/script><script src="/whatsapp.js" defer><\/script>
+<!--P:footer-->
 </body></html>`;
   target.innerHTML = '<iframe class="paytr-taksit-iframe" id="paytr-taksit-iframe"></iframe>';
   const iframe = document.getElementById('paytr-taksit-iframe');
@@ -844,30 +845,7 @@ initAuth().then(() => loadProduct());
   </div>
 </a>
 
-<footer style="background:#1C1814;color:#A89480;padding:36px 24px;margin-top:40px;font-size:12px;line-height:1.8;text-align:center">
-  <div style="max-width:800px;margin:0 auto">
-    <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:16px;font-size:11px;color:#6B5E50">
-      <span>🔒 SSL Korumalı</span>
-      <span>💳 3D Secure Ödeme</span>
-      <span>🚚 1-3 İş Günü Kargo</span>
-      <span>↩️ 14 Gün İade</span>
-    </div>
-    <strong style="color:#FDFAF6"><!--P:biz.name--></strong><br>
-    <!--P:biz.address--><br>
-    <a href="tel:+905323623730" style="color:#C49660;text-decoration:none">+90 532 362 37 30</a> ·
-    <a href="mailto:info@tanetekno.com" style="color:#C49660;text-decoration:none">info@tanetekno.com</a><br>
-    Vergi No: 3280623883 · Kozyatağı Vergi Dairesi<br>
-    <div style="margin-top:10px">
-      <a href="/teslimat-iade" style="color:#A89480">Teslimat & İade</a> ·
-      <a href="/gizlilik" style="color:#A89480">Gizlilik Politikası</a> ·
-      <a href="/mesafeli-satis" style="color:#A89480">Mesafeli Satış Sözleşmesi</a> ·
-      <a href="/kvkk" style="color:#A89480">KVKK</a> ·
-      <a href="/hakkimizda" style="color:#A89480">Hakkımızda</a> ·
-      <a href="/iletisim" style="color:#A89480">İletişim</a>
-    </div>
-    <div style="margin-top:8px;color:#4a4440">© 2025 Tane Store — Tüm hakları saklıdır.</div>
-  </div>
-</footer>
+
 <script src="/price-compare.js" defer></script>
 <script src="/whatsapp.js" defer></script>
 </body>
