@@ -70,8 +70,30 @@ const FOOTER = `<style>
   </div>
 </footer>`;
 
+// Ortak basit üst menü (ikincil sayfalar için — storefront nav'ları kendi etkileşimli yapısında kalır)
+const NAV = `<style>
+.tnv{position:sticky;top:0;z-index:100;background:rgba(253,250,246,.92);backdrop-filter:blur(12px);border-bottom:1px solid #ece4d8;font-family:'Inter',-apple-system,sans-serif}
+.tnv-in{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;gap:12px}
+.tnv-logo{font-weight:800;font-size:18px;text-decoration:none;color:#1a1a1a;display:flex;align-items:center;gap:8px;letter-spacing:-.5px}
+.tnv-logo img{height:28px}
+.tnv-sp{flex:1}
+.tnv-a{text-decoration:none;color:#555;font-weight:500;font-size:14px;padding:8px 12px;border-radius:8px;white-space:nowrap}
+.tnv-a:hover{color:#1a1a1a;background:#f5f0e8}
+.tnv-a.accent{color:#e8590c;font-weight:700}
+@media(max-width:560px){.tnv-a{padding:6px 7px;font-size:12.5px}.tnv-logo span{display:none}}
+</style>
+<nav class="tnv"><div class="tnv-in">
+  <a href="/" class="tnv-logo"><img src="/AmblemTane.png" alt="Tane Store" onerror="this.style.display='none'"><span>Tane Store</span></a>
+  <span class="tnv-sp"></span>
+  <a href="/" class="tnv-a">Mağaza</a>
+  <a href="/3d-baski" class="tnv-a accent">🖨️ 3D Baskı</a>
+  <a href="/lazer" class="tnv-a accent">⚡ Lazer</a>
+  <a href="/araclar" class="tnv-a">3D Araçlar</a>
+</div></nav>`;
+
 const PARTIALS = {
   'footer':        FOOTER,
+  'nav':           NAV,
   'biz.name':      BUSINESS.name,
   'biz.address':   BUSINESS.address,
   'biz.phone':     BUSINESS.phone,
